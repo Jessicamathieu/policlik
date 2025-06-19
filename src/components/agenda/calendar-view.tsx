@@ -2,9 +2,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AppointmentModal } from './appointment-modal'; 
 import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface Appointment {
   id: string;
@@ -84,10 +85,10 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
         {timeSlots.map((slot, index) => (
           <div 
             key={slot} 
-            className={`flex items-center justify-center p-2 text-xs border-b ${index % 2 === 0 ? 'font-semibold' : ''}`} // index % 2 for 30-min slots means on the hour
-            style={{ height: `${slotHeightPx * 2}px` }} // Each displayed slot represents an hour (2 * 30 min)
+            className={`flex items-center justify-center p-2 text-xs border-b ${index % 2 === 0 ? 'font-semibold' : ''}`}
+            style={{ height: `${slotHeightPx * 2}px` }} 
           >
-            {index % 2 === 0 ? slot : ''} {/* Display time only at the hour mark */}
+            {index % 2 === 0 ? slot : ''} 
           </div>
         ))}
       </div>
@@ -100,27 +101,25 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
           <div 
             key={slotIndex} 
             className="border-b relative cursor-pointer hover:bg-muted/50 transition-colors"
-            style={{ height: `${slotHeightPx}px` }} // height of one 30-minute slot
+            style={{ height: `${slotHeightPx}px` }} 
             onClick={() => handleSlotClick(slot)}
             role="button"
             tabIndex={0}
             aria-label={`Créer un rendez-vous à ${slot}`}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSlotClick(slot);}}
           >
-            {/* Placeholder for dropping/creating new appointments */}
           </div>
         ))}
         {/* Render appointments */}
         {appointments.filter(app => {
-          const appDate = new Date(app.date + 'T00:00:00'); // Ensure date parsing is consistent
+          const appDate = new Date(app.date + 'T00:00:00'); 
           return appDate.toDateString() === currentDate.toDateString();
         }).map(app => {
-          const startHour = 6; // Calendar view starts at 6 AM
+          const startHour = 6; 
           const startMinutes = timeToMinutes(app.startTime);
           const endMinutes = timeToMinutes(app.endTime);
           const durationMinutes = endMinutes - startMinutes;
 
-          // Calculations based on 30-minute intervals
           const topOffset = ((startMinutes - (startHour * 60)) / 30) * slotHeightPx; 
           const height = (durationMinutes / 30) * slotHeightPx;
 
@@ -128,14 +127,14 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
             <AppointmentModal 
               key={app.id}
               appointment={app}
-              onSave={onAppointmentUpdate} // Editing existing uses onAppointmentUpdate
+              onSave={onAppointmentUpdate} 
               trigger={
                 <button
                   className="absolute left-1 right-1 p-1.5 text-left text-xs bg-primary/90 text-primary-foreground rounded shadow-md hover:bg-primary transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                   style={{
                     top: `${topOffset}px`, 
-                    height: `${height}px`,
-                    minHeight: `${slotHeightPx}px` // Min height for visibility (30 min)
+                    height: `${Math.max(height, slotHeightPx)}px`, // Ensure min height for visibility
+                    minHeight: `${slotHeightPx}px` 
                   }}
                   aria-label={`Rendez-vous: ${app.clientName} de ${app.startTime} à ${app.endTime}`}
                 >
@@ -149,15 +148,14 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
           );
         })}
       </div>
-      {/* Modal for creating appointments by clicking on a slot */}
       {isSlotModalOpen && slotInitialData && (
         <AppointmentModal
           open={isSlotModalOpen}
           onOpenChange={setIsSlotModalOpen}
-          appointment={slotInitialData} // Pass initial start time and date
+          appointment={slotInitialData} 
           onSave={(newData) => {
-            onNewAppointmentSave(newData); // Creating new uses onNewAppointmentSave
-            setIsSlotModalOpen(false); // Close modal on save
+            onNewAppointmentSave(newData); 
+            setIsSlotModalOpen(false); 
           }}
         />
       )}
@@ -173,14 +171,11 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
           {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(day => (
             <div key={day} className="p-2 text-sm font-medium bg-card text-center">{day}</div>
           ))}
-          {/* Placeholder: This needs full implementation similar to day view but repeated for each day */}
-          {timeSlots.map(slot => ( // timeSlots are now 30-min
+          {timeSlots.map(slot => ( 
             <React.Fragment key={slot}>
-              {/* Display time only at the hour mark */}
               <div className={`h-10 flex items-center justify-center p-1 text-xs border-b bg-card sticky left-0 z-10 ${slot.endsWith(':00') ? 'font-semibold' : ''}`}>{slot.endsWith(':00') ? slot : ''}</div>
               {Array(7).fill(null).map((_, dayIndex) => (
                 <div key={`${slot}-${dayIndex}`} className="h-10 border-b border-l bg-card hover:bg-muted/50 cursor-pointer">
-                  {/* Placeholder for appointments on this slot/day */}
                 </div>
               ))}
             </React.Fragment>
@@ -191,15 +186,53 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
   );
 
   const renderMonthView = () => (
-    <Card>
+    <Card className="shadow-md">
+      <CardHeader>
+        <CardTitle className="font-headline">Liste des Rendez-vous du Mois</CardTitle>
+      </CardHeader>
       <CardContent className="p-4">
-        <p className="text-muted-foreground text-center">Vue Mois à implémenter.</p>
-        <div className="mt-4 p-6 bg-muted/30 rounded-lg">
-            <p>Affichage du calendrier mensuel ici. Cliquez sur un jour pour voir les détails.</p>
-        </div>
+        {appointments.length > 0 ? (
+          <div className="space-y-4">
+            {appointments
+              .sort((a, b) => { // Sort by date then by start time
+                const dateA = new Date(a.date + 'T' + a.startTime);
+                const dateB = new Date(b.date + 'T' + b.startTime);
+                return dateA.getTime() - dateB.getTime();
+              })
+              .map(app => (
+              <div key={app.id} className="p-4 bg-card border rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <h3 className="font-semibold text-lg text-primary">{app.clientName || 'Client non spécifié'}</h3>
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium">Date:</span> {format(new Date(app.date + 'T00:00:00'), 'EEEE dd MMMM yyyy', { locale: fr })}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium">Heure:</span> {app.startTime} - {app.endTime}
+                </p>
+                {app.serviceName && (
+                  <p className="text-sm text-muted-foreground"><span className="font-medium">Service:</span> {app.serviceName}</p>
+                )}
+                {app.address && (
+                  <p className="text-sm text-muted-foreground"><span className="font-medium">Adresse:</span> {app.address}</p>
+                )}
+                {app.description && (
+                  <p className="text-sm mt-1"><span className="font-medium">Description:</span> {app.description}</p>
+                )}
+                 {app.workDone && (
+                  <p className="text-sm mt-1"><span className="font-medium">Travail effectué:</span> {app.workDone}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-center py-8">Aucun rendez-vous programmé pour ce mois.</p>
+        )}
+        <p className="text-xs text-muted-foreground mt-6 text-center">
+          Pour imprimer cette liste avec des options de champs, utilisez le bouton "Imprimer" en haut de la page Agenda.
+        </p>
       </CardContent>
     </Card>
   );
+
 
   switch (view) {
     case "day":

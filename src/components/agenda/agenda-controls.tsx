@@ -1,8 +1,9 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { AppointmentModal } from "./appointment-modal";
-import { PlusCircle, Calendar, Rows, Columns } from "lucide-react";
+import { PlusCircle, Calendar, Rows, Columns, Printer } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -14,10 +15,11 @@ import {
 interface AgendaControlsProps {
   currentView: "day" | "week" | "month";
   onViewChange: (view: "day" | "week" | "month") => void;
-  onNewAppointmentSave: (appointmentData: any) => void; // Replace 'any' with your Appointment type
+  onNewAppointmentSave: (appointmentData: any) => void;
+  onPrintAppointments: () => void; 
 }
 
-export function AgendaControls({ currentView, onViewChange, onNewAppointmentSave }: AgendaControlsProps) {
+export function AgendaControls({ currentView, onViewChange, onNewAppointmentSave, onPrintAppointments }: AgendaControlsProps) {
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-4 bg-card rounded-lg shadow">
       <div className="flex items-center gap-2">
@@ -36,7 +38,9 @@ export function AgendaControls({ currentView, onViewChange, onNewAppointmentSave
       
       <div className="flex items-center gap-2">
         <Button variant="outline">Client</Button>
-        <Button variant="outline">Éditer</Button>
+        <Button variant="outline" onClick={onPrintAppointments}>
+          <Printer className="mr-2 h-4 w-4" /> Imprimer
+        </Button>
         <AppointmentModal
           trigger={
             <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
