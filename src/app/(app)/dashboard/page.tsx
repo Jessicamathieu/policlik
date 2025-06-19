@@ -55,21 +55,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {summaryCards.map((item, index) => (
-          <Card key={index} className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-border/70">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
-              <item.icon className={`h-5 w-5 ${item.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{item.value}</div>
-              <p className="text-xs text-muted-foreground">{item.description}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
+      {/* Today's Appointments and Revenue Overview (Moved Up) */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Today's Appointments Section */}
         <Card className="shadow-lg md:col-span-1">
@@ -134,7 +120,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Revenue Overview - Kept as is */}
+        {/* Revenue Overview */}
         <Card className="shadow-md md:col-span-1">
           <CardHeader>
             <CardTitle className="font-headline">Aperçu des Revenus</CardTitle>
@@ -149,6 +135,22 @@ export default function DashboardPage() {
              <p className="text-sm text-muted-foreground mt-2 text-center">Données de démonstration. Intégration graphique complète à venir.</p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {summaryCards.map((item, index) => (
+          <Card key={index} className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-border/70">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
+              <item.icon className={`h-5 w-5 ${item.color}`} />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{item.value}</div>
+              <p className="text-xs text-muted-foreground">{item.description}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );
