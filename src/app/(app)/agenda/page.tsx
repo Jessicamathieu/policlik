@@ -6,6 +6,7 @@ import { AgendaControls, type AgendaControlsProps } from '@/components/agenda/ag
 import { CalendarView } from '@/components/agenda/calendar-view';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 // Définition locale du type Appointment pour cette page
 interface Appointment {
@@ -38,10 +39,10 @@ export default function AgendaPage() {
 
   useEffect(() => {
     const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
+    const todayStr = format(today, "yyyy-MM-dd");
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    const tomorrowStr = format(tomorrow, "yyyy-MM-dd");
     setAppointments([
       { id: '1', clientId: '1', clientName: 'Jean Dupont', serviceId: 'SERV001', serviceName: 'Nettoyage Standard Résidentiel', date: todayStr, startTime: '09:00', endTime: '10:00', description: 'Nettoyage standard', workDone: '', address: '123 Rue Principale, Paris', phone: '0123456789', smsReminder: false },
       { id: '2', clientId: '2', clientName: 'Marie Curie', serviceId: 'SERV002', serviceName: 'Grand Ménage de Printemps', date: todayStr, startTime: '11:00', endTime: '12:30', description: 'Grand ménage', workDone: 'Tout est propre', address: '456 Avenue des Sciences, Lyon', phone: '0987654321', smsReminder: true },
@@ -67,14 +68,17 @@ export default function AgendaPage() {
   }, [toast]);
 
   const displayedAppointments = appointments.filter(app => {
+    // Ensure app.date is treated as local date, not UTC, by appending T00:00:00
     const appDate = new Date(app.date + "T00:00:00"); 
     
     if (currentView === "day") {
-      return appDate.toDateString() === currentDate.toDateString();
+      return appDate.getFullYear() === currentDate.getFullYear() &&
+             appDate.getMonth() === currentDate.getMonth() &&
+             appDate.getDate() === currentDate.getDate();
     }
     if (currentView === "week") {
       const startOfWeek = new Date(currentDate);
-      startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + (currentDate.getDay() === 0 ? -6 : 1)); 
+      startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + (currentDate.getDay() === 0 ? -6 : 1)); // Monday as start of week
       startOfWeek.setHours(0,0,0,0);
       const endOfWeek = new Date(startOfWeek);
       endOfWeek.setDate(startOfWeek.getDate() + 6);
@@ -89,16 +93,21 @@ export default function AgendaPage() {
 
   const handlePrintAppointments = useCallback(() => {
     let appointmentsToPrint = displayedAppointments;
-    let printMessage = "Impression de la vue mois demandée.";
+    let printMessage = `Impression de la vue ${currentView} demandée.`;
 
     if (currentView === "month" && printStartDate && printEndDate) {
       appointmentsToPrint = appointments.filter(app => {
         const appDate = new Date(app.date + "T00:00:00");
-        return appDate >= printStartDate && appDate <= printEndDate;
+        // Ensure printStartDate and printEndDate are at the beginning/end of their respective days for comparison
+        const start = new Date(printStartDate);
+        start.setHours(0,0,0,0);
+        const end = new Date(printEndDate);
+        end.setHours(23,59,59,999);
+        return appDate >= start && appDate <= end;
       });
-      printMessage = `Impression des rendez-vous entre ${format(printStartDate, "dd/MM/yyyy")} et ${format(printEndDate, "dd/MM/yyyy")}.`;
-    } else if (currentView !== "month") {
-       alert(`La fonction d'impression avec sélection de dates n'est optimisée que pour la vue 'Mois'. Pour la vue '${currentView}', elle imprimera les RDVs affichés.`);
+      printMessage = `Impression des rendez-vous entre ${format(printStartDate, "dd/MM/yyyy", { locale: fr })} et ${format(printEndDate, "dd/MM/yyyy", { locale: fr })}.`;
+    } else if (currentView !== "month" && (printStartDate || printEndDate)) {
+       alert(`La fonction d'impression avec sélection de dates n'est optimisée que pour la vue 'Mois'. Pour la vue '${currentView}', elle imprimera les RDVs actuellement affichés.`);
     }
     
     console.log(printMessage, "Rendez-vous à imprimer :", appointmentsToPrint);
