@@ -175,7 +175,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
             {daysOfWeek.map(day => (
                 <div key={`header-${day.toISOString()}`} className="bg-card p-2 text-xs font-medium text-center border-r flex flex-col items-center justify-center h-12">
                   <span>{format(day, 'EEE', { locale: fr })}</span>
-                  <span className="font-normal">{format(day, 'dd/MM', { locale: fr })}</span>
+                  <span className="font-normal">{format(day, 'dd', { locale: fr })}</span>
                 </div>
             ))}
 
