@@ -7,11 +7,11 @@ import { MoreHorizontal, PlusCircle, Search, Edit3, Trash2 } from "lucide-react"
 
 // Mock service data
 const services = [
-  { id: "SERV001", name: "Nettoyage Standard Résidentiel", category: "Nettoyage Résidentiel", rate: "€50/heure", unit: "heure", description: "Nettoyage de base pour appartements et maisons." },
-  { id: "SERV002", name: "Grand Ménage de Printemps", category: "Nettoyage Résidentiel", rate: "€250", unit: "forfait", description: "Nettoyage en profondeur de toutes les pièces." },
-  { id: "SERV003", name: "Nettoyage de Bureaux", category: "Nettoyage Commercial", rate: "€0.15/m²", unit: "m²", description: "Entretien régulier des locaux professionnels." },
+  { id: "SERV001", name: "Nettoyage Standard Résidentiel", category: "Nettoyage Résidentiel", rate: "CAD$50/heure", unit: "heure", description: "Nettoyage de base pour appartements et maisons." },
+  { id: "SERV002", name: "Grand Ménage de Printemps", category: "Nettoyage Résidentiel", rate: "CAD$250", unit: "forfait", description: "Nettoyage en profondeur de toutes les pièces." },
+  { id: "SERV003", name: "Nettoyage de Bureaux", category: "Nettoyage Commercial", rate: "CAD$0.15/m²", unit: "m²", description: "Entretien régulier des locaux professionnels." },
   { id: "SERV004", name: "Nettoyage Après Chantier", category: "Nettoyage Spécialisé", rate: "Devis", unit: "sur devis", description: "Remise en état après travaux de construction ou rénovation." },
-  { id: "SERV005", name: "Lavage de Vitres", category: "Nettoyage Spécialisé", rate: "€5/fenêtre", unit: "fenêtre", description: "Nettoyage intérieur et extérieur des vitres." },
+  { id: "SERV005", name: "Lavage de Vitres", category: "Nettoyage Spécialisé", rate: "CAD$5/fenêtre", unit: "fenêtre", description: "Nettoyage intérieur et extérieur des vitres." },
 ];
 
 export default function ServicesPage() {

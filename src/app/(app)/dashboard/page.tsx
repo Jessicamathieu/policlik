@@ -8,7 +8,7 @@ export default function DashboardPage() {
     { title: "Rendez-vous Aujourd'hui", value: "5", icon: CalendarDays, color: "text-blue-500", bgColor: "bg-blue-50", description: "3 à venir" },
     { title: "Devis en Attente", value: "12", icon: FileText, color: "text-orange-500", bgColor: "bg-orange-50", description: "À traiter rapidement" },
     { title: "Clients Actifs", value: "128", icon: Users, color: "text-green-500", bgColor: "bg-green-50", description: "+5 cette semaine" },
-    { title: "Revenus (Mois)", value: "€ 7,250", icon: DollarSign, color: "text-purple-500", bgColor: "bg-purple-50", description: "Objectif: €10,000" },
+    { title: "Revenus (Mois)", value: "CAD$ 7,250", icon: DollarSign, color: "text-purple-500", bgColor: "bg-purple-50", description: "Objectif: CAD$10,000" },
   ];
 
   return (

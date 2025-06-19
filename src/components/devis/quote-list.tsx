@@ -15,6 +15,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { MoreHorizontal, FileText, CheckCircle, XCircle, Mail, CalendarPlus, Trash2, Edit3 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 // Mock data
 const mockQuotes = [
@@ -63,7 +64,7 @@ export function QuoteList() {
             <TableCell className="font-medium">{quote.id}</TableCell>
             <TableCell>{quote.clientName}</TableCell>
             <TableCell>{format(quote.date, "dd MMM yyyy", { locale: fr })}</TableCell>
-            <TableCell className="text-right">€{quote.amount.toFixed(2)}</TableCell>
+            <TableCell className="text-right">CAD${quote.amount.toFixed(2)}</TableCell>
             <TableCell className="text-center">
               <Badge variant="outline" className={cn("text-xs", statusColors[quote.status as QuoteStatus])}>
                 {quote.status}

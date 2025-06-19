@@ -87,7 +87,7 @@ export default function DepensesPage() {
                   <TableCell>{format(expense.date, "dd MMM yyyy", { locale: fr })}</TableCell>
                   <TableCell>{expense.category}</TableCell>
                   <TableCell className="hidden md:table-cell">{expense.description}</TableCell>
-                  <TableCell className="text-right">€{expense.amount.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">CAD${expense.amount.toFixed(2)}</TableCell>
                   <TableCell className="text-center hidden sm:table-cell">
                     {expense.receiptUrl ? (
                       <a href={expense.receiptUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Voir</a>

@@ -109,7 +109,7 @@ export default function FacturesPage() {
                   <TableCell>{invoice.clientName}</TableCell>
                   <TableCell className="hidden sm:table-cell">{format(invoice.dateEmission, "dd MMM yyyy", { locale: fr })}</TableCell>
                   <TableCell className="hidden md:table-cell">{format(invoice.dateEcheance, "dd MMM yyyy", { locale: fr })}</TableCell>
-                  <TableCell className="text-right">€{invoice.amount.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">CAD${invoice.amount.toFixed(2)}</TableCell>
                   <TableCell className="text-center">
                     <Badge variant="outline" className={cn("text-xs font-semibold", statusColors[invoice.status])}>
                       {invoice.status}
@@ -158,4 +158,3 @@ export default function FacturesPage() {
     </div>
   );
 }
-

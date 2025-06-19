@@ -101,7 +101,7 @@ export default function PaiementsPage() {
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{payment.method}</TableCell>
                   <TableCell className={`text-right font-semibold ${payment.amount < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                    €{payment.amount.toFixed(2)}
+                    CAD${payment.amount.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-center">
                     <Badge variant="outline" className={cn("text-xs", paymentStatusColors[payment.status])}>

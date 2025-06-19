@@ -8,10 +8,10 @@ import Link from "next/link";
 
 // Mock client data
 const clients = [
-  { id: "1", name: "Jean Dupont", email: "jean.dupont@example.com", phone: "0123456789", address: "123 Rue Principale, 75001 Paris", lastService: "2023-10-15", totalSpent: "€1,250" },
-  { id: "2", name: "Marie Curie", email: "marie.curie@example.com", phone: "0987654321", address: "456 Avenue des Sciences, 69007 Lyon", lastService: "2023-11-01", totalSpent: "€875" },
-  { id: "3", name: "Pierre Martin", email: "pierre.martin@example.com", phone: "0612345678", address: "789 Boulevard Liberté, 13001 Marseille", lastService: "2023-09-20", totalSpent: "€2,100" },
-  { id: "4", name: "Sophie Dubois", email: "sophie.dubois@example.com", phone: "0765432109", address: "10 Rue de la Paix, 33000 Bordeaux", lastService: "2023-11-10", totalSpent: "€550" },
+  { id: "1", name: "Jean Dupont", email: "jean.dupont@example.com", phone: "0123456789", address: "123 Rue Principale, 75001 Paris", lastService: "2023-10-15", totalSpent: "CAD$1,250" },
+  { id: "2", name: "Marie Curie", email: "marie.curie@example.com", phone: "0987654321", address: "456 Avenue des Sciences, 69007 Lyon", lastService: "2023-11-01", totalSpent: "CAD$875" },
+  { id: "3", name: "Pierre Martin", email: "pierre.martin@example.com", phone: "0612345678", address: "789 Boulevard Liberté, 13001 Marseille", lastService: "2023-09-20", totalSpent: "CAD$2,100" },
+  { id: "4", name: "Sophie Dubois", email: "sophie.dubois@example.com", phone: "0765432109", address: "10 Rue de la Paix, 33000 Bordeaux", lastService: "2023-11-10", totalSpent: "CAD$550" },
 ];
 
 export default function ClientsPage() {
