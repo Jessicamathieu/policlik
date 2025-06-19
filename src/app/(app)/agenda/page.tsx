@@ -44,7 +44,7 @@ export default function AgendaPage() {
   // This is simplified for demo. Real implementation would be more robust.
   const displayedAppointments = appointments.filter(app => {
     const appDate = new Date(app.date);
-    if (view === "day") {
+    if (currentView === "day") {
       return appDate.toDateString() === currentDate.toDateString();
     }
     // Add week/month filtering logic here
