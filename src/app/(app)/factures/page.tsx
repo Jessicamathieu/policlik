@@ -1,13 +1,11 @@
 
-
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, PlusCircle, Search, FileDown, Filter, Printer, CreditCard, Mail, FileText as FileTextIcon } from "lucide-react"; // Renamed FileText to FileTextIcon
+import { MoreHorizontal, PlusCircle, Search, FileDown, Filter, Printer, CreditCard, Mail, FileText as FileTextIcon, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import Link from "next/link";
@@ -138,8 +136,11 @@ export default function FacturesPage() {
                             <FileTextIcon className="mr-2 h-4 w-4" /> Modifier
                            </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => alert(`Envoyer la facture ${invoice.id} par email.`)}>
                             <Mail className="mr-2 h-4 w-4" /> Envoyer par Email
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => alert(`Envoyer la facture ${invoice.id} par SMS.`)}>
+                            <MessageSquare className="mr-2 h-4 w-4" /> Envoyer par SMS
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                             <CreditCard className="mr-2 h-4 w-4" /> Enregistrer Paiement
