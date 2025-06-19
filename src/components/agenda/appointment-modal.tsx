@@ -114,7 +114,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
       setSmsReminder(appointment?.smsReminder || false);
       if (!appointment?.clientId) setClientSearch(""); 
     }
-  }, [appointment, currentOpen]); 
+  }, [appointment, currentOpen, selectedClient]); 
 
   const handleSave = () => {
     const clientData = mockClients.find(c => c.id === selectedClient);
@@ -249,7 +249,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
               value={startTime} 
               onChange={(e) => setStartTime(e.target.value)} 
               className="col-span-3" 
-              step="900" 
+              step="1800" 
             />
           </div>
 
@@ -263,7 +263,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
               value={endTime} 
               onChange={(e) => setEndTime(e.target.value)} 
               className="col-span-3" 
-              step="900" 
+              step="1800" 
             />
           </div>
           
@@ -343,9 +343,9 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="smsReminder" className="text-right col-span-1">
-              SMS Rappel
-            </Label>
+            <div className="text-right col-span-1"> 
+              <Label htmlFor="smsReminder">SMS Rappel</Label>
+            </div>
             <div className="col-span-3 flex items-center space-x-2">
                 <Checkbox
                 id="smsReminder"

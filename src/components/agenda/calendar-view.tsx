@@ -49,8 +49,8 @@ const timeToMinutes = (time: string): number => {
 
 
 export function CalendarView({ appointments, currentDate, view, onAppointmentUpdate, onNewAppointmentSave }: CalendarViewProps) {
-  const timeSlots = generateTimeSlots(6, 20, 15); // 6 AM to 8 PM, 15-min intervals
-  const slotHeightPx = 10; // Height of a 15-minute slot in pixels
+  const timeSlots = generateTimeSlots(6, 20, 30); // 6 AM to 8 PM, 30-min intervals
+  const slotHeightPx = 20; // Height of a 30-minute slot in pixels
 
   const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
   const [slotInitialData, setSlotInitialData] = useState<Partial<Appointment> | undefined>(undefined);
@@ -84,10 +84,10 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
         {timeSlots.map((slot, index) => (
           <div 
             key={slot} 
-            className={`h-${slotHeightPx} flex items-center justify-center p-2 text-xs border-b ${index % 4 === 3 ? 'font-semibold' : ''}`}
-            style={{ height: `${slotHeightPx * 4}px` }} // Each displayed slot represents an hour (4 * 15 min)
+            className={`flex items-center justify-center p-2 text-xs border-b ${index % 2 === 0 ? 'font-semibold' : ''}`} // index % 2 for 30-min slots means on the hour
+            style={{ height: `${slotHeightPx * 2}px` }} // Each displayed slot represents an hour (2 * 30 min)
           >
-            {index % 4 === 0 ? slot : ''} {/* Display time only at the hour mark */}
+            {index % 2 === 0 ? slot : ''} {/* Display time only at the hour mark */}
           </div>
         ))}
       </div>
@@ -99,8 +99,8 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
         {timeSlots.map((slot, slotIndex) => (
           <div 
             key={slotIndex} 
-            className="h-${slotHeightPx} border-b relative cursor-pointer hover:bg-muted/50 transition-colors"
-            style={{ height: `${slotHeightPx}px` }}
+            className="border-b relative cursor-pointer hover:bg-muted/50 transition-colors"
+            style={{ height: `${slotHeightPx}px` }} // height of one 30-minute slot
             onClick={() => handleSlotClick(slot)}
             role="button"
             tabIndex={0}
@@ -120,8 +120,9 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
           const endMinutes = timeToMinutes(app.endTime);
           const durationMinutes = endMinutes - startMinutes;
 
-          const topOffset = ((startMinutes - (startHour * 60)) / 15) * slotHeightPx; 
-          const height = (durationMinutes / 15) * slotHeightPx;
+          // Calculations based on 30-minute intervals
+          const topOffset = ((startMinutes - (startHour * 60)) / 30) * slotHeightPx; 
+          const height = (durationMinutes / 30) * slotHeightPx;
 
           return (
             <AppointmentModal 
@@ -134,7 +135,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                   style={{
                     top: `${topOffset}px`, 
                     height: `${height}px`,
-                    minHeight: `${slotHeightPx * 2}px` // Min height for visibility, e.g., 30 min
+                    minHeight: `${slotHeightPx}px` // Min height for visibility (30 min)
                   }}
                   aria-label={`Rendez-vous: ${app.clientName} de ${app.startTime} à ${app.endTime}`}
                 >
@@ -173,8 +174,9 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
             <div key={day} className="p-2 text-sm font-medium bg-card text-center">{day}</div>
           ))}
           {/* Placeholder: This needs full implementation similar to day view but repeated for each day */}
-          {timeSlots.map(slot => (
+          {timeSlots.map(slot => ( // timeSlots are now 30-min
             <React.Fragment key={slot}>
+              {/* Display time only at the hour mark */}
               <div className={`h-10 flex items-center justify-center p-1 text-xs border-b bg-card sticky left-0 z-10 ${slot.endsWith(':00') ? 'font-semibold' : ''}`}>{slot.endsWith(':00') ? slot : ''}</div>
               {Array(7).fill(null).map((_, dayIndex) => (
                 <div key={`${slot}-${dayIndex}`} className="h-10 border-b border-l bg-card hover:bg-muted/50 cursor-pointer">
