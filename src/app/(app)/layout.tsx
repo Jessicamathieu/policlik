@@ -22,7 +22,7 @@ export default function AppLayout({
       setActiveContrastColor(activeNavItem.contrastColor);
     } else {
       // Fallback to default theme colors if no specific nav item color is found
-      const dashboardItem = getActiveNavItemConfig('/dashboard');
+      const dashboardItem = getActiveNavItemConfig('/dashboard'); // Assuming dashboard is a safe default
       setActiveColor(dashboardItem?.color || '#3F51B5');
       setActiveContrastColor(dashboardItem?.contrastColor || '#FFFFFF');
     }
@@ -35,17 +35,13 @@ export default function AppLayout({
       '--page-main-contrast-color': activeContrastColor,
     }}>
       <AppHeader />
-      <main className="flex-1 p-4 sm:p-6 md:p-8 bg-background overflow-auto relative">
-        {/* Dynamic colored shape background */}
-        <div
-          className="absolute inset-0 z-[-1] opacity-100" // Using higher opacity for solid color shape
-          style={{
-            backgroundColor: 'var(--page-main-color)',
-            // This clip-path attempts to mimic the general feel of the example image's background shape
-            // It creates a large colored area primarily on the right and extending to the bottom.
-            clipPath: 'polygon(35% 0%, 100% 0%, 100% 100%, 15% 100%)',
-          }}
-        />
+      <main 
+        className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto relative"
+        style={{
+          backgroundColor: 'var(--page-main-color)',
+          color: 'var(--page-main-contrast-color)'
+        }}
+      >
         {children}
       </main>
     </div>
