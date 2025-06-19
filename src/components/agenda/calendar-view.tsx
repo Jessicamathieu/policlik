@@ -175,11 +175,11 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
             {formattedDateHeader || ' '}
         </div>
         <div className="grid grid-cols-[auto_repeat(7,minmax(140px,1fr))] gap-px bg-border">
-            <div className="sticky left-0 z-20 bg-card p-2 text-xs font-medium text-center border-r flex items-center justify-center h-12">
+            <div className="sticky left-0 z-20 bg-card p-2 text-xs font-medium text-center flex items-center justify-center h-12">
                 Heure
             </div>
             {daysOfWeek.map(day => (
-                <div key={`header-${day.toISOString()}`} className="bg-card p-2 text-xs font-medium text-center border-r flex flex-col items-center justify-center h-12">
+                <div key={`header-${day.toISOString()}`} className="bg-card p-2 text-xs font-medium text-center flex flex-col items-center justify-center h-12">
                   <span className="font-semibold">{format(day, 'EEE', { locale: fr })}</span>
                   <span className="font-normal text-lg">{format(day, 'd', { locale: fr })}</span>
                 </div>
@@ -188,7 +188,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
             {timeSlots.map((slot) => (
                 <React.Fragment key={`timeslot-row-${slot}`}>
                     <div 
-                        className="sticky left-0 z-20 bg-card p-2 text-xs border-r flex items-center justify-center font-semibold"
+                        className="sticky left-0 z-20 bg-card p-2 text-xs flex items-center justify-center font-semibold"
                         style={{ height: `${slotHeightPx}px` }}
                     >
                         {slot}
@@ -217,7 +217,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                     style={{ 
                         gridColumnStart: dayIndex + 2, 
                         gridRowStart: 2, 
-                        gridRowEnd: timeSlots.length + 3, // +2 for header row, +1 to span all time slots
+                        gridRowEnd: timeSlots.length + 2,
                      }}
                 >
                     {appointments
@@ -237,7 +237,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                                     onSave={onAppointmentUpdate}
                                     trigger={
                                         <button
-                                          className="absolute left-1 right-1 p-1 text-left text-xs bg-primary/90 text-primary-foreground rounded shadow-md hover:bg-primary transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                                          className="absolute left-1 right-1 p-1.5 text-left text-xs bg-primary/90 text-primary-foreground rounded shadow-md hover:bg-primary transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                                           style={{
                                                 top: `${topOffset}px`,
                                                 height: `${Math.max(height, slotHeightPx)}px`,
@@ -381,7 +381,3 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
       return renderDayView();
   }
 }
-
-    
-
-    
