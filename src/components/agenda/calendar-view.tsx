@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { AppointmentModal } from './appointment-modal'; 
 import { format } from 'date-fns';
@@ -20,7 +20,6 @@ interface Appointment {
   address?: string;
   phone?: string;
   smsReminder?: boolean;
-  // Remove status, it's not used in AppointmentModal anymore
 }
 
 interface CalendarViewProps {
@@ -55,6 +54,19 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
 
   const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
   const [slotInitialData, setSlotInitialData] = useState<Partial<Appointment> | undefined>(undefined);
+  const [formattedDateHeader, setFormattedDateHeader] = useState<string>('');
+
+  useEffect(() => {
+    if (currentDate) {
+      setFormattedDateHeader(
+        currentDate.toLocaleDateString('fr-FR', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+        })
+      );
+    }
+  }, [currentDate]);
 
   const handleSlotClick = (slotStartTime: string) => {
     setSlotInitialData({
@@ -82,7 +94,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
       {/* Appointments column */}
       <div className="relative bg-card">
         <div className="h-10 border-b flex items-center justify-center p-2 text-sm font-medium sticky top-0 bg-card z-10">
-          {currentDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+          {formattedDateHeader || ' '}
         </div>
         {timeSlots.map((slot, slotIndex) => (
           <div 
