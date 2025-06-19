@@ -55,10 +55,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Today's Appointments and Revenue Overview (Moved Up) */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Today's Appointments Section */}
-        <Card className="shadow-lg md:col-span-1">
+      {/* Today's Appointments Section (Full Width) */}
+      <div className="grid gap-6">
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2 text-xl">
               <CalendarClock className="h-6 w-6 text-primary" />
@@ -117,22 +116,6 @@ export default function DashboardPage() {
             <Button variant="outline" className="mt-4 w-full" asChild>
               <Link href="/agenda">Voir l'agenda complet</Link>
             </Button>
-          </CardContent>
-        </Card>
-
-        {/* Revenue Overview */}
-        <Card className="shadow-md md:col-span-1">
-          <CardHeader>
-            <CardTitle className="font-headline">Aperçu des Revenus</CardTitle>
-            <CardDescription>Graphique simplifié des revenus mensuels.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[200px] w-full bg-muted/30 rounded-md flex items-center justify-center">
-              {/* Placeholder for chart */}
-              <LineChart className="h-16 w-16 text-primary/50" />
-              <p className="ml-4 text-muted-foreground">Graphique des revenus à venir</p>
-            </div>
-             <p className="text-sm text-muted-foreground mt-2 text-center">Données de démonstration. Intégration graphique complète à venir.</p>
           </CardContent>
         </Card>
       </div>
