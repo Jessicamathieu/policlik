@@ -1,120 +1,56 @@
 
-"use client";
+"use client"; // Garder comme composant client à cause des hooks
 
-import './globals.css'; // Import global styles
-import { Toaster } from '@/components/ui/toaster';
-import { AppHeader } from '@/components/app/app-header';
-import { getActiveNavItemConfig } from '@/config/nav';
-import { usePathname } from 'next/navigation';
-import React, { useEffect, useState } from 'react'; // Imported React for React.Children
-import { PT_Sans } from 'next/font/google';
+import "./globals.css"; // Essentiel
+import { AppHeader } from "@/components/app/app-header";
+import { Toaster } from "@/components/ui/toaster"; // Pour les notifications
+import { getActiveNavItemConfig, pageColors } from "@/config/nav"; // Pour les couleurs dynamiques
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils"; // Pour les classnames
 
-const ptSans = PT_Sans({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  display: 'swap',
-  variable: '--font-pt-sans',
-});
+// Si vous utilisez next/font pour PT Sans, importez et configurez ici
+// import { PT_Sans } from 'next/font/google';
+// const ptSans = PT_Sans({
+//   weight: ['400', '700'],
+//   subsets: ['latin'],
+//   display: 'swap',
+// });
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [activeColor, setActiveColor] = useState<string>('#3F51B5'); // Default for body bg and CSS var
-  const [activeContrastColor, setActiveContrastColor] = useState<string>('#FFFFFF'); // Default for body text and CSS var
+  // Valeur par défaut pour la première pageColor ou un fallback pour éviter les erreurs undefined initialement
+  const [activeColor, setActiveColor] = useState(pageColors[0]?.color || '#2743e3');
+  const [activeContrastColor, setActiveContrastColor] = useState(pageColors[0]?.contrastColor || '#FFFFFF');
 
   useEffect(() => {
     const activeNavItem = getActiveNavItemConfig(pathname);
-    let colorToSet = '#3F51B5'; 
-    let contrastColorToSet = '#FFFFFF';
+    const colorToSet = activeNavItem?.color || pageColors[0]?.color || '#2743e3';
+    const contrastToSet = activeNavItem?.contrastColor || pageColors[0]?.contrastColor || '#FFFFFF';
 
-    if (activeNavItem?.color && activeNavItem?.contrastColor) {
-      colorToSet = activeNavItem.color;
-      contrastColorToSet = activeNavItem.contrastColor;
-    } else {
-      const dashboardItem = getActiveNavItemConfig('/dashboard');
-      if (dashboardItem?.color && dashboardItem?.contrastColor) {
-        colorToSet = dashboardItem.color;
-        contrastColorToSet = dashboardItem.contrastColor;
-      }
-    }
-    setActiveColor(colorToSet);
-    setActiveContrastColor(contrastColorToSet);
+    setActiveColor(colorToSet); // Bien que non utilisé directement pour styler body ici, utile si d'autres composants dépendent de cet état local.
+    setActiveContrastColor(contrastToSet); // Idem.
 
-    // Apply global CSS variables for dynamic theming (e.g., Tailwind primary color, AppHeader tabs)
+    // Définir les variables CSS sur la racine pour une utilisation globale par Tailwind ou d'autres composants
     document.documentElement.style.setProperty('--page-main-color', colorToSet);
-    document.documentElement.style.setProperty('--page-main-contrast-color', contrastColorToSet);
+    document.documentElement.style.setProperty('--page-main-contrast-color', contrastToSet);
   }, [pathname]);
 
-  // Card coloring logic
-  const cardColors = [
-    "#2743e3", // Bleu Polimik
-    "#0ccc34", // Vert
-    "#fb9026", // Orange
-    "#FFFF00"  // Jaune
-  ];
-  
-  // Determine if the page background is light.
-  // A simple heuristic: if activeColor is not one of the vibrant card colors and not black, assume light.
-  // This could be refined, e.g., by checking luminance or having a flag in pageColors config.
-  const isPageBackgroundLight = !cardColors.includes(activeColor.toLowerCase()) && activeColor.toLowerCase() !== '#000000' && activeColor.toLowerCase() !== '#3f51b5';
-
-
-  const childrenArray = React.Children.toArray(children);
-
   return (
-    <html lang="fr" className={ptSans.className}>
+    <html lang="fr"> {/* Ajouter l'attribut lang */}
       <body
-        className="flex min-h-screen w-full flex-col"
-        style={{
-          backgroundColor: activeColor, 
-          color: activeContrastColor,   
-        }}
+        className={cn(
+          "min-h-screen w-full flex flex-col bg-background text-foreground" 
+          // ptSans.className // Si vous utilisez next/font, ajoutez sa className ici
+          // La couleur de fond principale de la page est maintenant gérée par --background de globals.css
+          // La couleur de fond de la zone de contenu spécifique à (app) sera gérée par (app)/layout.tsx
+        )}
       >
-        <AppHeader />
-        <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto relative">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {childrenArray.map((child, i) => {
-              // Card background color logic:
-              // If page background is light, cards are colored.
-              // If page background is colored, cards are white.
-              const cardBgColor = isPageBackgroundLight ? cardColors[i % cardColors.length] : "#ffffff";
-              
-              // Card text color logic:
-              let cardTextColor = "#232323"; // Default dark text
-              if (isPageBackgroundLight) { // Page BG is light, cards are colored
-                // If card is yellow, text is black, otherwise white
-                cardTextColor = cardBgColor.toLowerCase() === "#ffff00" ? "#000000" : "#ffffff";
-              } else { // Page BG is colored, cards are white
-                 // Text on white cards should be dark for readability
-                 cardTextColor = "#232323"; 
-              }
-
-              return (
-                <div
-                  key={i}
-                  className={`
-                    rounded-xl shadow-lg p-6 min-h-[120px] flex flex-col justify-between
-                    transition-transform duration-150
-                    hover:scale-[1.03] hover:shadow-2xl
-                  `}
-                  style={{
-                    background: cardBgColor,
-                    color: cardTextColor,
-                    border: !isPageBackgroundLight ? "1.5px solid #e0e0e0" : "none", 
-                    boxShadow: "0 2px 16px 0 rgba(39,67,227,0.10)", // Consistent shadow
-                    cursor: "default" 
-                  }}
-                >
-                  {child}
-                </div>
-              );
-            })}
-          </div>
-        </main>
-        <Toaster />
+        <AppHeader /> {/* Afficher l'en-tête pour toutes les pages */}
+        <div className="flex-1 w-full flex flex-col"> {/* Ce div prend l'espace restant et permet au contenu de (app)/layout de s'étendre */}
+            {children} {/* children sera le contenu de la page ou les layouts imbriqués */}
+        </div>
+        <Toaster /> {/* Toaster global pour les notifications */}
       </body>
     </html>
   );

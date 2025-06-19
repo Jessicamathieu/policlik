@@ -1,49 +1,26 @@
 
-"use client"; // Required for useState, useEffect, usePathname
+"use client";
 
-import { AppHeader } from "@/components/app/app-header";
-import { getActiveNavItemConfig } from "@/config/nav";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+// Les variables CSS globales --page-main-color et --page-main-contrast-color
+// sont déjà définies sur documentElement par RootLayout.
 
-export default function AppLayout({
-children,
+export default function AppPagesLayout({
+  children,
 }: {
-children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-const pathname = usePathname();
-const [activeColor, setActiveColor] = useState<string>('#3F51B5'); // Default primary
-const [activeContrastColor, setActiveContrastColor] = useState<string>('#FFFFFF'); // Default primary foreground
-
-useEffect(() => {
-const activeNavItem = getActiveNavItemConfig(pathname);
-if (activeNavItem?.color && activeNavItem?.contrastColor) {
-setActiveColor(activeNavItem.color);
-setActiveContrastColor(activeNavItem.contrastColor);
-} else {
-// Fallback to default theme colors if no specific nav item color is found
-const dashboardItem = getActiveNavItemConfig('/dashboard'); // Assuming dashboard is a safe default
-setActiveColor(dashboardItem?.color || '#3F51B5');
-setActiveContrastColor(dashboardItem?.contrastColor || '#FFFFFF');
-}
-}, [pathname]);
-
-return (
-<div className="flex min-h-screen w-full flex-col" style={{
-// @ts-ignore
-'--page-main-color': activeColor,
-'--page-main-contrast-color': activeContrastColor,
-}}>
-<AppHeader />
-<main
-className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto relative"
-style={{
-backgroundColor: 'var(--page-main-color)',
-color: 'var(--page-main-contrast-color)'
-}}
->
-{children}
-</main>
-</div>
-);
+  return (
+    // Ce main représente la zone de contenu pour les pages du groupe (app).
+    // La structure externe (min-h-screen, flex-col) est gérée par le body de RootLayout.
+    // AppHeader est déjà dans RootLayout.
+    <main
+      className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto relative w-full" // Assure qu'il prend toute la largeur dans son conteneur flex parent
+      style={{
+        backgroundColor: 'var(--page-main-color)',
+        color: 'var(--page-main-contrast-color)',
+      }}
+    >
+      {children}
+    </main>
+  );
 }
