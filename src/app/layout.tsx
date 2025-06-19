@@ -48,20 +48,18 @@ export default function RootLayout({
     document.documentElement.style.setProperty('--page-main-contrast-color', contrastColorToSet);
   }, [pathname]);
 
-  // Card coloring logic from your previous src/app/layout.tsx structure
+  // Card coloring logic
   const cardColors = [
     "#2743e3", // Bleu Polimik
     "#0ccc34", // Vert
     "#fb9026", // Orange
     "#FFFF00"  // Jaune
   ];
-
-  // isBgWhite determines if the main page background is white/light, affecting card styling.
-  // Using a light gray as "white" for this logic. This should ideally align with your theme's actual background.
-  // For simplicity, let's assume any non-dark, non-vibrant activeColor means cards should be colored.
-  // A more robust check might involve parsing HSL or having a flag in pageColors config.
-  // For now, if activeColor isn't one of the vibrant cardColors, assume it's a light background.
-  const isPageBackgroundLight = !cardColors.includes(activeColor.toLowerCase()) && activeColor !== '#000000';
+  
+  // Determine if the page background is light.
+  // A simple heuristic: if activeColor is not one of the vibrant card colors and not black, assume light.
+  // This could be refined, e.g., by checking luminance or having a flag in pageColors config.
+  const isPageBackgroundLight = !cardColors.includes(activeColor.toLowerCase()) && activeColor.toLowerCase() !== '#000000' && activeColor.toLowerCase() !== '#3f51b5';
 
 
   const childrenArray = React.Children.toArray(children);
@@ -71,25 +69,27 @@ export default function RootLayout({
       <body
         className="flex min-h-screen w-full flex-col"
         style={{
-          backgroundColor: activeColor, // Page background is the active tab color
-          color: activeContrastColor,   // Default text color for the page
+          backgroundColor: activeColor, 
+          color: activeContrastColor,   
         }}
       >
         <AppHeader />
         <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto relative">
-          {/* This grid-of-cards structure for children is kept from your existing src/app/layout.tsx */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {childrenArray.map((child, i) => {
+              // Card background color logic:
+              // If page background is light, cards are colored.
+              // If page background is colored, cards are white.
               const cardBgColor = isPageBackgroundLight ? cardColors[i % cardColors.length] : "#ffffff";
-              let cardTextColor = "#232323"; // Default for white cards or error
+              
+              // Card text color logic:
+              let cardTextColor = "#232323"; // Default dark text
               if (isPageBackgroundLight) { // Page BG is light, cards are colored
+                // If card is yellow, text is black, otherwise white
                 cardTextColor = cardBgColor.toLowerCase() === "#ffff00" ? "#000000" : "#ffffff";
               } else { // Page BG is colored, cards are white
-                 cardTextColor = activeContrastColor; // Text on white card should be page's main content color (if page bg is dark)
-                                                  // Or simply #232323 (dark gray) if page bg is light (which means cards are colored, this path isn't hit)
-                                                  // This might need more refinement based on exact activeColor vs cardColor logic
-                 // If page background is colored, cards are white, text on cards should be dark.
-                 cardTextColor = "#232323";
+                 // Text on white cards should be dark for readability
+                 cardTextColor = "#232323"; 
               }
 
               return (
@@ -103,9 +103,9 @@ export default function RootLayout({
                   style={{
                     background: cardBgColor,
                     color: cardTextColor,
-                    border: !isPageBackgroundLight ? "1.5px solid #e0e0e0" : "none", // Border for white cards on colored page
-                    boxShadow: "0 2px 16px 0 rgba(39,67,227,0.10)",
-                    cursor: "default"
+                    border: !isPageBackgroundLight ? "1.5px solid #e0e0e0" : "none", 
+                    boxShadow: "0 2px 16px 0 rgba(39,67,227,0.10)", // Consistent shadow
+                    cursor: "default" 
                   }}
                 >
                   {child}
