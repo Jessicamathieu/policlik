@@ -47,7 +47,7 @@ const timeToMinutes = (time: string): number => {
   return hours * 60 + minutes;
 };
 
-const slotHeightPx = 30; 
+const slotHeightPx = 50; 
 const startHourGrid = 6; 
 
 export function CalendarView({ appointments, currentDate, view, onAppointmentUpdate, onNewAppointmentSave }: CalendarViewProps) {
@@ -175,11 +175,16 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
             {formattedDateHeader || ' '}
         </div>
         <div className="grid grid-cols-[auto_repeat(7,minmax(140px,1fr))] gap-px bg-border">
-            <div className="sticky left-0 top-10 z-20 bg-card h-12 border-b flex items-center justify-center p-2 text-sm font-medium text-muted-foreground">
+            <div 
+              className="sticky left-0 top-10 z-20 bg-card h-12 border-b flex items-center justify-center p-2 text-sm font-medium text-muted-foreground"
+            >
                 Heure
             </div>
             {daysOfWeek.map(day => (
-                <div key={`header-${day.toISOString()}`} className="sticky top-10 z-20 bg-card h-12 border-b p-2 text-xs font-medium text-center flex flex-col items-center justify-center">
+                <div 
+                  key={`header-${day.toISOString()}`} 
+                  className="sticky top-10 z-20 bg-card h-12 border-b p-2 text-xs font-medium text-center flex flex-col items-center justify-center"
+                >
                   <span className="font-semibold">{format(day, 'EEE', { locale: fr })}</span>
                   <span className="font-normal text-lg">{format(day, 'd', { locale: fr })}</span>
                 </div>
@@ -216,8 +221,8 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                     className="relative" 
                     style={{ 
                         gridColumnStart: dayIndex + 2, 
-                        gridRowStart: 3, // Start after the header row (Date + Heure) and Day Names
-                        gridRowEnd: timeSlots.length + 3, // End after all time slot rows
+                        gridRowStart: 3, 
+                        gridRowEnd: timeSlots.length + 3, 
                      }}
                 >
                     {appointments
