@@ -119,9 +119,9 @@
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-primary/70;
+  background-color: hsl(var(--primary) / 0.7); /* Use the :root --primary HSL variable with 70% opacity */
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-primary;
+  background-color: hsl(var(--primary)); /* Use the :root --primary HSL variable */
 }

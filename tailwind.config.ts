@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -33,8 +34,9 @@ export default {
           foreground: 'hsl(var(--popover-foreground))',
         },
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          // Updated to use dynamic CSS variables set in AppLayout
+          DEFAULT: 'var(--page-main-color)',
+          foreground: 'var(--page-main-contrast-color)',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -45,6 +47,8 @@ export default {
           foreground: 'hsl(var(--muted-foreground))',
         },
         accent: {
+          // Accent can also be dynamic or remain fixed from globals.css
+          // For now, let's keep it from globals.css, but it could also be var(--page-main-color) or a derivative
           DEFAULT: 'hsl(var(--accent))',
           foreground: 'hsl(var(--accent-foreground))',
         },
@@ -54,7 +58,7 @@ export default {
         },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
+        ring: 'var(--page-main-color)', // Ring color can also be dynamic
         chart: {
           '1': 'hsl(var(--chart-1))',
           '2': 'hsl(var(--chart-2))',

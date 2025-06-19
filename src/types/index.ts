@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from 'lucide-react';
 
 export interface NavItem {
@@ -8,4 +9,6 @@ export interface NavItem {
   disabled?: boolean;
   external?: boolean;
   items?: NavItem[];
+  color?: string; // Added for dynamic tab/page color
+  contrastColor?: string; // Added for text on colored background
 }
