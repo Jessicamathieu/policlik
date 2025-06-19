@@ -22,8 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, MapPin, Phone, PlusCircle, Briefcase } from "lucide-react";
+import { CalendarIcon, MapPin, Phone, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -31,9 +32,9 @@ import React from "react";
 
 // This would come from your data layer
 const mockClients = [
-  { id: "1", name: "Jean Dupont", address: "123 Rue Principale, Paris" },
-  { id: "2", name: "Marie Curie", address: "456 Avenue des Sciences, Lyon" },
-  { id: "3", name: "Pierre Martin", address: "789 Boulevard Liberté, Marseille" },
+  { id: "1", name: "Jean Dupont", address: "123 Rue Principale, Paris", phone: "0123456789" },
+  { id: "2", name: "Marie Curie", address: "456 Avenue des Sciences, Lyon", phone: "0987654321" },
+  { id: "3", name: "Pierre Martin", address: "789 Boulevard Liberté, Marseille", phone: "0612345678" },
 ];
 
 // Mock service data (ideally fetched or from a shared source)
@@ -44,8 +45,6 @@ const mockServices = [
   { id: "SERV004", name: "Nettoyage Après Chantier" },
   { id: "SERV005", name: "Lavage de Vitres" },
 ];
-
-const appointmentStatuses = ["Planifié", "Confirmé", "Terminé", "Annulé", "Reporté"];
 
 interface AppointmentModalProps {
   trigger?: React.ReactNode;
@@ -64,7 +63,7 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
   const [workDone, setWorkDone] = React.useState(appointment?.workDone || "");
   const [address, setAddress] = React.useState(appointment?.address || "");
   const [phone, setPhone] = React.useState(appointment?.phone || "");
-  const [status, setStatus] = React.useState(appointment?.status || "Planifié");
+  const [smsReminder, setSmsReminder] = React.useState(appointment?.smsReminder || false);
   const [clientSearch, setClientSearch] = React.useState("");
 
   const filteredClients = mockClients.filter(client => 
@@ -73,29 +72,33 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
   );
   
   React.useEffect(() => {
-    if (appointment) {
-      setSelectedClient(appointment.clientId || "");
-      setSelectedService(appointment.serviceId || "");
-      setAppointmentDate(appointment.date ? new Date(appointment.date) : new Date());
-      setStartTime(appointment.startTime || "09:00");
-      setEndTime(appointment.endTime || "10:00");
-      setDescription(appointment.description || "");
-      setWorkDone(appointment.workDone || "");
-      setAddress(appointment.address || (mockClients.find(c => c.id === appointment.clientId)?.address || ""));
-      setPhone(appointment.phone || "");
-      setStatus(appointment.status || "Planifié");
-    } else {
-      // Reset form for new appointment
-      setSelectedClient("");
-      setSelectedService("");
-      setAppointmentDate(new Date());
-      setStartTime("09:00");
-      setEndTime("10:00");
-      setDescription("");
-      setWorkDone("");
-      setAddress("");
-      setPhone("");
-      setStatus("Planifié");
+    if (isOpen) { // Only run when modal is opened or appointment changes while open
+      if (appointment) {
+        setSelectedClient(appointment.clientId || "");
+        const currentClient = mockClients.find(c => c.id === appointment.clientId);
+        setAddress(appointment.address || currentClient?.address || "");
+        setPhone(appointment.phone || currentClient?.phone || "");
+        setSelectedService(appointment.serviceId || "");
+        setAppointmentDate(appointment.date ? new Date(appointment.date) : new Date());
+        setStartTime(appointment.startTime || "09:00");
+        setEndTime(appointment.endTime || "10:00");
+        setDescription(appointment.description || "");
+        setWorkDone(appointment.workDone || "");
+        setSmsReminder(appointment.smsReminder || false);
+      } else {
+        // Reset form for new appointment
+        setSelectedClient("");
+        setSelectedService("");
+        setAppointmentDate(new Date());
+        setStartTime("09:00");
+        setEndTime("10:00");
+        setDescription("");
+        setWorkDone("");
+        setAddress("");
+        setPhone("");
+        setSmsReminder(false);
+        setClientSearch("");
+      }
     }
   }, [appointment, isOpen]);
 
@@ -113,9 +116,9 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
       endTime,
       description,
       workDone,
-      address: address || clientData?.address,
-      phone,
-      status,
+      address: address, // address state is now managed
+      phone: phone,     // phone state is now managed
+      smsReminder,
     };
     onSave(appointmentData);
     setIsOpen(false);
@@ -126,7 +129,10 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
     const client = mockClients.find(c => c.id === clientId);
     if (client) {
       setAddress(client.address);
-      // Potentially set phone if available on client object
+      setPhone(client.phone || "");
+    } else {
+      setAddress("");
+      setPhone("");
     }
   };
 
@@ -326,20 +332,21 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="status" className="text-right col-span-1">
-              Statut
+            <Label htmlFor="smsReminder" className="text-right col-span-1">
+              SMS Rappel
             </Label>
-            <Select onValueChange={setStatus} value={status}>
-              <SelectTrigger id="status" className="col-span-3">
-                <SelectValue placeholder="Sélectionner un statut" />
-              </SelectTrigger>
-              <SelectContent>
-                {appointmentStatuses.map(s => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="col-span-3 flex items-center space-x-2">
+                <Checkbox
+                id="smsReminder"
+                checked={smsReminder}
+                onCheckedChange={(checked) => setSmsReminder(Boolean(checked))}
+                />
+                <Label htmlFor="smsReminder" className="text-sm font-normal cursor-pointer">
+                    Notifier le client par SMS avant le RDV (confirme en répondant).
+                </Label>
+            </div>
           </div>
+
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setIsOpen(false)}>Annuler</Button>
@@ -351,5 +358,3 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
     </Dialog>
   );
 }
-
-    

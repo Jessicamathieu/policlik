@@ -8,9 +8,9 @@ import { useToast } from '@/hooks/use-toast';
 
 // Mock data for appointments
 const initialAppointments = [
-  { id: '1', clientId: '1', clientName: 'Jean Dupont', serviceId: 'SERV001', serviceName: 'Nettoyage Standard Résidentiel', date: new Date().toISOString().split('T')[0], startTime: '09:00', endTime: '10:00', description: 'Nettoyage standard', status: 'Planifié' },
-  { id: '2', clientId: '2', clientName: 'Marie Curie', serviceId: 'SERV002', serviceName: 'Grand Ménage de Printemps', date: new Date().toISOString().split('T')[0], startTime: '11:00', endTime: '12:30', description: 'Grand ménage', status: 'Confirmé' },
-  { id: '3', clientId: '3', clientName: 'Pierre Martin', serviceId: 'SERV005', serviceName: 'Lavage de Vitres', date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0], startTime: '14:00', endTime: '15:00', description: 'Nettoyage vitres', status: 'Planifié' },
+  { id: '1', clientId: '1', clientName: 'Jean Dupont', serviceId: 'SERV001', serviceName: 'Nettoyage Standard Résidentiel', date: new Date().toISOString().split('T')[0], startTime: '09:00', endTime: '10:00', description: 'Nettoyage standard', workDone: '', address: '123 Rue Principale, Paris', phone: '0123456789', smsReminder: false },
+  { id: '2', clientId: '2', clientName: 'Marie Curie', serviceId: 'SERV002', serviceName: 'Grand Ménage de Printemps', date: new Date().toISOString().split('T')[0], startTime: '11:00', endTime: '12:30', description: 'Grand ménage', workDone: 'Tout est propre', address: '456 Avenue des Sciences, Lyon', phone: '0987654321', smsReminder: true },
+  { id: '3', clientId: '3', clientName: 'Pierre Martin', serviceId: 'SERV005', serviceName: 'Lavage de Vitres', date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0], startTime: '14:00', endTime: '15:00', description: 'Nettoyage vitres', workDone: '', address: '789 Boulevard Liberté, Marseille', phone: '0612345678', smsReminder: false },
 ];
 
 export default function AgendaPage() {
@@ -71,5 +71,3 @@ export default function AgendaPage() {
     </div>
   );
 }
-
-    
