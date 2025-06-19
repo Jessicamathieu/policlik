@@ -2,9 +2,10 @@
 "use client";
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { AgendaControls } from '@/components/agenda/agenda-controls';
+import { AgendaControls, type AgendaControlsProps } from '@/components/agenda/agenda-controls';
 import { CalendarView } from '@/components/agenda/calendar-view';
 import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 // Définition locale du type Appointment pour cette page
 interface Appointment {
@@ -27,6 +28,8 @@ export default function AgendaPage() {
   const [currentView, setCurrentView] = useState<"day" | "week" | "month">("day");
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [currentDate, setCurrentDate] = useState<Date>(new Date()); 
+  const [printStartDate, setPrintStartDate] = useState<Date | undefined>(undefined);
+  const [printEndDate, setPrintEndDate] = useState<Date | undefined>(undefined);
   const { toast } = useToast();
 
   const handleViewChange = useCallback((view: "day" | "week" | "month") => {
@@ -63,21 +66,8 @@ export default function AgendaPage() {
     });
   }, [toast]);
 
-  const handlePrintAppointments = useCallback(() => {
-    if (currentView === "month") {
-      console.log("Impression de la vue mois demandée. Rendez-vous à imprimer :", displayedAppointments);
-      alert("Fonction d'impression pour la vue Mois : les données des rendez-vous sont dans la console. L'impression réelle et la sélection des champs seront implémentées.");
-      // Pour une impression basique de la page (peut être amélioré avec CSS print):
-      // setTimeout(() => window.print(), 100); // setTimeout pour laisser le temps à l'alerte de se fermer
-    } else {
-      alert(`La fonction d'impression n'est pas encore optimisée pour la vue '${currentView}'. Elle imprimera la page actuelle.`);
-      // setTimeout(() => window.print(), 100);
-    }
-  }, [currentView, displayedAppointments]);
-
-  // Filter appointments for the current view and date
   const displayedAppointments = appointments.filter(app => {
-    const appDate = new Date(app.date + "T00:00:00"); // Assurer que la date est interprétée comme locale
+    const appDate = new Date(app.date + "T00:00:00"); 
     
     if (currentView === "day") {
       return appDate.toDateString() === currentDate.toDateString();
@@ -97,6 +87,26 @@ export default function AgendaPage() {
     return true; 
   });
 
+  const handlePrintAppointments = useCallback(() => {
+    let appointmentsToPrint = displayedAppointments;
+    let printMessage = "Impression de la vue mois demandée.";
+
+    if (currentView === "month" && printStartDate && printEndDate) {
+      appointmentsToPrint = appointments.filter(app => {
+        const appDate = new Date(app.date + "T00:00:00");
+        return appDate >= printStartDate && appDate <= printEndDate;
+      });
+      printMessage = `Impression des rendez-vous entre ${format(printStartDate, "dd/MM/yyyy")} et ${format(printEndDate, "dd/MM/yyyy")}.`;
+    } else if (currentView !== "month") {
+       alert(`La fonction d'impression avec sélection de dates n'est optimisée que pour la vue 'Mois'. Pour la vue '${currentView}', elle imprimera les RDVs affichés.`);
+    }
+    
+    console.log(printMessage, "Rendez-vous à imprimer :", appointmentsToPrint);
+    alert(`${printMessage} Les données des rendez-vous sont dans la console. L'impression réelle et la sélection des champs seront implémentées.`);
+    
+  }, [currentView, appointments, displayedAppointments, printStartDate, printEndDate]);
+
+
   return (
     <div className="flex flex-col h-full">
       <h1 className="text-3xl font-bold tracking-tight mb-6 font-headline">Agenda des Rendez-vous</h1>
@@ -105,6 +115,10 @@ export default function AgendaPage() {
         onViewChange={handleViewChange}
         onNewAppointmentSave={handleNewAppointmentSave} 
         onPrintAppointments={handlePrintAppointments}
+        printStartDate={printStartDate}
+        setPrintStartDate={setPrintStartDate}
+        printEndDate={printEndDate}
+        setPrintEndDate={setPrintEndDate}
       />
       <div className="flex-grow overflow-auto">
         <CalendarView 
