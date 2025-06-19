@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -5,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useRouter } from "next/navigation"; // Corrected import for App Router
+import { useEffect } from 'react';
 
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +41,12 @@ export function LoginForm() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    // Redirect to dashboard on component mount
+    router.push("/dashboard");
+  }, [router]);
+
 
   async function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
