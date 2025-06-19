@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 210 60% 98%; /* Lighter, slightly bluer canvas */
+    --background: 210 20% 98%; /* Very Light Cool Off-White */
     --foreground: 220 40% 15%; /* Dark Slate Blue for text */
 
     --muted: 210 40% 94%; /* Softer Light Blue-Gray */
@@ -53,7 +53,7 @@
   }
 
   .dark {
-    --background: 220 25% 12%; /* Deep Dark Blue */
+    --background: 220 20% 10%; /* Deep, refined Dark Blue */
     --foreground: 210 40% 95%; /* Off-white with a cool tint */
 
     --muted: 220 20% 20%; /* Darker Blue-Gray */
