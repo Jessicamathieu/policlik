@@ -188,7 +188,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
             {timeSlots.map((slot) => (
                 <React.Fragment key={`timeslot-row-${slot}`}>
                     <div 
-                        className="sticky left-0 z-20 bg-card p-2 text-xs border-r border-b flex items-center justify-center font-semibold"
+                        className="sticky left-0 z-20 bg-card p-2 text-xs border-r flex items-center justify-center font-semibold"
                         style={{ height: `${slotHeightPx}px` }}
                     >
                         {slot}
@@ -197,7 +197,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                     {daysOfWeek.map(day => (
                         <div 
                             key={`slot-${day.toISOString()}-${slot}`} 
-                            className="bg-card border-r border-b relative cursor-pointer hover:bg-muted/50 transition-colors"
+                            className="bg-card relative cursor-pointer hover:bg-muted/50 transition-colors"
                             style={{ height: `${slotHeightPx}px` }}
                             onClick={() => handleSlotClick(day, slot)}
                             role="button"
@@ -237,8 +237,8 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                                     onSave={onAppointmentUpdate}
                                     trigger={
                                         <button
-                                            className="absolute left-1 right-1 p-1.5 text-left text-xs bg-primary/90 text-primary-foreground rounded shadow-md hover:bg-primary transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-                                            style={{
+                                          className="absolute left-1 right-1 p-1 text-left text-xs bg-primary/90 text-primary-foreground rounded shadow-md hover:bg-primary transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                                          style={{
                                                 top: `${topOffset}px`,
                                                 height: `${Math.max(height, slotHeightPx)}px`,
                                                 minHeight: `${slotHeightPx}px`,
@@ -381,5 +381,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
       return renderDayView();
   }
 }
+
+    
 
     
