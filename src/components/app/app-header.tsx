@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,50 +12,51 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Icons } from "@/components/icons";
-import { Menu, LogOut, UserCircle, Settings } from "lucide-react";
-import { useSidebar } from "@/components/ui/sidebar"; // Import useSidebar
+import { LogOut, UserCircle, Settings } from "lucide-react";
+import { appNavItems } from "@/config/nav";
+import type { NavItem } from "@/types";
+
+// Helper function to determine the active tab based on the current pathname
+const getCurrentBasePath = (currentPathname: string, navItems: NavItem[]): string => {
+  // Sort navItems by href length descending to match more specific paths first
+  // e.g., /devis/liste before /devis
+  const sortedNavItems = [...navItems].sort((a, b) => {
+    const lenA = a.href?.length || 0;
+    const lenB = b.href?.length || 0;
+    return lenB - lenA;
+  });
+
+  for (const item of sortedNavItems) {
+    if (item.href && currentPathname.startsWith(item.href)) {
+      return item.href;
+    }
+  }
+  // Fallback: if on root of app section, default to dashboard or first item
+  if (currentPathname === "/dashboard" && navItems.find(item => item.href === "/dashboard")) return "/dashboard";
+  return navItems.length > 0 && navItems[0].href ? navItems[0].href : currentPathname;
+};
+
 
 export function AppHeader() {
-  const { toggleSidebar, isMobile } = useSidebar(); // Get toggleSidebar and isMobile from context
+  const pathname = usePathname();
+  const activeTabValue = getCurrentBasePath(pathname, appNavItems);
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 shadow-sm">
-      {isMobile && ( // Only show on mobile
-        <Button
-          variant="outline"
-          size="icon"
-          className="shrink-0 md:hidden"
-          onClick={toggleSidebar} 
-          aria-label="Ouvrir/Fermer la barre latérale"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-      )}
-      {!isMobile && ( // On desktop, show the logo/name or a trigger if sidebar is collapsible icon-style
-         <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-lg md:text-base">
-            <Icons.Logo className="h-6 w-6 text-primary" />
-            <span className="font-headline">Polimik Gestion</span>
-          </Link>
-      )}
-      
-      <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4 justify-end">
-        {/* Future search bar */}
-        {/* <form className="ml-auto flex-1 sm:flex-initial">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Rechercher..."
-              className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-            />
-          </div>
-        </form> */}
+    <header className="sticky top-0 z-30 flex w-full flex-col border-b bg-background shadow-sm">
+      {/* Top Part: Logo and User Actions */}
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-0">
+        <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
+          <Icons.Logo className="h-6 w-6 text-primary" />
+          <span className="font-headline text-lg">Polimik Gestion</span>
+        </Link>
+        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-9 w-9">
-                <AvatarImage src="https://placehold.co/100x100.png" alt="Avatar utilisateur" />
+                <AvatarImage src="https://placehold.co/100x100.png" alt="Avatar utilisateur" data-ai-hint="user avatar" />
                 <AvatarFallback>PG</AvatarFallback>
               </Avatar>
               <span className="sr-only">Ouvrir le menu utilisateur</span>
@@ -70,22 +72,54 @@ export function AppHeader() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <UserCircle className="mr-2 h-4 w-4" />
-              <span>Profil</span>
+            <DropdownMenuItem asChild>
+              <Link href="/settings">
+                <UserCircle className="mr-2 h-4 w-4" />
+                <span>Profil</span>
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Paramètres</span>
+            <DropdownMenuItem asChild>
+               <Link href="/settings">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Paramètres</span>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => { /* Handle logout */ alert("Déconnexion simulée"); window.location.href = '/login';}}>
+            <DropdownMenuItem onClick={() => { window.location.href = '/login';}}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Déconnexion</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* Bottom Part: Navigation Tabs */}
+      <nav className="w-full border-t bg-background">
+        <Tabs value={activeTabValue} className="w-full">
+          <TabsList className="container mx-auto h-12 justify-start rounded-none bg-transparent p-0 -mb-px overflow-x-auto">
+            {appNavItems.map((item) => {
+              // We only render top-level items that have an href.
+              // Items that are only group titles for a sidebar accordion are skipped.
+              if (!item.href) return null;
+
+              const Icon = item.icon;
+              return (
+                <TabsTrigger
+                  key={item.title}
+                  value={item.href}
+                  asChild
+                  className="h-full data-[state=active]:shadow-[inset_0_-2px_0_0_hsl(var(--primary))] data-[state=active]:text-primary rounded-none px-4 text-sm font-medium text-muted-foreground hover:text-primary"
+                >
+                  <Link href={item.href}>
+                    {Icon && <Icon className="mr-2 h-4 w-4 shrink-0" />}
+                    {item.title}
+                  </Link>
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+        </Tabs>
+      </nav>
     </header>
   );
 }
