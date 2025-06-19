@@ -82,13 +82,13 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
     <div className="grid grid-cols-[auto_1fr] gap-px bg-border border rounded-lg shadow-sm overflow-hidden">
       <div className="sticky left-0 z-10 bg-card">
         <div className="h-10 border-b flex items-center justify-center p-2 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-10">Heure</div>
-        {timeSlots.map((slot, index) => (
+        {timeSlots.map((slot) => (
           <div 
             key={slot} 
-            className={`flex items-center justify-center p-2 text-xs border-b ${index % 2 === 0 ? 'font-semibold' : ''}`}
-            style={{ height: `${slotHeightPx * 2}px` }} 
+            className="flex items-center justify-center p-2 text-xs border-b font-semibold"
+            style={{ height: `${slotHeightPx}px` }} 
           >
-            {index % 2 === 0 ? slot : ''} 
+            {slot} 
           </div>
         ))}
       </div>
@@ -110,7 +110,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
           </div>
         ))}
         {appointments.filter(app => {
-          const appDate = parseISO(app.date + 'T00:00:00'); // Ensure local interpretation
+          const appDate = parseISO(app.date + 'T00:00:00');
           return isSameDay(appDate, currentDate);
         }).map(app => {
           const startMinutes = timeToMinutes(app.startTime);
@@ -164,108 +164,108 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
 
     return (
       <div className="border rounded-lg shadow-sm overflow-x-auto">
-        <div className="h-10 flex items-center justify-center p-2 text-sm font-semibold sticky top-0 bg-card z-20 border-b">
+        <div className="h-10 flex items-center justify-center p-2 text-sm font-semibold sticky top-0 bg-card z-30 border-b">
             {formattedDateHeader || ' '}
         </div>
-        <div className="grid grid-cols-[auto_repeat(7,minmax(120px,1fr))] gap-px bg-border">
-            {/* Header: Time Column */}
-            <div className="sticky left-0 z-10 bg-card p-2 text-xs font-medium text-center border-r">Heure</div>
-            {/* Header: Day Columns */}
+        <div className="grid grid-cols-[auto_repeat(7,minmax(140px,1fr))] gap-px bg-border">
+            {/* Row 1: Header (Time column header and Day headers) */}
+            <div className="sticky left-0 z-20 bg-card p-2 text-xs font-medium text-center border-r flex items-center justify-center h-12">
+                Heure
+            </div>
             {daysOfWeek.map(day => (
-                <div key={day.toISOString()} className="bg-card p-2 text-xs font-medium text-center border-r">
-                {format(day, 'EEE', { locale: fr })} <br />
-                {format(day, 'dd/MM', { locale: fr })}
+                <div key={`header-${day.toISOString()}`} className="bg-card p-2 text-xs font-medium text-center border-r flex flex-col items-center justify-center h-12">
+                  <span>{format(day, 'EEE', { locale: fr })}</span>
+                  <span className="font-normal">{format(day, 'dd/MM', { locale: fr })}</span>
                 </div>
             ))}
 
-            {/* Time Slots and Appointments */}
-            {timeSlots.map((slot, slotIndex) => (
-                <React.Fragment key={slot}>
-                {/* Time Label Cell */}
-                <div 
-                    className={`sticky left-0 z-10 bg-card p-2 text-xs border-r border-t ${slotIndex % 2 === 0 ? 'font-semibold' : ''}`}
-                    style={{ height: `${slotHeightPx * 2}px` }}
-                >
-                    {slotIndex % 2 === 0 ? slot : ''}
-                </div>
-                {/* Day Cells for this Time Slot */}
-                {daysOfWeek.map(day => (
+            {/* Subsequent rows: Time slots and appointment areas */}
+            {/* This section combines clickable slots and appointment rendering areas */}
+            {timeSlots.map((slot) => (
+                <React.Fragment key={`timeslot-row-${slot}`}>
+                    {/* Time Label Cell for the current 30-min slot */}
                     <div 
-                    key={`${day.toISOString()}-${slot}`} 
-                    className="bg-card border-r border-t relative cursor-pointer hover:bg-muted/50 transition-colors"
-                    style={{ height: `${slotHeightPx}px` }}
-                    onClick={() => handleSlotClick(day, slot)}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`Créer un rendez-vous à ${slot} le ${format(day, 'dd/MM/yyyy')}`}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSlotClick(day, slot);}}
+                        className="sticky left-0 z-20 bg-card p-2 text-xs border-r border-b flex items-center justify-center font-semibold"
+                        style={{ height: `${slotHeightPx}px` }}
                     >
-                    {/* Placeholder for single slot click, double up for actual full hour */}
+                        {slot}
                     </div>
-                ))}
-                {/* Second half of the hour slot (visual only, covered by the double height time label) */}
-                 {daysOfWeek.map(day => (
-                    <div 
-                    key={`${day.toISOString()}-${slot}-half`} 
-                    className="bg-card border-r border-t relative cursor-pointer hover:bg-muted/50 transition-colors"
-                    style={{ height: `${slotHeightPx}px` }}
-                     onClick={() => handleSlotClick(day, format(addDays(new Date(`1970-01-01T${slot}`), 0), 'HH:mm', {locale: fr}))} // Placeholder, adjust as needed
-                    role="button"
-                    tabIndex={-1} // Not directly interactive for new appt
-                    >
-                    </div>
-                ))}
 
-
+                    {/* Day Cells for the current 30-min time slot (clickable for new appointments) */}
+                    {daysOfWeek.map(day => (
+                        <div 
+                            key={`slot-${day.toISOString()}-${slot}`} 
+                            className="bg-card border-r border-b relative cursor-pointer hover:bg-muted/50 transition-colors"
+                            style={{ height: `${slotHeightPx}px` }}
+                            onClick={() => handleSlotClick(day, slot)}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Créer un rendez-vous à ${slot} le ${format(day, 'dd/MM/yyyy')}`}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSlotClick(day, slot);}}
+                        >
+                            {/* Background slot cell. Appointments will be overlayed. */}
+                        </div>
+                    ))}
                 </React.Fragment>
             ))}
-             {/* Render appointments overlayed on the grid */}
+            
+            {/* Render appointments overlayed on the grid */}
+            {/* This creates a container for each day's appointments that aligns with the grid columns and rows */}
             {daysOfWeek.map((day, dayIndex) => (
-                <div key={`appointments-for-${day.toISOString()}`} className="col-start-${dayIndex + 2} col-end-${dayIndex + 3} row-start-2 row-end-${timeSlots.length * 2 + 1} relative">
-                    {appointments.filter(app => isSameDay(parseISO(app.date + "T00:00:00"), day)).map(app => {
-                        const startMinutes = timeToMinutes(app.startTime);
-                        const endMinutes = timeToMinutes(app.endTime);
-                        const durationMinutes = endMinutes - startMinutes;
+                <div 
+                    key={`appointment-area-${day.toISOString()}`} 
+                    className="relative" 
+                    style={{ 
+                        gridColumnStart: dayIndex + 2, // +1 for 1-based index, +1 for time column
+                        gridRowStart: 2, // After header row (row 1 is headers)
+                        gridRowEnd: timeSlots.length + 2, // Span all time slot rows (length of timeSlots + header row)
+                     }}
+                >
+                    {appointments
+                        .filter(app => isSameDay(parseISO(app.date + "T00:00:00"), day))
+                        .map(app => {
+                            const startMinutes = timeToMinutes(app.startTime);
+                            const endMinutes = timeToMinutes(app.endTime);
+                            const durationMinutes = endMinutes - startMinutes;
 
-                        const topOffset = ((startMinutes - (startHourGrid * 60)) / 30) * slotHeightPx;
-                        const height = (durationMinutes / 30) * slotHeightPx;
-                        
-                        return (
-                            <AppointmentModal
-                            key={app.id}
-                            appointment={app}
-                            onSave={onAppointmentUpdate}
-                            trigger={
-                                <button
-                                className="absolute left-px right-px p-1 text-left text-xs bg-primary/90 text-primary-foreground rounded shadow-sm hover:bg-primary transition-colors overflow-hidden focus:outline-none focus:ring-1 focus:ring-ring"
-                                style={{
-                                    top: `${topOffset}px`,
-                                    height: `${Math.max(height, slotHeightPx)}px`,
-                                    minHeight: `${slotHeightPx}px`,
-                                    // Positioned relative to its day's column area; grid layout handles column placement
-                                }}
-                                aria-label={`Rendez-vous: ${app.clientName} de ${app.startTime} à ${app.endTime}`}
-                                >
-                                <p className="font-semibold truncate text-[10px] leading-tight">{app.clientName || 'RDV'}</p>
-                                <p className="truncate text-[9px] leading-tight">{app.startTime}-{app.endTime}</p>
-                                {app.serviceName && <p className="text-[9px] leading-tight truncate opacity-80">{app.serviceName}</p>}
-                                </button>
-                            }
-                            />
-                        );
-                    })}
+                            const topOffset = ((startMinutes - (startHourGrid * 60)) / 30) * slotHeightPx;
+                            const height = (durationMinutes / 30) * slotHeightPx;
+                            
+                            return (
+                                <AppointmentModal
+                                    key={app.id}
+                                    appointment={app}
+                                    onSave={onAppointmentUpdate}
+                                    trigger={
+                                        <button
+                                            className="absolute left-px right-px p-1 text-left text-xs bg-primary/90 text-primary-foreground rounded shadow-sm hover:bg-primary transition-colors overflow-hidden focus:outline-none focus:ring-1 focus:ring-ring"
+                                            style={{
+                                                top: `${topOffset}px`,
+                                                height: `${Math.max(height, slotHeightPx)}px`,
+                                                minHeight: `${slotHeightPx}px`,
+                                            }}
+                                            aria-label={`Rendez-vous: ${app.clientName} de ${app.startTime} à ${app.endTime}`}
+                                        >
+                                            <p className="font-semibold truncate text-[10px] leading-tight">{app.clientName || 'RDV'}</p>
+                                            <p className="truncate text-[9px] leading-tight">{app.startTime}-{app.endTime}</p>
+                                            {app.serviceName && <p className="text-[9px] leading-tight truncate opacity-80">{app.serviceName}</p>}
+                                        </button>
+                                    }
+                                />
+                            );
+                        })}
                 </div>
             ))}
         </div>
          {isSlotModalOpen && slotInitialData && (
             <AppointmentModal
-            open={isSlotModalOpen}
-            onOpenChange={setIsSlotModalOpen}
-            appointment={slotInitialData} 
-            onSave={(newData) => {
-                onNewAppointmentSave(newData); 
-                setIsSlotModalOpen(false); 
-            }}
+                open={isSlotModalOpen}
+                onOpenChange={setIsSlotModalOpen}
+                appointment={slotInitialData} 
+                onSave={(newData) => {
+                    onNewAppointmentSave(newData); 
+                    setIsSlotModalOpen(false); 
+                }}
             />
         )}
       </div>
@@ -335,3 +335,4 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
       return renderDayView();
   }
 }
+
