@@ -52,7 +52,7 @@ interface Appointment {
   clientName?: string;
   serviceId?: string;
   serviceName?: string;
-  date?: string; // yyyy-MM-dd
+  date?: string | Date; // yyyy-MM-dd or Date object
   startTime?: string; // "HH:mm"
   endTime?: string; // "HH:mm"
   description?: string;
@@ -112,15 +112,15 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
       setAddress(appointment?.address || client?.address || "");
       setPhone(appointment?.phone || client?.phone || "");
       setSmsReminder(appointment?.smsReminder || false);
-      if (!appointment?.clientId) setClientSearch(""); // Reset search if no client pre-selected
+      if (!appointment?.clientId) setClientSearch(""); 
     }
-  }, [appointment, currentOpen]); // selectedClient removed from deps to avoid loop on client change
+  }, [appointment, currentOpen]); 
 
   const handleSave = () => {
     const clientData = mockClients.find(c => c.id === selectedClient);
     const serviceData = mockServices.find(s => s.id === selectedService);
     const appointmentData: Partial<Appointment> = {
-      id: appointment?.id, // Keep existing id if editing
+      id: appointment?.id, 
       clientId: selectedClient,
       clientName: clientData?.name,
       serviceId: selectedService,
@@ -249,7 +249,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
               value={startTime} 
               onChange={(e) => setStartTime(e.target.value)} 
               className="col-span-3" 
-              step="900" // 15 minutes
+              step="900" 
             />
           </div>
 
@@ -263,7 +263,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
               value={endTime} 
               onChange={(e) => setEndTime(e.target.value)} 
               className="col-span-3" 
-              step="900" // 15 minutes
+              step="900" 
             />
           </div>
           
@@ -377,7 +377,6 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
     );
   }
 
-  // If no trigger, it's a programmatically controlled Dialog
   return (
     <Dialog open={currentOpen} onOpenChange={setCurrentOpen}>
       {dialogContent}
