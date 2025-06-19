@@ -57,16 +57,22 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
   const [formattedDateHeader, setFormattedDateHeader] = useState<string>('');
 
   useEffect(() => {
-    if (currentDate && view === "day") {
+    if (!currentDate) return;
+
+    if (view === "day") {
       setFormattedDateHeader(
         format(currentDate, 'EEEE dd MMMM yyyy', { locale: fr })
       );
-    } else if (currentDate && view === "week") {
+    } else if (view === "week") {
       const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 }); // Monday
       const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
       setFormattedDateHeader(
         `Semaine du ${format(weekStart, 'dd MMMM', { locale: fr })} au ${format(weekEnd, 'dd MMMM yyyy', { locale: fr })}`
       );
+    } else if (view === "month") {
+        setFormattedDateHeader(
+            format(currentDate, 'MMMM yyyy', { locale: fr })
+        );
     }
   }, [currentDate, view]);
 
@@ -110,7 +116,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
           </div>
         ))}
         {appointments.filter(app => {
-          const appDate = parseISO(app.date + 'T00:00:00');
+          const appDate = parseISO(app.date + 'T00:00:00'); // Ensure local interpretation
           return isSameDay(appDate, currentDate);
         }).map(app => {
           const startMinutes = timeToMinutes(app.startTime);
@@ -175,12 +181,11 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
             {daysOfWeek.map(day => (
                 <div key={`header-${day.toISOString()}`} className="bg-card p-2 text-xs font-medium text-center border-r flex flex-col items-center justify-center h-12">
                   <span>{format(day, 'EEE', { locale: fr })}</span>
-                  <span className="font-normal">{format(day, 'dd', { locale: fr })}</span>
+                  <span className="font-normal">{format(day, 'd', { locale: fr })}</span>
                 </div>
             ))}
 
             {/* Subsequent rows: Time slots and appointment areas */}
-            {/* This section combines clickable slots and appointment rendering areas */}
             {timeSlots.map((slot) => (
                 <React.Fragment key={`timeslot-row-${slot}`}>
                     {/* Time Label Cell for the current 30-min slot */}
@@ -210,19 +215,18 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
             ))}
             
             {/* Render appointments overlayed on the grid */}
-            {/* This creates a container for each day's appointments that aligns with the grid columns and rows */}
             {daysOfWeek.map((day, dayIndex) => (
                 <div 
                     key={`appointment-area-${day.toISOString()}`} 
                     className="relative" 
                     style={{ 
-                        gridColumnStart: dayIndex + 2, // +1 for 1-based index, +1 for time column
-                        gridRowStart: 2, // After header row (row 1 is headers)
-                        gridRowEnd: timeSlots.length + 2, // Span all time slot rows (length of timeSlots + header row)
+                        gridColumnStart: dayIndex + 2, 
+                        gridRowStart: 2, 
+                        gridRowEnd: timeSlots.length + 2, 
                      }}
                 >
                     {appointments
-                        .filter(app => isSameDay(parseISO(app.date + "T00:00:00"), day))
+                        .filter(app => isSameDay(parseISO(app.date + "T00:00:00"), day)) // Ensure local interpretation
                         .map(app => {
                             const startMinutes = timeToMinutes(app.startTime);
                             const endMinutes = timeToMinutes(app.endTime);
@@ -238,7 +242,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                                     onSave={onAppointmentUpdate}
                                     trigger={
                                         <button
-                                            className="absolute left-px right-px p-1 text-left text-xs bg-primary/90 text-primary-foreground rounded shadow-sm hover:bg-primary transition-colors overflow-hidden focus:outline-none focus:ring-1 focus:ring-ring"
+                                            className="absolute left-1 right-1 p-1.5 text-left text-xs bg-primary/90 text-primary-foreground rounded shadow-md hover:bg-primary transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                                             style={{
                                                 top: `${topOffset}px`,
                                                 height: `${Math.max(height, slotHeightPx)}px`,
@@ -277,7 +281,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
     <Card className="shadow-md">
       <CardHeader>
         <CardTitle className="font-headline text-center">
-            {currentDate ? format(currentDate, 'MMMM yyyy', { locale: fr }) : "Mois"}
+            {formattedDateHeader || "Mois"}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4">
@@ -324,6 +328,14 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
   );
 
 
+  if (!currentDate) {
+    return (
+        <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">Chargement de l'agenda...</p>
+        </div>
+    );
+  }
+
   switch (view) {
     case "day":
       return renderDayView();
@@ -335,4 +347,3 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
       return renderDayView();
   }
 }
-
