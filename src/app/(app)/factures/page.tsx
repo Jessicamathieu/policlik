@@ -1,12 +1,13 @@
 
 
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, PlusCircle, Search, FileDown, Filter, Printer, CreditCard, Mail, FileText } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Search, FileDown, Filter, Printer, CreditCard, Mail, FileText as FileTextIcon } from "lucide-react"; // Renamed FileText to FileTextIcon
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import Link from "next/link";
@@ -53,8 +54,10 @@ export default function FacturesPage() {
           <Button variant="outline">
             <FileDown className="mr-2 h-4 w-4" /> Exporter
           </Button>
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-            <PlusCircle className="mr-2 h-4 w-4" /> Nouvelle Facture
+          <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
+            <Link href="/factures/nouveau">
+              <PlusCircle className="mr-2 h-4 w-4" /> Nouvelle Facture
+            </Link>
           </Button>
         </div>
       </div>
@@ -131,8 +134,8 @@ export default function FacturesPage() {
                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                           <Link href={`/factures/${invoice.id}/modifier`} className="flex items-center w-full">
-                            <FileText className="mr-2 h-4 w-4" /> Modifier
+                           <Link href={`/factures/nouveau?invoiceId=${invoice.id}`} className="flex items-center w-full"> {/* TODO: Update to edit link */}
+                            <FileTextIcon className="mr-2 h-4 w-4" /> Modifier
                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem>

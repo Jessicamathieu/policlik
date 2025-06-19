@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -82,7 +83,7 @@ export default function ClientsPage() {
                            <Link href={`/agenda?clientId=${client.id}&action=nouveau`}>Nouveau RDV</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                           <Link href={`/factures?clientId=${client.id}&action=nouvelle`}>Nouvelle Facture</Link>
+                           <Link href={`/factures/nouveau?clientId=${client.id}`}>Nouvelle Facture</Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive">Supprimer</DropdownMenuItem>

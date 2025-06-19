@@ -1,5 +1,6 @@
+
 import type { NavItem } from '@/types';
-import { LayoutDashboard, CalendarDays, Users, FileText, Truck, Briefcase, Settings, CreditCard, DollarSign } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, Users, FileText, Truck, Briefcase, Settings, CreditCard, DollarSign, FilePlus2 } from 'lucide-react';
 
 export const appNavItems: NavItem[] = [
   {
@@ -25,7 +26,7 @@ export const appNavItems: NavItem[] = [
       {
         title: 'Nouvelle Demande',
         href: '/devis/demandes',
-        icon: FileText, // Sub-items might not need icons if clear by context
+        icon: FilePlus2, 
       },
       {
         title: 'Liste des Devis',
@@ -38,6 +39,18 @@ export const appNavItems: NavItem[] = [
     title: 'Factures',
     href: '/factures',
     icon: CreditCard,
+    items: [ // Added sub-items for Factures
+      {
+        title: 'Liste des Factures',
+        href: '/factures', // Main page for listing
+        icon: CreditCard,
+      },
+      {
+        title: 'Nouvelle Facture',
+        href: '/factures/nouveau',
+        icon: FilePlus2, // Using FilePlus2 for "new"
+      }
+    ]
   },
   {
     title: 'Services',
