@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, LinkIcon, MapPin, Phone, PlusCircle } from "lucide-react";
+import { CalendarIcon, MapPin, Phone, PlusCircle, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -33,6 +34,15 @@ const mockClients = [
   { id: "1", name: "Jean Dupont", address: "123 Rue Principale, Paris" },
   { id: "2", name: "Marie Curie", address: "456 Avenue des Sciences, Lyon" },
   { id: "3", name: "Pierre Martin", address: "789 Boulevard Liberté, Marseille" },
+];
+
+// Mock service data (ideally fetched or from a shared source)
+const mockServices = [
+  { id: "SERV001", name: "Nettoyage Standard Résidentiel" },
+  { id: "SERV002", name: "Grand Ménage de Printemps" },
+  { id: "SERV003", name: "Nettoyage de Bureaux" },
+  { id: "SERV004", name: "Nettoyage Après Chantier" },
+  { id: "SERV005", name: "Lavage de Vitres" },
 ];
 
 const appointmentStatuses = ["Planifié", "Confirmé", "Terminé", "Annulé", "Reporté"];
@@ -46,6 +56,7 @@ interface AppointmentModalProps {
 export function AppointmentModal({ trigger, appointment, onSave }: AppointmentModalProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [selectedClient, setSelectedClient] = React.useState(appointment?.clientId || "");
+  const [selectedService, setSelectedService] = React.useState(appointment?.serviceId || "");
   const [appointmentDate, setAppointmentDate] = React.useState<Date | undefined>(appointment?.date ? new Date(appointment.date) : new Date());
   const [startTime, setStartTime] = React.useState(appointment?.startTime || "09:00");
   const [endTime, setEndTime] = React.useState(appointment?.endTime || "10:00");
@@ -64,6 +75,7 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
   React.useEffect(() => {
     if (appointment) {
       setSelectedClient(appointment.clientId || "");
+      setSelectedService(appointment.serviceId || "");
       setAppointmentDate(appointment.date ? new Date(appointment.date) : new Date());
       setStartTime(appointment.startTime || "09:00");
       setEndTime(appointment.endTime || "10:00");
@@ -75,6 +87,7 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
     } else {
       // Reset form for new appointment
       setSelectedClient("");
+      setSelectedService("");
       setAppointmentDate(new Date());
       setStartTime("09:00");
       setEndTime("10:00");
@@ -88,10 +101,13 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
 
   const handleSave = () => {
     const clientData = mockClients.find(c => c.id === selectedClient);
+    const serviceData = mockServices.find(s => s.id === selectedService);
     const appointmentData = {
       id: appointment?.id || Date.now().toString(),
       clientId: selectedClient,
       clientName: clientData?.name,
+      serviceId: selectedService,
+      serviceName: serviceData?.name,
       date: appointmentDate ? format(appointmentDate, "yyyy-MM-dd") : undefined,
       startTime,
       endTime,
@@ -152,6 +168,26 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
                    <Button variant="ghost" className="w-full justify-start mt-1 text-primary">
                     <PlusCircle className="mr-2 h-4 w-4" /> Nouveau Client
                   </Button>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="service" className="text-right col-span-1">
+              Service
+            </Label>
+            <div className="col-span-3">
+              <Select onValueChange={setSelectedService} value={selectedService}>
+                <SelectTrigger id="service">
+                  <SelectValue placeholder="Sélectionner un service" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mockServices.map(service => (
+                    <SelectItem key={service.id} value={service.id}>
+                      {service.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -315,3 +351,5 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
     </Dialog>
   );
 }
+
+    

@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useCallback } from 'react';
@@ -7,9 +8,9 @@ import { useToast } from '@/hooks/use-toast';
 
 // Mock data for appointments
 const initialAppointments = [
-  { id: '1', clientName: 'Jean Dupont', date: new Date().toISOString().split('T')[0], startTime: '09:00', endTime: '10:00', description: 'Nettoyage standard', status: 'Planifié' },
-  { id: '2', clientName: 'Marie Curie', date: new Date().toISOString().split('T')[0], startTime: '11:00', endTime: '12:30', description: 'Grand ménage', status: 'Confirmé' },
-  { id: '3', clientName: 'Pierre Martin', date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0], startTime: '14:00', endTime: '15:00', description: 'Nettoyage vitres', status: 'Planifié' },
+  { id: '1', clientId: '1', clientName: 'Jean Dupont', serviceId: 'SERV001', serviceName: 'Nettoyage Standard Résidentiel', date: new Date().toISOString().split('T')[0], startTime: '09:00', endTime: '10:00', description: 'Nettoyage standard', status: 'Planifié' },
+  { id: '2', clientId: '2', clientName: 'Marie Curie', serviceId: 'SERV002', serviceName: 'Grand Ménage de Printemps', date: new Date().toISOString().split('T')[0], startTime: '11:00', endTime: '12:30', description: 'Grand ménage', status: 'Confirmé' },
+  { id: '3', clientId: '3', clientName: 'Pierre Martin', serviceId: 'SERV005', serviceName: 'Lavage de Vitres', date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0], startTime: '14:00', endTime: '15:00', description: 'Nettoyage vitres', status: 'Planifié' },
 ];
 
 export default function AgendaPage() {
@@ -28,7 +29,7 @@ export default function AgendaPage() {
     setAppointments(prev => [...prev, { ...appointmentData, id: String(Date.now()) }]);
     toast({
       title: "Rendez-vous créé",
-      description: `Le rendez-vous pour ${appointmentData.clientName || 'un client'} a été ajouté.`,
+      description: `Le rendez-vous pour ${appointmentData.clientName || 'un client'} concernant ${appointmentData.serviceName || 'un service'} a été ajouté.`,
     });
   }, [toast]);
 
@@ -36,7 +37,7 @@ export default function AgendaPage() {
     setAppointments(prev => prev.map(app => app.id === updatedAppointmentData.id ? updatedAppointmentData : app));
     toast({
       title: "Rendez-vous mis à jour",
-      description: `Le rendez-vous pour ${updatedAppointmentData.clientName || 'un client'} a été modifié.`,
+      description: `Le rendez-vous pour ${updatedAppointmentData.clientName || 'un client'} concernant ${updatedAppointmentData.serviceName || 'un service'} a été modifié.`,
     });
   }, [toast]);
 
@@ -70,3 +71,5 @@ export default function AgendaPage() {
     </div>
   );
 }
+
+    
