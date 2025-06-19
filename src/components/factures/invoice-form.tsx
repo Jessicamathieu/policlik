@@ -43,11 +43,12 @@ const mockClients = [
 ];
 
 const mockServices = [
-  { id: "SERV001", name: "Nettoyage Standard Résidentiel", price: 50 },
-  { id: "SERV002", name: "Grand Ménage de Printemps", price: 250 },
-  { id: "SERV003", name: "Nettoyage de Bureaux", price: 0.15 }, // per m², example
-  { id: "SERV005", name: "Lavage de Vitres", price: 5 }, // per window
-  { id: "PROD001", name: "Produit Nettoyant XYZ", price: 15 },
+  { id: "SERV001", name: "Nettoyage Standard Résidentiel", price: 50, colorClassName: "bg-blue-500" },
+  { id: "SERV002", name: "Grand Ménage de Printemps", price: 250, colorClassName: "bg-green-500" },
+  { id: "SERV003", name: "Nettoyage de Bureaux", price: 0.15, colorClassName: "bg-indigo-500" }, // per m², example
+  { id: "SERV004", name: "Nettoyage Après Chantier", price: 300, colorClassName: "bg-purple-500" }, // Example price
+  { id: "SERV005", name: "Lavage de Vitres", price: 5, colorClassName: "bg-sky-500" }, // per window
+  { id: "PROD001", name: "Produit Nettoyant XYZ", price: 15, colorClassName: "bg-gray-500" },
 ];
 
 const lineItemSchema = z.object({
@@ -450,3 +451,5 @@ export function InvoiceForm() {
     </Form>
   );
 }
+
+    

@@ -22,6 +22,7 @@ interface Appointment {
   address?: string;
   phone?: string;
   smsReminder?: boolean;
+  serviceColorClassName?: string;
 }
 
 interface CalendarViewProps {
@@ -133,7 +134,10 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
               onSave={onAppointmentUpdate} 
               trigger={
                 <button
-                  className="absolute left-1 right-1 p-1.5 text-left text-xs bg-primary/90 text-primary-foreground rounded shadow-md hover:bg-primary transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                  className={cn(
+                    "absolute left-1 right-1 p-1.5 text-left text-xs text-primary-foreground rounded shadow-md transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 hover:opacity-90",
+                    app.serviceColorClassName || 'bg-primary/90'
+                  )}
                   style={{
                     top: `${topOffset}px`, 
                     height: `${Math.max(height, slotHeightPx)}px`, 
@@ -242,7 +246,10 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                                     onSave={onAppointmentUpdate}
                                     trigger={
                                         <button
-                                          className="absolute left-1 right-1 p-1 text-left text-xs bg-primary/90 text-primary-foreground rounded shadow-md hover:bg-primary transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                                          className={cn(
+                                            "absolute left-1 right-1 p-1 text-left text-xs text-primary-foreground rounded shadow-md transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 hover:opacity-90",
+                                            app.serviceColorClassName || 'bg-primary/90'
+                                          )}
                                           style={{
                                                 top: `${topOffset}px`,
                                                 height: `${Math.max(height, slotHeightPx)}px`,
@@ -332,7 +339,10 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                           onSave={onAppointmentUpdate}
                           trigger={
                             <button 
-                              className="w-full text-left text-[10px] sm:text-xs bg-primary/80 text-primary-foreground rounded px-1 py-0.5 block truncate hover:bg-primary focus:outline-none focus:ring-1 focus:ring-ring"
+                              className={cn(
+                                "w-full text-left text-[10px] sm:text-xs text-primary-foreground rounded px-1 py-0.5 block truncate focus:outline-none focus:ring-1 focus:ring-ring hover:opacity-90",
+                                app.serviceColorClassName || 'bg-primary/80'
+                              )}
                               onClick={(e) => e.stopPropagation()} // Prevent day click when clicking appointment
                               aria-label={`Rendez-vous: ${app.clientName || app.serviceName} de ${app.startTime} à ${app.endTime}`}
                             >
@@ -387,3 +397,4 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
   }
 }
 
+    

@@ -37,13 +37,13 @@ const mockClients = [
   { id: "3", name: "Pierre Martin", address: "789 Boulevard Liberté, Marseille", phone: "0612345678" },
 ];
 
-// Mock service data (ideally fetched or from a shared source)
+// Mock service data
 const mockServices = [
-  { id: "SERV001", name: "Nettoyage Standard Résidentiel" },
-  { id: "SERV002", name: "Grand Ménage de Printemps" },
-  { id: "SERV003", name: "Nettoyage de Bureaux" },
-  { id: "SERV004", name: "Nettoyage Après Chantier" },
-  { id: "SERV005", name: "Lavage de Vitres" },
+  { id: "SERV001", name: "Nettoyage Standard Résidentiel", colorClassName: "bg-blue-500" },
+  { id: "SERV002", name: "Grand Ménage de Printemps", colorClassName: "bg-green-500" },
+  { id: "SERV003", name: "Nettoyage de Bureaux", colorClassName: "bg-indigo-500" },
+  { id: "SERV004", name: "Nettoyage Après Chantier", colorClassName: "bg-purple-500" },
+  { id: "SERV005", name: "Lavage de Vitres", colorClassName: "bg-sky-500" },
 ];
 
 interface Appointment {
@@ -60,6 +60,7 @@ interface Appointment {
   address?: string;
   phone?: string;
   smsReminder?: boolean;
+  serviceColorClassName?: string;
 }
 
 interface AppointmentModalProps {
@@ -133,6 +134,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
       address: address, 
       phone: phone,     
       smsReminder,
+      serviceColorClassName: serviceData?.colorClassName,
     };
     onSave(appointmentData);
     if(setCurrentOpen) setCurrentOpen(false);
@@ -202,7 +204,10 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
                 <SelectContent>
                   {mockServices.map(service => (
                     <SelectItem key={service.id} value={service.id}>
-                      {service.name}
+                      <div className="flex items-center">
+                        <span className={cn("w-3 h-3 rounded-full mr-2", service.colorClassName)}></span>
+                        {service.name}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -383,3 +388,5 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
     </Dialog>
   );
 }
+
+    
