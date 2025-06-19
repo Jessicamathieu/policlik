@@ -16,7 +16,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Icons } from "@/components/icons";
 import { LogOut, UserCircle, Settings } from "lucide-react";
-import { appNavItems, getActiveNavItemConfig } from "@/config/nav";
+import { appNavItems, pageColors as navPageColors } from "@/config/nav"; // Import pageColors
 import type { NavItem } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -48,8 +48,13 @@ export function AppHeader() {
   const pathname = usePathname();
   const activeTabValue = getCurrentBasePathForTabs(pathname, appNavItems);
 
+  const gradientStops = navPageColors.map((pc, index, arr) => ({
+    offset: arr.length === 1 ? "100%" : `${(index / (arr.length - 1)) * 100}%`,
+    color: pc.color,
+  }));
+
   return (
-    <header className="sticky top-0 z-30 flex w-full flex-col border-b bg-background shadow-sm">
+    <header className="sticky top-0 z-30 flex w-full flex-col bg-background shadow-sm">
       {/* Top Part: Logo and User Actions */}
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-0">
         <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
@@ -99,7 +104,7 @@ export function AppHeader() {
       </div>
 
       {/* Bottom Part: Navigation Tabs */}
-      <nav className="w-full border-t bg-background">
+      <nav className="w-full bg-background"> {/* Removed border-t */}
         <Tabs value={activeTabValue} className="w-full">
           <TabsList className="container mx-auto h-12 justify-start rounded-none bg-transparent p-0 -mb-px overflow-x-auto">
             {appNavItems.map((item) => {
@@ -114,23 +119,28 @@ export function AppHeader() {
                   asChild
                   className={cn(
                     "h-full rounded-none px-4 text-sm font-medium transition-all duration-150 ease-in-out",
-                    "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--page-main-color)]", // Dynamic ring color
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2", // Focus ring will use --item-focus-ring-color
                     isActive
-                      ? 'shadow-[inset_0_-2px_0_0_var(--page-main-color)]' // Active indicator uses dynamic color
-                      : 'text-muted-foreground hover:text-[var(--page-main-color)] hover:opacity-90' 
+                      ? '' // Removed shadow indicator
+                      : 'text-muted-foreground hover:opacity-90' 
                   )}
                   style={
-                    isActive 
-                    ? { 
+                    {
+                      ...(isActive && { 
                         backgroundColor: item.color || 'var(--page-main-color)', 
                         color: item.contrastColor || 'var(--page-main-contrast-color)',
+                      }),
+                      '--item-focus-ring-color': item.color || 'hsl(var(--primary))', // Default to global primary if item.color not set
+                      ...( !isActive && {
                         // @ts-ignore
-                        '--page-main-color': item.color, // Make sure var is available for shadow
-                      } 
-                    : {}
+                        '&:hover': {
+                           color: item.color || 'var(--page-main-color)',
+                        }
+                      })
+                    } as React.CSSProperties
                   }
                 >
-                  <Link href={item.href}>
+                  <Link href={item.href} style={{color: isActive ? item.contrastColor : undefined }}>
                     {Icon && <Icon className="mr-2 h-4 w-4 shrink-0" />}
                     {item.title}
                   </Link>
@@ -139,6 +149,20 @@ export function AppHeader() {
             })}
           </TabsList>
         </Tabs>
+        {/* Spilled Paint SVG Separator */}
+        <div className="relative w-full h-3 md:h-4 -mt-px"> {/* Adjusted height and negative margin */}
+          <svg width="100%" height="100%" viewBox="0 0 1200 15" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="pageColorGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                {gradientStops.map(stop => (
+                  <stop key={stop.offset} offset={stop.offset} style={{stopColor: stop.color, stopOpacity:1}} />
+                ))}
+              </linearGradient>
+            </defs>
+            <path d="M0 8 C 50 2, 100 10, 150 7 S 250 2, 300 8 S 400 13, 450 8 S 550 3, 600 8 S 700 13, 750 8 S 850 3, 900 8 S 1000 13, 1050 8 S 1150 2, 1200 8" 
+                  stroke="url(#pageColorGradient)" strokeWidth="3" fill="none" strokeLinecap="round" />
+          </svg>
+        </div>
       </nav>
     </header>
   );
