@@ -1,87 +1,117 @@
+
 "use client";
 
-import { AppHeader } from "@/components/app/app-header";
-import { Toaster } from "@/components/ui/toaster";
-import { getActiveNavItemConfig } from "@/config/nav";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import "./globals.css"; // Si tu as un global CSS
+import './globals.css'; // Import global styles
+import { Toaster } from '@/components/ui/toaster';
+import { AppHeader } from '@/components/app/app-header';
+import { getActiveNavItemConfig } from '@/config/nav';
+import { usePathname } from 'next/navigation';
+import React, { useEffect, useState } from 'react'; // Imported React for React.Children
+import { PT_Sans } from 'next/font/google';
 
-export default function AppLayout({
+const ptSans = PT_Sans({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  display: 'swap',
+  variable: '--font-pt-sans',
+});
+
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [activeColor, setActiveColor] = useState<string>('#2743e3'); // Polimik blue par défaut
-  const [activeContrastColor, setActiveContrastColor] = useState<string>('#FFFFFF');
+  const [activeColor, setActiveColor] = useState<string>('#3F51B5'); // Default for body bg and CSS var
+  const [activeContrastColor, setActiveContrastColor] = useState<string>('#FFFFFF'); // Default for body text and CSS var
 
   useEffect(() => {
     const activeNavItem = getActiveNavItemConfig(pathname);
-    let newActiveColor = '#2743e3';
-    let newActiveContrastColor = '#FFFFFF';
+    let colorToSet = '#3F51B5'; 
+    let contrastColorToSet = '#FFFFFF';
 
     if (activeNavItem?.color && activeNavItem?.contrastColor) {
-      newActiveColor = activeNavItem.color;
-      newActiveContrastColor = activeNavItem.contrastColor;
+      colorToSet = activeNavItem.color;
+      contrastColorToSet = activeNavItem.contrastColor;
     } else {
       const dashboardItem = getActiveNavItemConfig('/dashboard');
       if (dashboardItem?.color && dashboardItem?.contrastColor) {
-        newActiveColor = dashboardItem.color;
-        newActiveContrastColor = dashboardItem.contrastColor;
+        colorToSet = dashboardItem.color;
+        contrastColorToSet = dashboardItem.contrastColor;
       }
     }
-    setActiveColor(newActiveColor);
-    setActiveContrastColor(newActiveContrastColor);
+    setActiveColor(colorToSet);
+    setActiveContrastColor(contrastColorToSet);
 
-    document.documentElement.style.setProperty('--page-main-color', newActiveColor);
-    document.documentElement.style.setProperty('--page-main-contrast-color', newActiveContrastColor);
+    // Apply global CSS variables for dynamic theming (e.g., Tailwind primary color, AppHeader tabs)
+    document.documentElement.style.setProperty('--page-main-color', colorToSet);
+    document.documentElement.style.setProperty('--page-main-contrast-color', contrastColorToSet);
   }, [pathname]);
 
-  // Palette Service Polimik (bleu, vert, orange, blanc, jaune)
+  // Card coloring logic from your previous src/app/layout.tsx structure
   const cardColors = [
-    "#2743e3", // bleu Polimik
-    "#0ccc34", // vert accent
-    "#fb9026", // orange accent
-    "#fff",    // blanc
-    "#FFFF00", // jaune accent
+    "#2743e3", // Bleu Polimik
+    "#0ccc34", // Vert
+    "#fb9026", // Orange
+    "#FFFF00"  // Jaune
   ];
 
-  // Texte foncé sur blanc/jaune, blanc sinon
-  const getTextColor = (bg: string) => {
-    if (bg === "#fff" || bg === "#FFFF00") return "#232323";
-    return "#fff";
-  };
+  // isBgWhite determines if the main page background is white/light, affecting card styling.
+  // Using a light gray as "white" for this logic. This should ideally align with your theme's actual background.
+  // For simplicity, let's assume any non-dark, non-vibrant activeColor means cards should be colored.
+  // A more robust check might involve parsing HSL or having a flag in pageColors config.
+  // For now, if activeColor isn't one of the vibrant cardColors, assume it's a light background.
+  const isPageBackgroundLight = !cardColors.includes(activeColor.toLowerCase()) && activeColor !== '#000000';
 
-  // Toujours traiter children comme un array
-  const childrenArray = Array.isArray(children) ? children : [children];
+
+  const childrenArray = React.Children.toArray(children);
 
   return (
-    <html lang="fr">
-      <body 
-        className="flex min-h-screen w-full flex-col bg-[color:var(--page-main-color)] text-[color:var(--page-main-contrast-color)]"
+    <html lang="fr" className={ptSans.className}>
+      <body
+        className="flex min-h-screen w-full flex-col"
         style={{
-          backgroundColor: activeColor,
-          color: activeContrastColor
+          backgroundColor: activeColor, // Page background is the active tab color
+          color: activeContrastColor,   // Default text color for the page
         }}
       >
         <AppHeader />
         <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto relative">
-          <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-3">
-            {childrenArray.map((child, i) => (
-              <div
-                key={i}
-                className="rounded-2xl shadow-xl p-7 min-h-[130px] flex flex-col justify-between transition-transform hover:scale-105 hover:shadow-2xl duration-150 cursor-pointer border"
-                style={{
-                  background: cardColors[i % cardColors.length],
-                  color: getTextColor(cardColors[i % cardColors.length]),
-                  border: cardColors[i % cardColors.length] === "#fff" ? '2px solid #2743e3' : 'none',
-                  boxShadow: "0 8px 32px 0 rgba(39,67,227,0.12)",
-                }}
-              >
-                {child}
-              </div>
-            ))}
+          {/* This grid-of-cards structure for children is kept from your existing src/app/layout.tsx */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {childrenArray.map((child, i) => {
+              const cardBgColor = isPageBackgroundLight ? cardColors[i % cardColors.length] : "#ffffff";
+              let cardTextColor = "#232323"; // Default for white cards or error
+              if (isPageBackgroundLight) { // Page BG is light, cards are colored
+                cardTextColor = cardBgColor.toLowerCase() === "#ffff00" ? "#000000" : "#ffffff";
+              } else { // Page BG is colored, cards are white
+                 cardTextColor = activeContrastColor; // Text on white card should be page's main content color (if page bg is dark)
+                                                  // Or simply #232323 (dark gray) if page bg is light (which means cards are colored, this path isn't hit)
+                                                  // This might need more refinement based on exact activeColor vs cardColor logic
+                 // If page background is colored, cards are white, text on cards should be dark.
+                 cardTextColor = "#232323";
+              }
+
+              return (
+                <div
+                  key={i}
+                  className={`
+                    rounded-xl shadow-lg p-6 min-h-[120px] flex flex-col justify-between
+                    transition-transform duration-150
+                    hover:scale-[1.03] hover:shadow-2xl
+                  `}
+                  style={{
+                    background: cardBgColor,
+                    color: cardTextColor,
+                    border: !isPageBackgroundLight ? "1.5px solid #e0e0e0" : "none", // Border for white cards on colored page
+                    boxShadow: "0 2px 16px 0 rgba(39,67,227,0.10)",
+                    cursor: "default"
+                  }}
+                >
+                  {child}
+                </div>
+              );
+            })}
           </div>
         </main>
         <Toaster />
