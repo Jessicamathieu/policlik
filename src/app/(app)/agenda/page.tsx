@@ -42,13 +42,24 @@ export default function AgendaPage() {
   }, [toast]);
 
   // Filter appointments for the current view and date
-  // This is simplified for demo. Real implementation would be more robust.
   const displayedAppointments = appointments.filter(app => {
     const appDate = new Date(app.date);
     if (currentView === "day") {
       return appDate.toDateString() === currentDate.toDateString();
     }
-    // Add week/month filtering logic here
+    // Add week/month filtering logic here for appointments list
+    // For simplicity, if not 'day' view, show all appointments for now
+    // This part is for the list of appointments passed to CalendarView, not the view logic inside CalendarView itself
+    if (currentView === "week") {
+      const startOfWeek = new Date(currentDate);
+      startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + (currentDate.getDay() === 0 ? -6 : 1)); // Adjust to Monday
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      return appDate >= startOfWeek && appDate <= endOfWeek;
+    }
+    if (currentView === "month") {
+      return appDate.getFullYear() === currentDate.getFullYear() && appDate.getMonth() === currentDate.getMonth();
+    }
     return true; 
   });
 
@@ -66,6 +77,7 @@ export default function AgendaPage() {
           currentDate={currentDate} 
           view={currentView}
           onAppointmentUpdate={handleAppointmentUpdate}
+          onNewAppointmentSave={handleNewAppointmentSave} // Pass down the save handler
         />
       </div>
     </div>

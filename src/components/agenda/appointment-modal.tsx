@@ -26,7 +26,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, MapPin, Phone, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import React from "react";
 
@@ -46,17 +46,41 @@ const mockServices = [
   { id: "SERV005", name: "Lavage de Vitres" },
 ];
 
-interface AppointmentModalProps {
-  trigger?: React.ReactNode;
-  appointment?: any; // Replace 'any' with your Appointment type
-  onSave: (appointmentData: any) => void;
+interface Appointment {
+  id?: string;
+  clientId?: string;
+  clientName?: string;
+  serviceId?: string;
+  serviceName?: string;
+  date?: string; // yyyy-MM-dd
+  startTime?: string; // "HH:mm"
+  endTime?: string; // "HH:mm"
+  description?: string;
+  workDone?: string;
+  address?: string;
+  phone?: string;
+  smsReminder?: boolean;
 }
 
-export function AppointmentModal({ trigger, appointment, onSave }: AppointmentModalProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
+interface AppointmentModalProps {
+  trigger?: React.ReactNode;
+  appointment?: Partial<Appointment>; // Can be partial for new or for initial data
+  onSave: (appointmentData: Partial<Appointment>) => void;
+  open?: boolean; // To control modal programmatically
+  onOpenChange?: (open: boolean) => void; // To control modal programmatically
+}
+
+export function AppointmentModal({ trigger, appointment, onSave, open, onOpenChange }: AppointmentModalProps) {
+  const [internalOpen, setInternalOpen] = React.useState(false);
+  const isControlled = open !== undefined && onOpenChange !== undefined;
+  const currentOpen = isControlled ? open : internalOpen;
+  const setCurrentOpen = isControlled ? onOpenChange : setInternalOpen;
+
   const [selectedClient, setSelectedClient] = React.useState(appointment?.clientId || "");
   const [selectedService, setSelectedService] = React.useState(appointment?.serviceId || "");
-  const [appointmentDate, setAppointmentDate] = React.useState<Date | undefined>(appointment?.date ? new Date(appointment.date) : new Date());
+  const [appointmentDate, setAppointmentDate] = React.useState<Date | undefined>(
+    appointment?.date ? (typeof appointment.date === 'string' ? parseISO(appointment.date) : appointment.date) : new Date()
+  );
   const [startTime, setStartTime] = React.useState(appointment?.startTime || "09:00");
   const [endTime, setEndTime] = React.useState(appointment?.endTime || "10:00");
   const [description, setDescription] = React.useState(appointment?.description || "");
@@ -72,41 +96,31 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
   );
   
   React.useEffect(() => {
-    if (isOpen) { // Only run when modal is opened or appointment changes while open
-      if (appointment) {
-        setSelectedClient(appointment.clientId || "");
-        const currentClient = mockClients.find(c => c.id === appointment.clientId);
-        setAddress(appointment.address || currentClient?.address || "");
-        setPhone(appointment.phone || currentClient?.phone || "");
-        setSelectedService(appointment.serviceId || "");
-        setAppointmentDate(appointment.date ? new Date(appointment.date) : new Date());
-        setStartTime(appointment.startTime || "09:00");
-        setEndTime(appointment.endTime || "10:00");
-        setDescription(appointment.description || "");
-        setWorkDone(appointment.workDone || "");
-        setSmsReminder(appointment.smsReminder || false);
-      } else {
-        // Reset form for new appointment
-        setSelectedClient("");
-        setSelectedService("");
-        setAppointmentDate(new Date());
-        setStartTime("09:00");
-        setEndTime("10:00");
-        setDescription("");
-        setWorkDone("");
-        setAddress("");
-        setPhone("");
-        setSmsReminder(false);
-        setClientSearch("");
-      }
+    if (currentOpen) { 
+      const initialDate = appointment?.date 
+        ? (typeof appointment.date === 'string' ? parseISO(appointment.date) : appointment.date) 
+        : new Date();
+      const client = mockClients.find(c => c.id === (appointment?.clientId || selectedClient));
+
+      setSelectedClient(appointment?.clientId || "");
+      setSelectedService(appointment?.serviceId || "");
+      setAppointmentDate(initialDate instanceof Date && !isNaN(initialDate.valueOf()) ? initialDate : new Date());
+      setStartTime(appointment?.startTime || "09:00");
+      setEndTime(appointment?.endTime || "10:00");
+      setDescription(appointment?.description || "");
+      setWorkDone(appointment?.workDone || "");
+      setAddress(appointment?.address || client?.address || "");
+      setPhone(appointment?.phone || client?.phone || "");
+      setSmsReminder(appointment?.smsReminder || false);
+      if (!appointment?.clientId) setClientSearch(""); // Reset search if no client pre-selected
     }
-  }, [appointment, isOpen]);
+  }, [appointment, currentOpen]); // selectedClient removed from deps to avoid loop on client change
 
   const handleSave = () => {
     const clientData = mockClients.find(c => c.id === selectedClient);
     const serviceData = mockServices.find(s => s.id === selectedService);
-    const appointmentData = {
-      id: appointment?.id || Date.now().toString(),
+    const appointmentData: Partial<Appointment> = {
+      id: appointment?.id, // Keep existing id if editing
       clientId: selectedClient,
       clientName: clientData?.name,
       serviceId: selectedService,
@@ -116,12 +130,12 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
       endTime,
       description,
       workDone,
-      address: address, // address state is now managed
-      phone: phone,     // phone state is now managed
+      address: address, 
+      phone: phone,     
       smsReminder,
     };
     onSave(appointmentData);
-    setIsOpen(false);
+    if(setCurrentOpen) setCurrentOpen(false);
   };
 
   const handleClientChange = (clientId: string) => {
@@ -136,15 +150,12 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
     }
   };
 
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+  const dialogContent = (
+    <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-headline">{appointment ? "Modifier le Rendez-vous" : "Nouveau Rendez-vous"}</DialogTitle>
+          <DialogTitle className="font-headline">{appointment?.id ? "Modifier le Rendez-vous" : "Nouveau Rendez-vous"}</DialogTitle>
           <DialogDescription>
-            {appointment ? "Mettez à jour les détails du rendez-vous." : "Planifiez un nouveau rendez-vous pour un client."}
+            {appointment?.id ? "Mettez à jour les détails du rendez-vous." : "Planifiez un nouveau rendez-vous."}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
@@ -349,12 +360,27 @@ export function AppointmentModal({ trigger, appointment, onSave }: AppointmentMo
 
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)}>Annuler</Button>
+          <Button variant="outline" onClick={() => {if(setCurrentOpen) setCurrentOpen(false)}}>Annuler</Button>
           <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-            {appointment ? "Sauvegarder" : "Créer Rendez-vous"}
+            {appointment?.id ? "Sauvegarder" : "Créer Rendez-vous"}
           </Button>
         </DialogFooter>
       </DialogContent>
+  );
+
+  if (trigger) {
+    return (
+      <Dialog open={currentOpen} onOpenChange={setCurrentOpen}>
+        <DialogTrigger asChild>{trigger}</DialogTrigger>
+        {dialogContent}
+      </Dialog>
+    );
+  }
+
+  // If no trigger, it's a programmatically controlled Dialog
+  return (
+    <Dialog open={currentOpen} onOpenChange={setCurrentOpen}>
+      {dialogContent}
     </Dialog>
   );
 }

@@ -1,23 +1,34 @@
+
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { AppointmentModal } from './appointment-modal'; // To edit appointments
+import { AppointmentModal } from './appointment-modal'; 
+import { format } from 'date-fns';
 
 interface Appointment {
   id: string;
-  clientName: string;
+  clientId?: string;
+  clientName?: string;
+  serviceId?: string;
+  serviceName?: string;
+  date: string; // yyyy-MM-dd
   startTime: string; // "HH:mm"
   endTime: string; // "HH:mm"
   description: string;
-  status: string;
+  workDone?: string;
+  address?: string;
+  phone?: string;
+  smsReminder?: boolean;
+  // Remove status, it's not used in AppointmentModal anymore
 }
 
 interface CalendarViewProps {
   appointments: Appointment[];
-  currentDate: Date; // To determine which day/week/month to show
+  currentDate: Date; 
   view: "day" | "week" | "month";
-  onAppointmentUpdate: (appointmentData: any) => void;
+  onAppointmentUpdate: (appointmentData: Partial<Appointment>) => void;
+  onNewAppointmentSave: (appointmentData: Partial<Appointment>) => void; // For creating new appointments
 }
 
 // Helper to generate time slots
@@ -38,8 +49,20 @@ const timeToMinutes = (time: string): number => {
 };
 
 
-export function CalendarView({ appointments, currentDate, view, onAppointmentUpdate }: CalendarViewProps) {
+export function CalendarView({ appointments, currentDate, view, onAppointmentUpdate, onNewAppointmentSave }: CalendarViewProps) {
   const timeSlots = generateTimeSlots(6, 20, 15); // 6 AM to 8 PM, 15-min intervals
+  const slotHeightPx = 10; // Height of a 15-minute slot in pixels
+
+  const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
+  const [slotInitialData, setSlotInitialData] = useState<Partial<Appointment> | undefined>(undefined);
+
+  const handleSlotClick = (slotStartTime: string) => {
+    setSlotInitialData({
+      date: format(currentDate, "yyyy-MM-dd"),
+      startTime: slotStartTime,
+    });
+    setIsSlotModalOpen(true);
+  };
 
   const renderDayView = () => (
     <div className="grid grid-cols-[auto_1fr] gap-px bg-border border rounded-lg shadow-sm overflow-hidden">
@@ -47,8 +70,12 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
       <div className="sticky left-0 z-10 bg-card">
         <div className="h-10 border-b flex items-center justify-center p-2 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-10">Heure</div>
         {timeSlots.map((slot, index) => (
-          <div key={slot} className={`h-10 flex items-center justify-center p-2 text-xs border-b ${index % 4 === 3 ? 'font-semibold' : ''}`}>
-            {slot}
+          <div 
+            key={slot} 
+            className={`h-${slotHeightPx} flex items-center justify-center p-2 text-xs border-b ${index % 4 === 3 ? 'font-semibold' : ''}`}
+            style={{ height: `${slotHeightPx * 4}px` }} // Each displayed slot represents an hour (4 * 15 min)
+          >
+            {index % 4 === 0 ? slot : ''} {/* Display time only at the hour mark */}
           </div>
         ))}
       </div>
@@ -58,47 +85,69 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
           {currentDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
         </div>
         {timeSlots.map((slot, slotIndex) => (
-          <div key={slotIndex} className="h-10 border-b relative">
+          <div 
+            key={slotIndex} 
+            className="h-${slotHeightPx} border-b relative cursor-pointer hover:bg-muted/50 transition-colors"
+            style={{ height: `${slotHeightPx}px` }}
+            onClick={() => handleSlotClick(slot)}
+            role="button"
+            tabIndex={0}
+            aria-label={`Créer un rendez-vous à ${slot}`}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSlotClick(slot);}}
+          >
             {/* Placeholder for dropping/creating new appointments */}
           </div>
         ))}
         {/* Render appointments */}
         {appointments.filter(app => {
-          // Basic date check for demo; needs proper date comparison for multi-day views
-          const appDate = new Date(app.id); // Assuming ID might contain date info for demo
+          const appDate = new Date(app.date + 'T00:00:00'); // Ensure date parsing is consistent
           return appDate.toDateString() === currentDate.toDateString();
         }).map(app => {
+          const startHour = 6; // Calendar view starts at 6 AM
           const startMinutes = timeToMinutes(app.startTime);
           const endMinutes = timeToMinutes(app.endTime);
           const durationMinutes = endMinutes - startMinutes;
 
-          const topOffset = (startMinutes - (6 * 60)) / 15 * 40; // 40px per slot (10px height * 4 quarter hours)
-          const height = (durationMinutes / 15) * 40; // 10px height per 15 min slot
+          const topOffset = ((startMinutes - (startHour * 60)) / 15) * slotHeightPx; 
+          const height = (durationMinutes / 15) * slotHeightPx;
 
           return (
             <AppointmentModal 
               key={app.id}
               appointment={app}
-              onSave={onAppointmentUpdate}
+              onSave={onAppointmentUpdate} // Editing existing uses onAppointmentUpdate
               trigger={
                 <button
-                  className="absolute left-1 right-1 p-2 text-left text-xs bg-primary/80 text-primary-foreground rounded-md shadow-md hover:bg-primary transition-colors duration-150 ease-in-out overflow-hidden"
+                  className="absolute left-1 right-1 p-1.5 text-left text-xs bg-primary/90 text-primary-foreground rounded shadow-md hover:bg-primary transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                   style={{
-                    top: `${topOffset / 4}px`, // Adjusting because parent slots are 10px high, so 40px / 4 = 10px
-                    height: `${height / 4}px`, // Same adjustment
-                    minHeight: '20px' // Ensure it's clickable
+                    top: `${topOffset}px`, 
+                    height: `${height}px`,
+                    minHeight: `${slotHeightPx * 2}px` // Min height for visibility, e.g., 30 min
                   }}
                   aria-label={`Rendez-vous: ${app.clientName} de ${app.startTime} à ${app.endTime}`}
                 >
-                  <p className="font-semibold truncate">{app.clientName}</p>
-                  <p className="truncate">{app.startTime} - {app.endTime}</p>
-                  <p className="text-xs truncate opacity-80">{app.description}</p>
+                  <p className="font-semibold truncate text-[11px] leading-tight">{app.clientName || 'Rendez-vous'}</p>
+                  <p className="truncate text-[10px] leading-tight">{app.startTime} - {app.endTime}</p>
+                  {app.serviceName && <p className="text-[10px] leading-tight truncate opacity-80">{app.serviceName}</p>}
+                  {!app.serviceName && app.description && <p className="text-[10px] leading-tight truncate opacity-80">{app.description}</p>}
                 </button>
               }
             />
           );
         })}
       </div>
+      {/* Modal for creating appointments by clicking on a slot */}
+      {isSlotModalOpen && slotInitialData && (
+        <AppointmentModal
+          open={isSlotModalOpen}
+          onOpenChange={setIsSlotModalOpen}
+          appointment={slotInitialData} // Pass initial start time and date
+          onSave={(newData) => {
+            onNewAppointmentSave(newData); // Creating new uses onNewAppointmentSave
+            setIsSlotModalOpen(false); // Close modal on save
+          }}
+        />
+      )}
     </div>
   );
 
@@ -106,14 +155,22 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
     <Card>
       <CardContent className="p-4">
         <p className="text-muted-foreground text-center">Vue Semaine à implémenter.</p>
-        {/* Placeholder for week view */}
         <div className="grid grid-cols-8 gap-px bg-border border rounded-lg overflow-hidden mt-4">
-          <div className="p-2 text-sm font-medium bg-card">Heure</div>
+          <div className="p-2 text-sm font-medium bg-card text-center sticky left-0 z-10">Heure</div>
           {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(day => (
             <div key={day} className="p-2 text-sm font-medium bg-card text-center">{day}</div>
           ))}
-          {/* Simplified: just show one day's appointments for demo */}
-          {renderDayView()} 
+          {/* Placeholder: This needs full implementation similar to day view but repeated for each day */}
+          {timeSlots.map(slot => (
+            <React.Fragment key={slot}>
+              <div className={`h-10 flex items-center justify-center p-1 text-xs border-b bg-card sticky left-0 z-10 ${slot.endsWith(':00') ? 'font-semibold' : ''}`}>{slot.endsWith(':00') ? slot : ''}</div>
+              {Array(7).fill(null).map((_, dayIndex) => (
+                <div key={`${slot}-${dayIndex}`} className="h-10 border-b border-l bg-card hover:bg-muted/50 cursor-pointer">
+                  {/* Placeholder for appointments on this slot/day */}
+                </div>
+              ))}
+            </React.Fragment>
+          ))}
         </div>
       </CardContent>
     </Card>
@@ -123,7 +180,6 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
     <Card>
       <CardContent className="p-4">
         <p className="text-muted-foreground text-center">Vue Mois à implémenter.</p>
-        {/* Placeholder for month view - could use ShadCN Calendar for navigation then show details */}
         <div className="mt-4 p-6 bg-muted/30 rounded-lg">
             <p>Affichage du calendrier mensuel ici. Cliquez sur un jour pour voir les détails.</p>
         </div>
