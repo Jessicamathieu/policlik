@@ -64,12 +64,12 @@ export function AgendaControls({
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-[150px] justify-start text-left font-normal",
+                    "w-full sm:w-[150px] justify-start text-left font-normal",
                     !printStartDate && "text-muted-foreground"
                   )}
                 >
                   <CalendarDays className="mr-2 h-4 w-4" />
-                  {printStartDate ? format(printStartDate, "dd/MM/yy", { locale: fr }) : <span>Date début</span>}
+                  {printStartDate ? format(printStartDate, "dd/MM/yy", { locale: fr }) : <span>Début impression</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
@@ -87,12 +87,12 @@ export function AgendaControls({
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-[150px] justify-start text-left font-normal",
+                    "w-full sm:w-[150px] justify-start text-left font-normal",
                     !printEndDate && "text-muted-foreground"
                   )}
                 >
                   <CalendarDays className="mr-2 h-4 w-4" />
-                  {printEndDate ? format(printEndDate, "dd/MM/yy", { locale: fr }) : <span>Date fin</span>}
+                  {printEndDate ? format(printEndDate, "dd/MM/yy", { locale: fr }) : <span>Fin impression</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
@@ -110,7 +110,6 @@ export function AgendaControls({
             </Popover>
           </>
         )}
-        <Button variant="outline">Client</Button> {/* Placeholder, functionality to be defined */}
         <Button variant="outline" onClick={onPrintAppointments}>
           <Printer className="mr-2 h-4 w-4" /> Imprimer
         </Button>
