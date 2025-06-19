@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { AgendaControls } from '@/components/agenda/agenda-controls';
 import { CalendarView } from '@/components/agenda/calendar-view';
 import { useToast } from '@/hooks/use-toast';
@@ -24,27 +24,28 @@ interface Appointment {
   smsReminder?: boolean;
 }
 
+// Helper pour initialiser les dates pour les rendez-vous fictifs
+const getInitialAppointmentDates = () => {
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+  return { todayStr, tomorrowStr };
+};
+
+
 export default function AgendaPage() {
   const [currentView, setCurrentView] = useState<"day" | "week" | "month">("day");
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [currentDate, setCurrentDate] = useState<Date | null>(null);
+  const { todayStr, tomorrowStr } = getInitialAppointmentDates();
+
+  const [appointments, setAppointments] = useState<Appointment[]>([
+    { id: '1', clientId: '1', clientName: 'Jean Dupont', serviceId: 'SERV001', serviceName: 'Nettoyage Standard Résidentiel', date: todayStr, startTime: '09:00', endTime: '10:00', description: 'Nettoyage standard', workDone: '', address: '123 Rue Principale, Paris', phone: '0123456789', smsReminder: false },
+    { id: '2', clientId: '2', clientName: 'Marie Curie', serviceId: 'SERV002', serviceName: 'Grand Ménage de Printemps', date: todayStr, startTime: '11:00', endTime: '12:30', description: 'Grand ménage', workDone: 'Tout est propre', address: '456 Avenue des Sciences, Lyon', phone: '0987654321', smsReminder: true },
+    { id: '3', clientId: '3', clientName: 'Pierre Martin', serviceId: 'SERV005', serviceName: 'Lavage de Vitres', date: tomorrowStr, startTime: '14:00', endTime: '15:00', description: 'Nettoyage vitres', workDone: '', address: '789 Boulevard Liberté, Marseille', phone: '0612345678', smsReminder: false },
+  ]);
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const { toast } = useToast();
-
-  useEffect(() => {
-    const today = new Date();
-    setCurrentDate(today);
-
-    const todayStr = today.toISOString().split('T')[0];
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split('T')[0];
-
-    setAppointments([
-      { id: '1', clientId: '1', clientName: 'Jean Dupont', serviceId: 'SERV001', serviceName: 'Nettoyage Standard Résidentiel', date: todayStr, startTime: '09:00', endTime: '10:00', description: 'Nettoyage standard', workDone: '', address: '123 Rue Principale, Paris', phone: '0123456789', smsReminder: false },
-      { id: '2', clientId: '2', clientName: 'Marie Curie', serviceId: 'SERV002', serviceName: 'Grand Ménage de Printemps', date: todayStr, startTime: '11:00', endTime: '12:30', description: 'Grand ménage', workDone: 'Tout est propre', address: '456 Avenue des Sciences, Lyon', phone: '0987654321', smsReminder: true },
-      { id: '3', clientId: '3', clientName: 'Pierre Martin', serviceId: 'SERV005', serviceName: 'Lavage de Vitres', date: tomorrowStr, startTime: '14:00', endTime: '15:00', description: 'Nettoyage vitres', workDone: '', address: '789 Boulevard Liberté, Marseille', phone: '0612345678', smsReminder: false },
-    ]);
-  }, []);
 
   const handleViewChange = useCallback((view: "day" | "week" | "month") => {
     setCurrentView(view);
@@ -69,7 +70,6 @@ export default function AgendaPage() {
 
   // Filter appointments for the current view and date
   const displayedAppointments = appointments.filter(app => {
-    if (!currentDate) return false; // Ne pas filtrer si currentDate n'est pas encore défini
     const appDate = new Date(app.date + "T00:00:00"); // Assurer que la date est interprétée comme locale
     
     if (currentView === "day") {
@@ -89,15 +89,6 @@ export default function AgendaPage() {
     }
     return true; 
   });
-
-  if (!currentDate || appointments.length === 0) {
-    return (
-      <div className="flex flex-col h-full items-center justify-center">
-        <p className="text-lg text-muted-foreground">Chargement de l'agenda...</p>
-        {/* Vous pouvez ajouter un composant Spinner ici */}
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-full">
