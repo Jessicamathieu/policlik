@@ -8,7 +8,7 @@ export const pageColors = [
   { color: '#3F51B5', contrastColor: '#FFFFFF', name: 'blue' }, // Polimik Dark Blue (Primary Style Guide)
   { color: '#0ccc34', contrastColor: '#FFFFFF', name: 'green' }, 
   { color: '#FF9800', contrastColor: '#FFFFFF', name: 'orange' }, // Polimik Orange (Accent Style Guide)
-  { color: '#F0F2F5', contrastColor: '#000000', name: 'light-gray' }, // Polimik Light Gray (Background Style Guide) - Text black for contrast
+  { color: '#F0F2F5', contrastColor: '#FF9800', name: 'light-gray' }, // Polimik Light Gray (Background) -> Text Orange (Accent)
 ];
 
 export const appNavItems: NavItem[] = [
@@ -37,8 +37,8 @@ export const appNavItems: NavItem[] = [
     title: 'Devis',
     href: '/devis',
     icon: FileText,
-    color: pageColors[3].color, // Light gray
-    contrastColor: pageColors[3].contrastColor, // Black text
+    color: pageColors[3].color, 
+    contrastColor: pageColors[3].contrastColor, 
     items: [
       {
         title: 'Nouvelle Demande',
@@ -97,8 +97,8 @@ export const appNavItems: NavItem[] = [
     title: 'Paiements',
     href: '/paiements',
     icon: CreditCard, 
-    color: pageColors[3].color, // Light gray
-    contrastColor: pageColors[3].contrastColor, // Black text
+    color: pageColors[3].color, 
+    contrastColor: pageColors[3].contrastColor, 
   },
 ];
 
@@ -107,16 +107,22 @@ export const getActiveNavItemConfig = (pathname: string): NavItem | undefined =>
   let bestMatch: NavItem | undefined = undefined;
   let bestMatchLength = 0;
 
-  const checkItems = (items: NavItem[]) => {
+  const checkItems = (items: NavItem[], parentItem?: NavItem) => {
     for (const item of items) {
-      if (item.href && pathname.startsWith(item.href)) {
-        if (item.href.length > bestMatchLength) {
-          bestMatch = item;
-          bestMatchLength = item.href.length;
+      const currentItemWithFallbackColor = {
+        ...item,
+        color: item.color || parentItem?.color,
+        contrastColor: item.contrastColor || parentItem?.contrastColor,
+      };
+
+      if (currentItemWithFallbackColor.href && pathname.startsWith(currentItemWithFallbackColor.href)) {
+        if (currentItemWithFallbackColor.href.length > bestMatchLength) {
+          bestMatch = currentItemWithFallbackColor;
+          bestMatchLength = currentItemWithFallbackColor.href.length;
         }
       }
       if (item.items) {
-        checkItems(item.items); // Recursively check sub-items
+        checkItems(item.items, currentItemWithFallbackColor); // Pass parent for color fallback
       }
     }
   };
@@ -127,16 +133,26 @@ export const getActiveNavItemConfig = (pathname: string): NavItem | undefined =>
   if (bestMatch && bestMatch.items) {
     const exactSubItemMatch = bestMatch.items.find(sub => sub.href === pathname);
     if (exactSubItemMatch) {
-      return exactSubItemMatch;
+      return {
+        ...exactSubItemMatch,
+        color: exactSubItemMatch.color || bestMatch.color,
+        contrastColor: exactSubItemMatch.contrastColor || bestMatch.contrastColor,
+      };
     }
   }
-  if (bestMatch?.href === pathname) return bestMatch;
-
-  // If bestMatch is a prefix, and it has sub-items, check if one of them is a more precise default for this path
-  if (bestMatch && bestMatch.items && bestMatch.href !== pathname) {
-     const defaultChild = bestMatch.items.find(sub => sub.href === bestMatch!.href); // e.g. /factures item linking to /factures
-     if (defaultChild) return defaultChild;
-  }
+  
+  // If the found bestMatch is a parent item (e.g. /devis for path /devis/liste)
+  // and an exact match for the parent path itself exists as a sub-item, prefer that sub-item.
+   if (bestMatch && bestMatch.href === pathname && bestMatch.items) {
+     const exactSelfAsChild = bestMatch.items.find(sub => sub.href === pathname);
+     if (exactSelfAsChild) {
+       return {
+        ...exactSelfAsChild,
+        color: exactSelfAsChild.color || bestMatch.color,
+        contrastColor: exactSelfAsChild.contrastColor || bestMatch.contrastColor,
+      };
+     }
+   }
 
 
   return bestMatch || appNavItems.find(item => item.href === '/dashboard'); // Default to dashboard
