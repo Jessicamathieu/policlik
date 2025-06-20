@@ -29,7 +29,7 @@ export default function DepensesPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline">Suivi des Dépenses</h1>
-          <p className="text-muted-foreground">Enregistrez et gérez toutes vos dépenses professionnelles.</p>
+          <p className="text-primary-foreground">Enregistrez et gérez toutes vos dépenses professionnelles.</p>
         </div>
         <div className="flex gap-2">
            <Button variant="outline">

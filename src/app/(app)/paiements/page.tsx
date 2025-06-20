@@ -43,7 +43,7 @@ export default function PaiementsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline">Suivi des Paiements</h1>
-          <p className="text-muted-foreground">Consultez l'historique et le statut de tous les paiements.</p>
+          <p className="text-primary-foreground">Consultez l'historique et le statut de tous les paiements.</p>
         </div>
          <Button variant="outline">
             <FileDown className="mr-2 h-4 w-4" /> Exporter

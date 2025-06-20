@@ -12,7 +12,7 @@ export default function DevisPage() {
     <div className="flex flex-col gap-6">
        <div>
         <h1 className="text-3xl font-bold tracking-tight font-headline">Gestion des Devis</h1>
-        <p className="text-muted-foreground">Créez, envoyez et suivez vos devis clients.</p>
+        <p className="text-primary-foreground">Créez, envoyez et suivez vos devis clients.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

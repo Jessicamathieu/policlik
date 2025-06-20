@@ -20,7 +20,7 @@ export default function ServicesPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline">Liste des Services</h1>
-          <p className="text-muted-foreground">Gérez vos services prédéfinis et leurs tarifs associés.</p>
+          <p className="text-primary-foreground">Gérez vos services prédéfinis et leurs tarifs associés.</p>
         </div>
         <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
           <PlusCircle className="mr-2 h-4 w-4" /> Nouveau Service

@@ -19,7 +19,7 @@ export default function QuoteListPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline">Liste des Devis</h1>
-          <p className="text-muted-foreground">Consultez et gérez tous les devis soumis.</p>
+          <p className="text-primary-foreground">Consultez et gérez tous les devis soumis.</p>
         </div>
          <div className="flex gap-2">
            <Button variant="outline">
