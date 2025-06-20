@@ -23,42 +23,39 @@ export default {
         code: ['monospace'],
       },
       colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        background: 'hsl(var(--background-hsl))', // Use HSL var from :root
+        foreground: 'hsl(var(--foreground-hsl))', // Use HSL var from :root
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+          DEFAULT: 'hsl(var(--card-hsl))',
+          foreground: 'hsl(var(--card-foreground-hsl))',
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
+          DEFAULT: 'hsl(var(--popover-hsl))',
+          foreground: 'hsl(var(--popover-foreground-hsl))',
         },
         primary: {
-          // Updated to use dynamic CSS variables set in AppLayout
-          DEFAULT: 'var(--page-main-color)',
-          foreground: 'var(--page-main-contrast-color)',
+          DEFAULT: 'hsl(var(--primary-h) var(--primary-s) var(--primary-l))',
+          foreground: 'hsl(var(--primary-foreground-h) var(--primary-foreground-s) var(--primary-foreground-l))',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: 'hsl(var(--secondary-h) var(--secondary-s) var(--secondary-l))',
+          foreground: 'hsl(var(--secondary-foreground-h) var(--secondary-foreground-s) var(--secondary-foreground-l))',
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          DEFAULT: 'hsl(var(--muted-hsl))',
+          foreground: 'hsl(var(--muted-foreground-hsl))',
         },
         accent: {
-          // Accent can also be dynamic or remain fixed from globals.css
-          // For now, let's keep it from globals.css, but it could also be var(--page-main-color) or a derivative
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: 'hsl(var(--accent-h) var(--accent-s) var(--accent-l))',
+          foreground: 'hsl(var(--accent-foreground-h) var(--accent-foreground-s) var(--accent-foreground-l))',
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+          DEFAULT: 'hsl(var(--destructive-h) var(--destructive-s) var(--destructive-l))',
+          foreground: 'hsl(var(--destructive-foreground-h) var(--destructive-foreground-s) var(--destructive-foreground-l))',
         },
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'var(--page-main-color)', // Ring color can also be dynamic
+        border: 'hsl(var(--border-hsl))',
+        input: 'hsl(var(--input-hsl))',
+        ring: 'hsl(var(--primary-h) var(--primary-s) var(--primary-l))', 
         chart: {
           '1': 'hsl(var(--chart-1))',
           '2': 'hsl(var(--chart-2))',
@@ -67,14 +64,14 @@ export default {
           '5': 'hsl(var(--chart-5))',
         },
         sidebar: {
-          DEFAULT: 'hsl(var(--sidebar-background))',
-          foreground: 'hsl(var(--sidebar-foreground))',
-          primary: 'hsl(var(--sidebar-primary))',
-          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-          accent: 'hsl(var(--sidebar-accent))',
-          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-          border: 'hsl(var(--sidebar-border))',
-          ring: 'hsl(var(--sidebar-ring))',
+          DEFAULT: 'hsl(var(--sidebar-background-hsl))',
+          foreground: 'hsl(var(--sidebar-foreground-hsl))',
+          primary: 'hsl(var(--sidebar-primary-hsl))', // Updated to use HSL components
+          'primary-foreground': 'hsl(var(--sidebar-primary-foreground-hsl))',
+          accent: 'hsl(var(--sidebar-accent-hsl))',
+          'accent-foreground': 'hsl(var(--sidebar-accent-foreground-hsl))',
+          border: 'hsl(var(--sidebar-border-hsl))',
+          ring: 'hsl(var(--sidebar-ring-hsl))',
         },
       },
       borderRadius: {
