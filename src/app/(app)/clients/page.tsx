@@ -1,10 +1,9 @@
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, PlusCircle, Search, FileDown } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Search, FileDown, Edit, CalendarPlus, FilePlus, Trash2, Phone, MapPin, Mail as MailIcon } from "lucide-react"; // Added Edit, CalendarPlus, FilePlus, Phone, MapPin, MailIcon
 import Link from "next/link";
 
 // Mock client data
@@ -42,58 +41,86 @@ export default function ClientsPage() {
             <Input placeholder="Rechercher un client par nom, email, adresse..." className="pl-8 w-full sm:w-1/2 lg:w-1/3" />
           </div>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nom</TableHead>
-                <TableHead className="hidden md:table-cell">Email</TableHead>
-                <TableHead className="hidden lg:table-cell">Téléphone</TableHead>
-                <TableHead>Adresse</TableHead>
-                <TableHead className="hidden md:table-cell text-right">Total Dépensé</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {clients.map((client) => (
-                <TableRow key={client.id}>
-                  <TableCell className="font-medium">
-                    <Link href={`/clients/${client.id}`} className="hover:underline text-primary">
-                      {client.name}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">{client.email}</TableCell>
-                  <TableCell className="hidden lg:table-cell">{client.phone}</TableCell>
-                  <TableCell>{client.address}</TableCell>
-                  <TableCell className="hidden md:table-cell text-right">{client.totalSpent}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Ouvrir menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>
-                           <Link href={`/clients/${client.id}/modifier`}>Modifier</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                           <Link href={`/agenda?clientId=${client.id}&action=nouveau`}>Nouveau RDV</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                           <Link href={`/factures/nouveau?clientId=${client.id}`}>Nouvelle Facture</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive">Supprimer</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <CardContent className="p-4 sm:p-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+            {clients.map((client) => (
+              <Card key={client.id} className="flex flex-col shadow-md hover:shadow-lg transition-shadow duration-200 rounded-xl overflow-hidden border border-border/70">
+                <CardHeader className="flex flex-row items-start justify-between space-y-0 p-4 bg-muted/30">
+                  <div>
+                    <CardTitle className="text-lg font-semibold leading-tight">
+                      <Link href={`/clients/${client.id}`} className="hover:underline text-primary">
+                        {client.name}
+                      </Link>
+                    </CardTitle>
+                    {client.email && (
+                       <Link href={`mailto:${client.email}`} className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1">
+                         <MailIcon className="h-3 w-3"/> {client.email}
+                       </Link>
+                    )}
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8 -mt-1 -mr-1">
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Ouvrir menu pour {client.name}</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/clients/${client.id}/modifier`} className="flex items-center cursor-pointer">
+                          <Edit className="mr-2 h-4 w-4" /> Modifier
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                         <Link href={`/agenda?clientId=${client.id}&action=nouveau`} className="flex items-center cursor-pointer">
+                          <CalendarPlus className="mr-2 h-4 w-4" /> Nouveau RDV
+                         </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                         <Link href={`/factures/nouveau?clientId=${client.id}`} className="flex items-center cursor-pointer">
+                           <FilePlus className="mr-2 h-4 w-4" /> Nouvelle Facture
+                         </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive flex items-center cursor-pointer">
+                        <Trash2 className="mr-2 h-4 w-4" /> Supprimer
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </CardHeader>
+                <CardContent className="p-4 text-sm space-y-2.5 flex-grow">
+                  {client.phone && (
+                    <div className="flex items-center">
+                      <Phone className="h-4 w-4 mr-2.5 text-muted-foreground" />
+                      <Link href={`tel:${client.phone}`} className="hover:text-primary">{client.phone}</Link>
+                    </div>
+                  )}
+                  {client.address && (
+                    <div className="flex items-start">
+                      <MapPin className="h-4 w-4 mr-2.5 mt-0.5 text-muted-foreground shrink-0" />
+                      <Link 
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(client.address)}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex-1 hover:text-primary"
+                      >
+                        {client.address}
+                      </Link>
+                    </div>
+                  )}
+                </CardContent>
+                {client.totalSpent && (
+                  <CardFooter className="p-4 bg-muted/30 text-sm border-t">
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-muted-foreground">Total Dépensé:</span>
+                      <span className="font-semibold text-primary">{client.totalSpent}</span>
+                    </div>
+                  </CardFooter>
+                )}
+              </Card>
+            ))}
+          </div>
         </CardContent>
       </Card>
       {/* Add pagination if many clients */}
