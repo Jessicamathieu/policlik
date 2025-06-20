@@ -43,7 +43,7 @@ export function AgendaControls({
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-4 bg-card rounded-lg shadow">
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground hidden sm:inline">Vue :</span>
+        <span className="text-sm font-medium text-card-foreground hidden sm:inline">Vue :</span>
         <Select value={currentView} onValueChange={(value: "day" | "week" | "month") => onViewChange(value)}>
           <SelectTrigger className="w-[120px] sm:w-[150px]">
             <SelectValue placeholder="Choisir la vue" />
