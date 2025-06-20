@@ -23,7 +23,7 @@ export default function QuoteListPage() {
           <p className="text-muted-foreground">Consultez et gérez tous les devis soumis.</p>
         </div>
          <div className="flex gap-2">
-           <Button variant="outline" className="text-foreground border-foreground/30 hover:bg-accent hover:text-accent-foreground">
+           <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
             <FileDown className="mr-2 h-4 w-4" /> Exporter
           </Button>
           <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
@@ -34,23 +34,23 @@ export default function QuoteListPage() {
         </div>
       </div>
       
-      <Card className="bg-card text-card-foreground shadow-md"> {/* Card is now colored */}
+      <Card className="bg-card text-card-foreground shadow-md"> 
         <CardHeader>
            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <CardTitle>Devis Soumis</CardTitle>
+                <CardTitle className="text-card-foreground">Devis Soumis</CardTitle>
                 <CardDescription className="opacity-75">Suivez le statut de chaque devis et prenez les actions nécessaires.</CardDescription>
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-grow sm:flex-grow-0">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-card-foreground opacity-50" />
-                    <Input placeholder="Rechercher devis..." className="pl-8 w-full sm:w-auto bg-background text-foreground placeholder:text-muted-foreground border-input" /> {/* Input is light */}
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="Rechercher devis..." className="pl-8 w-full sm:w-auto bg-background text-foreground placeholder:text-muted-foreground border-input" /> 
                 </div>
                  <Select defaultValue="all">
-                    <SelectTrigger className="w-full sm:w-[180px] bg-background text-foreground border-input"> {/* Select is light */}
+                    <SelectTrigger className="w-full sm:w-[180px] bg-background text-foreground border-input"> 
                         <SelectValue placeholder="Filtrer par statut" />
                     </SelectTrigger>
-                    <SelectContent> {/* Popover content remains light/dark */}
+                    <SelectContent> 
                         <SelectItem value="all">Tous les statuts</SelectItem>
                         <SelectItem value="pending">En attente</SelectItem>
                         <SelectItem value="sent">Envoyé</SelectItem>
@@ -63,7 +63,7 @@ export default function QuoteListPage() {
            </div>
         </CardHeader>
         <CardContent>
-          <QuoteList /> {/* QuoteList will render a Table, its text needs to be card-foreground */}
+          <QuoteList /> 
         </CardContent>
       </Card>
     </div>

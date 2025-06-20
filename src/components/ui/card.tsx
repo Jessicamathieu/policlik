@@ -37,7 +37,7 @@ const CardTitle = React.forwardRef<
   <div 
     ref={ref}
     className={cn(
-      "text-2xl font-semibold leading-none tracking-tight text-card-foreground", // Ensure text color comes from card-foreground
+      "text-2xl font-semibold leading-none tracking-tight text-card-foreground", 
       className
     )}
     {...props}
@@ -51,7 +51,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div 
     ref={ref}
-    className={cn("text-sm text-card-foreground opacity-75", className)} // Use card-foreground and apply opacity
+    className={cn("text-sm text-card-foreground opacity-75", className)} 
     {...props}
   />
 ))

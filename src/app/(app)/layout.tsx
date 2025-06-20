@@ -1,8 +1,6 @@
 
 "use client";
 
-// Removed useState and useEffect as background is now static white controlled by RootLayout and globals.css
-
 export default function AppPagesLayout({
   children,
 }: {

@@ -20,19 +20,15 @@ import { cn } from "@/lib/utils";
 
 type InvoiceStatus = "Brouillon" | "Envoyée" | "Payée" | "Non Payée" | "Partiellement Payée" | "En Retard";
 
-// Status colors will be applied on top of the card's dynamic background.
-// These need to be highly contrasting.
 const statusColors: Record<InvoiceStatus, string> = {
-  "Brouillon": "bg-gray-500 text-white border-gray-700", 
-  "Envoyée": "bg-sky-500 text-white border-sky-700",
-  "Payée": "bg-emerald-500 text-white border-emerald-700",
-  "Non Payée": "bg-amber-500 text-black border-amber-700",
-  "Partiellement Payée": "bg-orange-500 text-white border-orange-700",
-  "En Retard": "bg-rose-600 text-white border-rose-800",
+  "Brouillon": "bg-gray-100 text-gray-800 border-gray-300", 
+  "Envoyée": "bg-sky-100 text-sky-800 border-sky-300",
+  "Payée": "bg-emerald-100 text-emerald-800 border-emerald-300",
+  "Non Payée": "bg-amber-100 text-amber-800 border-amber-300",
+  "Partiellement Payée": "bg-orange-100 text-orange-800 border-orange-300",
+  "En Retard": "bg-rose-100 text-rose-800 border-rose-300",
 };
 
-
-// Mock invoice data
 const invoices = [
   { id: "FAC001", clientName: "Entreprise Alpha", dateEmission: new Date(2023, 10, 20), dateEcheance: new Date(2023, 11, 20), amount: 1500.00, status: "Payée" as InvoiceStatus },
   { id: "FAC002", clientName: "Société Beta", dateEmission: new Date(2023, 11, 1), dateEcheance: new Date(2023, 12, 1), amount: 950.50, status: "Envoyée" as InvoiceStatus },
@@ -51,7 +47,7 @@ export default function FacturesPage() {
           <p className="text-muted-foreground">Créez, suivez et gérez vos factures clients.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="text-foreground border-foreground/30 hover:bg-accent hover:text-accent-foreground">
+          <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
             <FileDown className="mr-2 h-4 w-4" /> Exporter
           </Button>
           <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
@@ -62,26 +58,26 @@ export default function FacturesPage() {
         </div>
       </div>
 
-      <Card className="bg-card text-card-foreground"> {/* Card is now colored */}
+      <Card className="bg-card text-card-foreground"> 
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <CardTitle>Liste des Factures</CardTitle>
+                <CardTitle className="text-card-foreground">Liste des Factures</CardTitle>
                 <CardDescription className="opacity-75">Suivez l'état de paiement de toutes vos factures.</CardDescription>
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-grow sm:flex-grow-0">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-card-foreground opacity-50" />
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input 
                       placeholder="Rechercher facture..." 
-                      className="pl-8 w-full sm:w-auto bg-background border-input text-foreground placeholder:text-muted-foreground" /* Input is light */
+                      className="pl-8 w-full sm:w-auto bg-background border-input text-foreground placeholder:text-muted-foreground" 
                     />
                 </div>
                  <Select defaultValue="all">
-                    <SelectTrigger className="w-full sm:w-[180px] bg-background border-input text-foreground"> {/* Select is light */}
+                    <SelectTrigger className="w-full sm:w-[180px] bg-background border-input text-foreground"> 
                         <SelectValue placeholder="Filtrer par statut" />
                     </SelectTrigger>
-                    <SelectContent> {/* Popover content, should remain light/dark based on its own theme */}
+                    <SelectContent> 
                         <SelectItem value="all">Tous les statuts</SelectItem>
                         {Object.keys(statusColors).map(status => (
                             <SelectItem key={status} value={status.toLowerCase().replace(' ', '-')}>{status}</SelectItem>
@@ -94,21 +90,21 @@ export default function FacturesPage() {
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow className="border-card-foreground/30">
-                <TableHead className="text-card-foreground opacity-80">ID Facture</TableHead>
-                <TableHead className="text-card-foreground opacity-80">Client</TableHead>
-                <TableHead className="hidden sm:table-cell text-card-foreground opacity-80">Date Émission</TableHead>
-                <TableHead className="hidden md:table-cell text-card-foreground opacity-80">Date Échéance</TableHead>
-                <TableHead className="text-right text-card-foreground opacity-80">Montant</TableHead>
-                <TableHead className="text-center text-card-foreground opacity-80">Statut</TableHead>
-                <TableHead className="text-right text-card-foreground opacity-80">Actions</TableHead>
+              <TableRow className="border-b-border">
+                <TableHead className="text-muted-foreground">ID Facture</TableHead>
+                <TableHead className="text-muted-foreground">Client</TableHead>
+                <TableHead className="hidden sm:table-cell text-muted-foreground">Date Émission</TableHead>
+                <TableHead className="hidden md:table-cell text-muted-foreground">Date Échéance</TableHead>
+                <TableHead className="text-right text-muted-foreground">Montant</TableHead>
+                <TableHead className="text-center text-muted-foreground">Statut</TableHead>
+                <TableHead className="text-right text-muted-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {invoices.map((invoice) => (
-                <TableRow key={invoice.id} className="border-card-foreground/20">
-                  <TableCell className="font-medium">
-                    <Link href={`/factures/${invoice.id}`} className="hover:underline text-card-foreground">
+                <TableRow key={invoice.id} className="border-b-border">
+                  <TableCell className="font-medium text-card-foreground">
+                    <Link href={`/factures/${invoice.id}`} className="hover:text-primary">
                       {invoice.id}
                     </Link>
                   </TableCell>
@@ -124,7 +120,7 @@ export default function FacturesPage() {
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost" className="text-card-foreground hover:bg-card-foreground/10">
+                        <Button aria-haspopup="true" size="icon" variant="ghost" className="text-muted-foreground hover:bg-muted/50">
                           <MoreHorizontal className="h-4 w-4" />
                           <span className="sr-only">Actions pour {invoice.id}</span>
                         </Button>

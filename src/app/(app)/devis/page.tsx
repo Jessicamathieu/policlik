@@ -15,14 +15,14 @@ export default function DevisPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 bg-card text-card-foreground">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 font-headline">
+            <CardTitle className="flex items-center gap-2 font-headline text-card-foreground">
               <PlusCircle className="h-6 w-6 text-card-foreground opacity-90" />
               Nouvelle Demande de Devis
             </CardTitle>
             <CardDescription className="opacity-75">Permettez à vos clients de soumettre des demandes en ligne ou créez-en une manuellement.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild className="w-full bg-card-foreground text-card hover:bg-card-foreground/90">
+            <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
               <Link href="/devis/demandes">Créer / Voir Formulaire</Link>
             </Button>
           </CardContent>
@@ -30,14 +30,14 @@ export default function DevisPage() {
 
         <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 bg-card text-card-foreground">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 font-headline">
+            <CardTitle className="flex items-center gap-2 font-headline text-card-foreground">
               <ListChecks className="h-6 w-6 text-card-foreground opacity-90" />
               Liste des Devis
             </CardTitle>
             <CardDescription className="opacity-75">Consultez tous les devis soumis, suivez leur statut et convertissez-les en rendez-vous.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild className="w-full bg-card-foreground text-card hover:bg-card-foreground/90">
+            <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
               <Link href="/devis/liste">Voir la Liste des Devis</Link>
             </Button>
           </CardContent>
@@ -45,7 +45,7 @@ export default function DevisPage() {
         
         <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 lg:col-span-1 bg-card text-card-foreground">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 font-headline">
+            <CardTitle className="flex items-center gap-2 font-headline text-card-foreground">
               <FileText className="h-6 w-6 text-card-foreground opacity-90" />
               Statistiques Devis
             </CardTitle>
@@ -57,7 +57,7 @@ export default function DevisPage() {
                 <p><strong>Acceptés:</strong> 23</p>
                 <p><strong>Refusés:</strong> 2</p>
             </div>
-             <Button variant="outline" className="w-full mt-4 border-card-foreground/50 text-card-foreground hover:bg-card-foreground/10">Voir Rapports Détaillés</Button>
+             <Button variant="outline" className="w-full mt-4 border-input text-foreground hover:bg-accent hover:text-accent-foreground">Voir Rapports Détaillés</Button>
           </CardContent>
         </Card>
       </div>

@@ -6,7 +6,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { MoreHorizontal, PlusCircle, Search, FileDown, Edit, CalendarPlus, FilePlus, Trash2, Phone, MapPin, Mail as MailIcon } from "lucide-react";
 import Link from "next/link";
 
-// Mock client data
 const clients = [
   { id: "1", name: "Jean Dupont", email: "jean.dupont@example.com", phone: "0123456789", address: "123 Rue Principale, 75001 Paris", lastService: "2023-10-15", totalSpent: "CAD$1,250" },
   { id: "2", name: "Marie Curie", email: "marie.curie@example.com", phone: "0987654321", address: "456 Avenue des Sciences, 69007 Lyon", lastService: "2023-11-01", totalSpent: "CAD$875" },
@@ -20,10 +19,10 @@ export default function ClientsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Gestion des Clients</h1>
-          <p className="text-muted-foreground">Consultez et gérez votre base de données clients.</p> {/* text-muted-foreground for text on white page bg */}
+          <p className="text-muted-foreground">Consultez et gérez votre base de données clients.</p> 
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="text-foreground border-foreground/30 hover:bg-accent hover:text-accent-foreground">
+          <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
             <FileDown className="mr-2 h-4 w-4" /> Exporter
           </Button>
           <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
@@ -32,43 +31,43 @@ export default function ClientsPage() {
         </div>
       </div>
 
-      <Card className="bg-card text-card-foreground"> {/* Main card is now colored */}
+      <Card className="bg-card text-card-foreground"> 
         <CardHeader>
           <CardTitle>Liste des Clients</CardTitle>
           <CardDescription className="opacity-75">Recherchez, filtrez et gérez vos clients.</CardDescription>
           <div className="relative mt-4">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-card-foreground opacity-50" />
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input 
               placeholder="Rechercher un client par nom, email, adresse..." 
-              className="pl-8 w-full sm:w-1/2 lg:w-1/3 bg-background border-input text-foreground placeholder:text-muted-foreground" /* Input remains light */
+              className="pl-8 w-full sm:w-1/2 lg:w-1/3 bg-background border-input text-foreground placeholder:text-muted-foreground"
             />
           </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
             {clients.map((client) => (
-              <Card key={client.id} className="flex flex-col shadow-md hover:shadow-lg transition-shadow duration-200 rounded-xl overflow-hidden bg-card-foreground/10 border-card-foreground/20 text-card-foreground"> {/* Inner cards are lighter shade of card-foreground */}
-                <CardHeader className="flex flex-row items-start justify-between space-y-0 p-4 bg-card-foreground/20"> {/* Header of inner card slightly darker */}
+              <Card key={client.id} className="flex flex-col shadow-md hover:shadow-lg transition-shadow duration-200 rounded-xl overflow-hidden bg-background border text-foreground"> 
+                <CardHeader className="flex flex-row items-start justify-between space-y-0 p-4 bg-muted/30 border-b"> 
                   <div>
                     <CardTitle className="text-lg font-semibold leading-tight">
-                      <Link href={`/clients/${client.id}`} className="hover:underline text-card-foreground">
+                      <Link href={`/clients/${client.id}`} className="hover:text-primary text-foreground">
                         {client.name}
                       </Link>
                     </CardTitle>
                     {client.email && (
-                       <Link href={`mailto:${client.email}`} className="text-xs opacity-80 hover:opacity-100 flex items-center gap-1">
+                       <Link href={`mailto:${client.email}`} className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1">
                          <MailIcon className="h-3 w-3"/> {client.email}
                        </Link>
                     )}
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8 -mt-1 -mr-1 hover:bg-card-foreground/20 text-card-foreground">
+                      <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8 -mt-1 -mr-1 hover:bg-muted text-muted-foreground">
                         <MoreHorizontal className="h-4 w-4" />
                         <span className="sr-only">Ouvrir menu pour {client.name}</span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end"> {/* Popover content, should remain light/dark based on its own theme */}
+                    <DropdownMenuContent align="end"> 
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
                         <Link href={`/clients/${client.id}/modifier`} className="flex items-center cursor-pointer">
@@ -92,21 +91,21 @@ export default function ClientsPage() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </CardHeader>
-                <CardContent className="p-4 text-sm space-y-2.5 flex-grow text-card-foreground">
+                <CardContent className="p-4 text-sm space-y-2.5 flex-grow text-foreground">
                   {client.phone && (
                     <div className="flex items-center">
-                      <Phone className="h-4 w-4 mr-2.5 opacity-80" />
-                      <Link href={`tel:${client.phone}`} className="hover:opacity-80">{client.phone}</Link>
+                      <Phone className="h-4 w-4 mr-2.5 text-muted-foreground" />
+                      <Link href={`tel:${client.phone}`} className="hover:text-primary">{client.phone}</Link>
                     </div>
                   )}
                   {client.address && (
                     <div className="flex items-start">
-                      <MapPin className="h-4 w-4 mr-2.5 mt-0.5 opacity-80 shrink-0" />
+                      <MapPin className="h-4 w-4 mr-2.5 mt-0.5 text-muted-foreground shrink-0" />
                       <Link 
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(client.address)}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex-1 hover:opacity-80"
+                        className="flex-1 hover:text-primary"
                       >
                         {client.address}
                       </Link>
@@ -114,9 +113,9 @@ export default function ClientsPage() {
                   )}
                 </CardContent>
                 {client.totalSpent && (
-                  <CardFooter className="p-4 bg-card-foreground/20 text-sm border-t border-card-foreground/30"> {/* Footer of inner card */}
-                    <div className="flex items-center justify-between w-full text-card-foreground">
-                      <span className="opacity-80">Total Dépensé:</span>
+                  <CardFooter className="p-4 bg-muted/30 text-sm border-t"> 
+                    <div className="flex items-center justify-between w-full text-foreground">
+                      <span className="text-muted-foreground">Total Dépensé:</span>
                       <span className="font-semibold">{client.totalSpent}</span>
                     </div>
                   </CardFooter>

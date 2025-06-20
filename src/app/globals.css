@@ -24,15 +24,9 @@
     --background: hsl(var(--background-hsl));
     --foreground: hsl(var(--foreground-hsl));
 
-    /* Card will now use primary colors (dynamic based on active nav) */
-    --card-h: var(--primary-h);
-    --card-s: var(--primary-s);
-    --card-l: var(--primary-l);
-    --card-hsl: var(--card-h) var(--card-s) var(--card-l);
-    --card-foreground-h: var(--primary-foreground-h);
-    --card-foreground-s: var(--primary-foreground-s);
-    --card-foreground-l: var(--primary-foreground-l);
-    --card-foreground-hsl: var(--card-foreground-h) var(--card-foreground-s) var(--card-foreground-l);
+    /* Card will now be statically white */
+    --card-hsl: 0 0% 100%; /* Pure White */
+    --card-foreground-hsl: 220 40% 15%; /* Dark Slate Blue for text on cards */
     
     --card: hsl(var(--card-hsl));
     --card-foreground: hsl(var(--card-foreground-hsl));
@@ -48,7 +42,6 @@
     --muted-foreground-hsl: 210 30% 55%; /* Slightly darker muted text for better contrast on light bg */
     --muted: hsl(var(--muted-hsl));
     --muted-foreground: hsl(var(--muted-foreground-hsl));
-
 
     --border-hsl: 210 25% 88%; /* Border for light elements */
     --input-hsl: 0 0% 100%; /* Inputs are white */
@@ -87,7 +80,6 @@
     
     /* Ring will use primary HSL components */
     --ring: hsl(var(--primary-h), var(--primary-s), calc(var(--primary-l) + 10%));
-
 
     --radius: 0.5rem;
 
@@ -130,13 +122,9 @@
     --background-hsl: 220 20% 10%; 
     --foreground-hsl: 210 40% 95%; 
 
-    /* Card will now use primary colors in dark theme too */
-    --card-h: var(--primary-h);
-    --card-s: var(--primary-s);
-    --card-l: var(--primary-l);
-    --card-foreground-h: var(--primary-foreground-h);
-    --card-foreground-s: var(--primary-foreground-s);
-    --card-foreground-l: var(--primary-foreground-l);
+    /* Card background is dark in dark theme */
+    --card-hsl: 220 20% 13%; 
+    --card-foreground-hsl: 210 40% 95%;
 
     /* Popovers dark */
     --popover-hsl: 220 25% 15%; 
@@ -182,7 +170,6 @@
     /* Sidebar colors for dark theme */
     --sidebar-background-hsl: 220 25% 14%; /* Dark sidebar background */
     --sidebar-foreground-hsl: 210 40% 92%; /* Light sidebar text */
-    /* sidebar-primary and accent can inherit from global primary/accent or be overridden */
     --sidebar-border-hsl: 220 15% 25%;
   }
 }

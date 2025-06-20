@@ -6,7 +6,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, PlusCircle, Search, Edit3, Trash2 } from "lucide-react";
 
-// Mock service data
 const services = [
   { id: "SERV001", name: "Nettoyage Standard Résidentiel", category: "Nettoyage Résidentiel", rate: "CAD$50/heure", unit: "heure", description: "Nettoyage de base pour appartements et maisons." },
   { id: "SERV002", name: "Grand Ménage de Printemps", category: "Nettoyage Résidentiel", rate: "CAD$250", unit: "forfait", description: "Nettoyage en profondeur de toutes les pièces." },
@@ -28,29 +27,29 @@ export default function ServicesPage() {
         </Button>
       </div>
 
-      <Card className="shadow-md bg-card text-card-foreground"> {/* Card is now colored */}
+      <Card className="shadow-md bg-card text-card-foreground"> 
         <CardHeader>
-          <CardTitle>Services Proposés</CardTitle>
+          <CardTitle className="text-card-foreground">Services Proposés</CardTitle>
           <CardDescription className="opacity-75">Ajoutez, modifiez ou supprimez des services de votre catalogue.</CardDescription>
           <div className="relative mt-4">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-card-foreground opacity-50" />
-            <Input placeholder="Rechercher un service par nom ou catégorie..." className="pl-8 w-full sm:w-1/2 lg:w-1/3 bg-background text-foreground placeholder:text-muted-foreground border-input" /> {/* Input is light */}
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Rechercher un service par nom ou catégorie..." className="pl-8 w-full sm:w-1/2 lg:w-1/3 bg-background text-foreground placeholder:text-muted-foreground border-input" /> 
           </div>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow className="border-b-card-foreground/30">
-                <TableHead className="text-card-foreground opacity-80">Nom du Service</TableHead>
-                <TableHead className="hidden sm:table-cell text-card-foreground opacity-80">Catégorie</TableHead>
-                <TableHead className="text-card-foreground opacity-80">Tarif</TableHead>
-                <TableHead className="hidden md:table-cell text-card-foreground opacity-80">Unité</TableHead>
-                <TableHead className="text-right text-card-foreground opacity-80">Actions</TableHead>
+              <TableRow className="border-b-border">
+                <TableHead className="text-muted-foreground">Nom du Service</TableHead>
+                <TableHead className="hidden sm:table-cell text-muted-foreground">Catégorie</TableHead>
+                <TableHead className="text-muted-foreground">Tarif</TableHead>
+                <TableHead className="hidden md:table-cell text-muted-foreground">Unité</TableHead>
+                <TableHead className="text-right text-muted-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {services.map((service) => (
-                <TableRow key={service.id} className="border-b-card-foreground/20">
+                <TableRow key={service.id} className="border-b-border">
                   <TableCell className="font-medium text-card-foreground">{service.name}</TableCell>
                   <TableCell className="hidden sm:table-cell text-card-foreground">{service.category}</TableCell>
                   <TableCell className="text-card-foreground">{service.rate}</TableCell>
@@ -58,12 +57,12 @@ export default function ServicesPage() {
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost" className="text-card-foreground hover:bg-card-foreground/10">
+                        <Button aria-haspopup="true" size="icon" variant="ghost" className="text-muted-foreground hover:bg-muted/50">
                           <MoreHorizontal className="h-4 w-4" />
                           <span className="sr-only">Actions pour {service.name}</span>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end"> {/* Popover content */}
+                      <DropdownMenuContent align="end"> 
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem>
                           <Edit3 className="mr-2 h-4 w-4" /> Modifier

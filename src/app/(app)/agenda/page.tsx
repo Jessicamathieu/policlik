@@ -119,7 +119,7 @@ export default function AgendaPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <h1 className="text-3xl font-bold tracking-tight mb-6 font-headline">Agenda des Rendez-vous</h1>
+      <h1 className="text-3xl font-bold tracking-tight mb-6 font-headline text-foreground">Agenda des Rendez-vous</h1>
       <AgendaControls 
         currentView={currentView} 
         onViewChange={handleViewChange}
@@ -142,5 +142,3 @@ export default function AgendaPage() {
     </div>
   );
 }
-
-    

@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { Metadata } from "next"; // Metadata type can still be imported but not exported from client component
+import type { Metadata } from "next"; 
 import { PT_Sans } from "next/font/google";
 import "./globals.css";
 import { AppHeader } from "@/components/app/app-header";
@@ -16,9 +16,6 @@ const ptSans = PT_Sans({
   weight: ["400", "700"],
   variable: "--font-pt-sans",
 });
-
-// Cannot export metadata from a Client Component for dynamic metadata.
-// Static metadata can be placed in head.js or directly in <head> below.
 
 export default function RootLayout({
   children,
@@ -37,10 +34,9 @@ export default function RootLayout({
 
     const activeNavItem = getActiveNavItemConfig(pathname);
     
-    // Fallback to dashboard colors if no specific item found or no colors defined
-    const dashboardItem = getActiveNavItemConfig('/dashboard'); // Assuming dashboard has defined colors
-    const defaultPrimaryHex = dashboardItem?.color || "#3F51B5"; // Default blue
-    const defaultPrimaryForegroundHex = dashboardItem?.contrastColor || "#FFFFFF"; // Default white
+    const dashboardItem = getActiveNavItemConfig('/dashboard'); 
+    const defaultPrimaryHex = dashboardItem?.color || "#3F51B5"; 
+    const defaultPrimaryForegroundHex = dashboardItem?.contrastColor || "#FFFFFF";
 
     let currentPrimaryHex = defaultPrimaryHex;
     let currentPrimaryForegroundHex = defaultPrimaryForegroundHex;
@@ -58,21 +54,12 @@ export default function RootLayout({
       docStyle.setProperty('--primary-h', `${primaryHSL.h}`);
       docStyle.setProperty('--primary-s', `${primaryHSL.s}%`);
       docStyle.setProperty('--primary-l', `${primaryHSL.l}%`);
-
-      // Cards use the primary color
-      docStyle.setProperty('--card-h', `${primaryHSL.h}`);
-      docStyle.setProperty('--card-s', `${primaryHSL.s}%`);
-      docStyle.setProperty('--card-l', `${primaryHSL.l}%`);
     } else {
-      // Fallback if hexToHSL fails for primary (should not happen with defaults)
       const fallbackPrimaryHSL = hexToHSL(defaultPrimaryHex);
       if (fallbackPrimaryHSL) {
         docStyle.setProperty('--primary-h', `${fallbackPrimaryHSL.h}`);
         docStyle.setProperty('--primary-s', `${fallbackPrimaryHSL.s}%`);
         docStyle.setProperty('--primary-l', `${fallbackPrimaryHSL.l}%`);
-        docStyle.setProperty('--card-h', `${fallbackPrimaryHSL.h}`);
-        docStyle.setProperty('--card-s', `${fallbackPrimaryHSL.s}%`);
-        docStyle.setProperty('--card-l', `${fallbackPrimaryHSL.l}%`);
       }
     }
 
@@ -80,21 +67,12 @@ export default function RootLayout({
       docStyle.setProperty('--primary-foreground-h', `${primaryForegroundHSL.h}`);
       docStyle.setProperty('--primary-foreground-s', `${primaryForegroundHSL.s}%`);
       docStyle.setProperty('--primary-foreground-l', `${primaryForegroundHSL.l}%`);
-
-      // Card foreground uses primary foreground
-      docStyle.setProperty('--card-foreground-h', `${primaryForegroundHSL.h}`);
-      docStyle.setProperty('--card-foreground-s', `${primaryForegroundHSL.s}%`);
-      docStyle.setProperty('--card-foreground-l', `${primaryForegroundHSL.l}%`);
     } else {
-      // Fallback if hexToHSL fails for foreground
       const fallbackFgHSL = hexToHSL(defaultPrimaryForegroundHex);
       if (fallbackFgHSL) {
         docStyle.setProperty('--primary-foreground-h', `${fallbackFgHSL.h}`);
         docStyle.setProperty('--primary-foreground-s', `${fallbackFgHSL.s}%`);
         docStyle.setProperty('--primary-foreground-l', `${fallbackFgHSL.l}%`);
-        docStyle.setProperty('--card-foreground-h', `${fallbackFgHSL.h}`);
-        docStyle.setProperty('--card-foreground-s', `${fallbackFgHSL.s}%`);
-        docStyle.setProperty('--card-foreground-l', `${fallbackFgHSL.l}%`);
       }
     }
   }, [pathname, isMounted]);
@@ -104,7 +82,6 @@ export default function RootLayout({
       <head>
         <title>Polimik Gestion</title>
         <meta name="description" content="Application de gestion pour Polimik." />
-        {/* Add other static head elements here if needed, like favicons */}
       </head>
       <body className={`font-body antialiased bg-background text-foreground`}>
         <AppHeader />
