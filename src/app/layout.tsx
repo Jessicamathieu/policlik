@@ -1,59 +1,60 @@
+"use client";
 
-"use client"; 
-
-import "./globals.css"; 
+import "./globals.css";
 import { AppHeader } from "@/components/app/app-header";
-import { Toaster } from "@/components/ui/toaster"; 
-import { getActiveNavItemConfig, pageColors } from "@/config/nav"; 
+import { getActiveNavItemConfig } from "@/config/nav";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
-import { cn } from "@/lib/utils"; 
-import { hexToHSL } from "@/lib/utils"; // Import hexToHSL
+import { useEffect, useState } from "react";
+import { PT_Sans } from "next/font/google";
 
-// import { PT_Sans } from 'next/font/google';
-// const ptSans = PT_Sans({
-//   weight: ['400', '700'],
-//   subsets: ['latin'],
-//   display: 'swap',
-// });
+/* --- police globale --- */
+const ptSans = PT_Sans({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+  variable: "--font-pt-sans",
+});
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function AppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
 
+  /* --- couleur d’accent pour tes onglets (pas le fond) --- */
+  const [accentColor, setAccentColor]   = useState("#2743e3");
+  const [accentContrast, setAccentText] = useState("#FFFFFF");
+
   useEffect(() => {
-    const activeNavItem = getActiveNavItemConfig(pathname);
-    // Use the primary blue from the style guide as the ultimate fallback
-    const colorHex = activeNavItem?.color || pageColors.find(p => p.name === 'blue')?.color || '#3F51B5'; 
-    const contrastColorHex = activeNavItem?.contrastColor || pageColors.find(p => p.name === 'blue')?.contrastColor || '#FFFFFF';
-
-    const primaryHSL = hexToHSL(colorHex);
-    if (primaryHSL) {
-      document.documentElement.style.setProperty('--primary-h', `${primaryHSL.h}`);
-      document.documentElement.style.setProperty('--primary-s', `${primaryHSL.s}%`);
-      document.documentElement.style.setProperty('--primary-l', `${primaryHSL.l}%`);
+    const nav = getActiveNavItemConfig(pathname);
+    if (nav?.color && nav?.contrastColor) {
+      setAccentColor(nav.color);
+      setAccentText(nav.contrastColor);
+    } else {
+      const def = getActiveNavItemConfig("/dashboard");
+      setAccentColor(def?.color ?? "#2743e3");
+      setAccentText(def?.contrastColor ?? "#FFFFFF");
     }
 
-    const primaryFgHSL = hexToHSL(contrastColorHex);
-    if (primaryFgHSL) {
-      document.documentElement.style.setProperty('--primary-foreground-h', `${primaryFgHSL.h}`);
-      document.documentElement.style.setProperty('--primary-foreground-s', `${primaryFgHSL.s}%`);
-      document.documentElement.style.setProperty('--primary-foreground-l', `${primaryFgHSL.l}%`);
-    }
-  }, [pathname]);
+    /* Variables CSS si d’autres composants en ont besoin */
+    document.documentElement.style.setProperty("--page-main-color", accentColor);
+    document.documentElement.style.setProperty(
+      "--page-main-contrast-color",
+      accentContrast
+    );
+  }, [pathname, accentColor, accentContrast]);
 
   return (
-    <html lang="fr"> 
-      <body
-        className={cn(
-          "min-h-screen w-full flex flex-col bg-background text-foreground" 
-          // ptSans.className 
-        )}
-      >
-        <AppHeader /> 
-        <div className="flex-1 w-full flex flex-col"> 
-            {children} 
-        </div>
-        <Toaster /> 
+    <html lang="fr" className={ptSans.className}>
+      <body className="flex min-h-screen w-full flex-col bg-white text-[#232323]">
+        {/* --- ‼️ Header unique pour toute l’app --- */}
+        <AppHeader />
+
+        {/* --- zone de contenu (pas de cartes imposées) --- */}
+        <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto relative">
+          {children}
+        </main>
       </body>
     </html>
   );
