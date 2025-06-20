@@ -19,11 +19,11 @@ export default function ClientsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight font-headline">Gestion des Clients</h1>
-          <p className="text-primary-foreground">Consultez et gérez votre base de données clients.</p>
+          <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Gestion des Clients</h1>
+          <p className="text-muted-foreground">Consultez et gérez votre base de données clients.</p> {/* text-muted-foreground for text on white page bg */}
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="text-foreground">
+          <Button variant="outline" className="text-foreground border-foreground/30 hover:bg-accent hover:text-accent-foreground">
             <FileDown className="mr-2 h-4 w-4" /> Exporter
           </Button>
           <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
@@ -32,43 +32,43 @@ export default function ClientsPage() {
         </div>
       </div>
 
-      <Card>
+      <Card className="bg-card text-card-foreground"> {/* Main card is now colored */}
         <CardHeader>
           <CardTitle>Liste des Clients</CardTitle>
-          <CardDescription>Recherchez, filtrez et gérez vos clients.</CardDescription>
+          <CardDescription className="opacity-75">Recherchez, filtrez et gérez vos clients.</CardDescription>
           <div className="relative mt-4">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-card-foreground opacity-50" />
             <Input 
               placeholder="Rechercher un client par nom, email, adresse..." 
-              className="pl-8 w-full sm:w-1/2 lg:w-1/3 bg-background border-input text-foreground placeholder:text-muted-foreground" 
+              className="pl-8 w-full sm:w-1/2 lg:w-1/3 bg-background border-input text-foreground placeholder:text-muted-foreground" /* Input remains light */
             />
           </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
             {clients.map((client) => (
-              <Card key={client.id} className="flex flex-col shadow-md hover:shadow-lg transition-shadow duration-200 rounded-xl overflow-hidden border-border/70">
-                <CardHeader className="flex flex-row items-start justify-between space-y-0 p-4 bg-card-foreground/10">
+              <Card key={client.id} className="flex flex-col shadow-md hover:shadow-lg transition-shadow duration-200 rounded-xl overflow-hidden bg-card-foreground/10 border-card-foreground/20 text-card-foreground"> {/* Inner cards are lighter shade of card-foreground */}
+                <CardHeader className="flex flex-row items-start justify-between space-y-0 p-4 bg-card-foreground/20"> {/* Header of inner card slightly darker */}
                   <div>
                     <CardTitle className="text-lg font-semibold leading-tight">
-                      <Link href={`/clients/${client.id}`} className="hover:underline text-primary-foreground">
+                      <Link href={`/clients/${client.id}`} className="hover:underline text-card-foreground">
                         {client.name}
                       </Link>
                     </CardTitle>
                     {client.email && (
-                       <Link href={`mailto:${client.email}`} className="text-xs text-primary-foreground/80 hover:text-primary-foreground flex items-center gap-1">
+                       <Link href={`mailto:${client.email}`} className="text-xs opacity-80 hover:opacity-100 flex items-center gap-1">
                          <MailIcon className="h-3 w-3"/> {client.email}
                        </Link>
                     )}
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8 -mt-1 -mr-1 text-primary-foreground hover:bg-primary-foreground/10">
+                      <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8 -mt-1 -mr-1 hover:bg-card-foreground/20 text-card-foreground">
                         <MoreHorizontal className="h-4 w-4" />
                         <span className="sr-only">Ouvrir menu pour {client.name}</span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end"> {/* Popover content, should remain light/dark based on its own theme */}
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
                         <Link href={`/clients/${client.id}/modifier`} className="flex items-center cursor-pointer">
@@ -92,21 +92,21 @@ export default function ClientsPage() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </CardHeader>
-                <CardContent className="p-4 text-sm space-y-2.5 flex-grow">
+                <CardContent className="p-4 text-sm space-y-2.5 flex-grow text-card-foreground">
                   {client.phone && (
                     <div className="flex items-center">
-                      <Phone className="h-4 w-4 mr-2.5 text-primary-foreground/80" />
-                      <Link href={`tel:${client.phone}`} className="hover:text-primary-foreground/80">{client.phone}</Link>
+                      <Phone className="h-4 w-4 mr-2.5 opacity-80" />
+                      <Link href={`tel:${client.phone}`} className="hover:opacity-80">{client.phone}</Link>
                     </div>
                   )}
                   {client.address && (
                     <div className="flex items-start">
-                      <MapPin className="h-4 w-4 mr-2.5 mt-0.5 text-primary-foreground/80 shrink-0" />
+                      <MapPin className="h-4 w-4 mr-2.5 mt-0.5 opacity-80 shrink-0" />
                       <Link 
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(client.address)}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex-1 hover:text-primary-foreground/80"
+                        className="flex-1 hover:opacity-80"
                       >
                         {client.address}
                       </Link>
@@ -114,10 +114,10 @@ export default function ClientsPage() {
                   )}
                 </CardContent>
                 {client.totalSpent && (
-                  <CardFooter className="p-4 bg-card-foreground/10 text-sm border-t border-primary-foreground/20">
-                    <div className="flex items-center justify-between w-full">
-                      <span className="text-primary-foreground/80">Total Dépensé:</span>
-                      <span className="font-semibold text-primary-foreground">{client.totalSpent}</span>
+                  <CardFooter className="p-4 bg-card-foreground/20 text-sm border-t border-card-foreground/30"> {/* Footer of inner card */}
+                    <div className="flex items-center justify-between w-full text-card-foreground">
+                      <span className="opacity-80">Total Dépensé:</span>
+                      <span className="font-semibold">{client.totalSpent}</span>
                     </div>
                   </CardFooter>
                 )}
@@ -126,7 +126,6 @@ export default function ClientsPage() {
           </div>
         </CardContent>
       </Card>
-      {/* Add pagination if many clients */}
     </div>
   );
 }

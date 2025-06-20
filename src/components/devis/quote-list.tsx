@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -27,19 +28,17 @@ const mockQuotes = [
 
 type QuoteStatus = "Envoyé" | "Accepté" | "Refusé" | "En attente" | "Converti";
 
+// Badge colors updated for contrast on dynamic card background
 const statusColors: Record<QuoteStatus, string> = {
-  "Envoyé": "bg-blue-100 text-blue-700 border-blue-300",
-  "Accepté": "bg-green-100 text-green-700 border-green-300",
-  "Refusé": "bg-red-100 text-red-700 border-red-300",
-  "En attente": "bg-yellow-100 text-yellow-700 border-yellow-300",
-  "Converti": "bg-purple-100 text-purple-700 border-purple-300",
+  "Envoyé": "bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200", // Light blue badge, dark blue text
+  "Accepté": "bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200", // Light green badge
+  "Refusé": "bg-rose-100 text-rose-800 border-rose-300 hover:bg-rose-200",     // Light red badge
+  "En attente": "bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200", // Light yellow badge
+  "Converti": "bg-violet-100 text-violet-800 border-violet-300 hover:bg-violet-200", // Light purple badge
 };
 
 
 export function QuoteList() {
-  // Add state for quotes if they are to be fetched or managed client-side
-  // const [quotes, setQuotes] = React.useState(mockQuotes);
-
   const handleSendEmail = (quoteId: string) => alert(`Envoyer email pour devis ${quoteId}`);
   const handleConvertToAppointment = (quoteId: string) => alert(`Convertir devis ${quoteId} en RDV`);
   const handleEditQuote = (quoteId: string) => alert(`Modifier devis ${quoteId}`);
@@ -49,22 +48,22 @@ export function QuoteList() {
   return (
     <Table>
       <TableHeader>
-        <TableRow>
-          <TableHead>ID Devis</TableHead>
-          <TableHead>Client</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead className="text-right">Montant</TableHead>
-          <TableHead className="text-center">Statut</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+        <TableRow className="border-b-card-foreground/30">
+          <TableHead className="text-card-foreground opacity-80">ID Devis</TableHead>
+          <TableHead className="text-card-foreground opacity-80">Client</TableHead>
+          <TableHead className="text-card-foreground opacity-80">Date</TableHead>
+          <TableHead className="text-right text-card-foreground opacity-80">Montant</TableHead>
+          <TableHead className="text-center text-card-foreground opacity-80">Statut</TableHead>
+          <TableHead className="text-right text-card-foreground opacity-80">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {mockQuotes.map((quote) => (
-          <TableRow key={quote.id}>
-            <TableCell className="font-medium">{quote.id}</TableCell>
-            <TableCell>{quote.clientName}</TableCell>
-            <TableCell>{format(quote.date, "dd MMM yyyy", { locale: fr })}</TableCell>
-            <TableCell className="text-right">CAD${quote.amount.toFixed(2)}</TableCell>
+          <TableRow key={quote.id} className="border-b-card-foreground/20">
+            <TableCell className="font-medium text-card-foreground">{quote.id}</TableCell>
+            <TableCell className="text-card-foreground">{quote.clientName}</TableCell>
+            <TableCell className="text-card-foreground">{format(quote.date, "dd MMM yyyy", { locale: fr })}</TableCell>
+            <TableCell className="text-right text-card-foreground">CAD${quote.amount.toFixed(2)}</TableCell>
             <TableCell className="text-center">
               <Badge variant="outline" className={cn("text-xs", statusColors[quote.status as QuoteStatus])}>
                 {quote.status}
@@ -73,12 +72,12 @@ export function QuoteList() {
             <TableCell className="text-right">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" className="text-card-foreground hover:bg-card-foreground/10">
                     <MoreHorizontal className="h-4 w-4" />
                     <span className="sr-only">Actions pour {quote.id}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end"> {/* Popover content, should remain light/dark */}
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                   <DropdownMenuItem onClick={() => handleEditQuote(quote.id)}>
                     <Edit3 className="mr-2 h-4 w-4" /> Modifier
@@ -94,7 +93,6 @@ export function QuoteList() {
                       <CalendarPlus className="mr-2 h-4 w-4" /> Convertir en RDV
                     </DropdownMenuItem>
                   )}
-                  {/* Example: Update status options */}
                   {quote.status !== "Accepté" && (
                     <DropdownMenuItem onClick={() => alert(`Marquer ${quote.id} comme Accepté`)}>
                       <CheckCircle className="mr-2 h-4 w-4 text-green-500" /> Marquer Accepté

@@ -81,15 +81,18 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
   const handleSlotClick = useCallback((dateForSlot: Date, slotStartTime?: string) => {
     setSlotInitialData({
       date: format(dateForSlot, "yyyy-MM-dd"),
-      startTime: slotStartTime || "09:00", // Default start time if not provided
+      startTime: slotStartTime || "09:00", 
     });
     setIsSlotModalOpen(true);
   }, []);
   
   const renderDayView = () => (
+    // The calendar grid itself will be on the white page background.
+    // It uses `bg-card` for its cells, which is now dynamic/colored. This might be too much color.
+    // Let's make the grid cells use `bg-background` (white) and borders, then appointments are colored.
     <div className="grid grid-cols-[auto_1fr] gap-px bg-border border rounded-lg shadow-sm overflow-hidden">
-      <div className="sticky left-0 z-10 bg-card">
-        <div className="h-10 border-b flex items-center justify-center p-2 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-10">Heure</div>
+      <div className="sticky left-0 z-10 bg-muted text-foreground"> {/* Time column header and cells use muted/foreground for light bg */}
+        <div className="h-10 border-b flex items-center justify-center p-2 text-sm font-medium sticky top-0 bg-muted z-10">Heure</div>
         {timeSlots.map((slot) => (
           <div 
             key={slot} 
@@ -100,14 +103,14 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
           </div>
         ))}
       </div>
-      <div className="relative bg-card">
-        <div className="h-10 border-b flex items-center justify-center p-2 text-sm font-medium sticky top-0 bg-card z-10">
+      <div className="relative bg-background"> {/* Day column uses page background (white) */}
+        <div className="h-10 border-b flex items-center justify-center p-2 text-sm font-medium sticky top-0 bg-muted z-10 text-foreground"> {/* Day header use muted/foreground */}
           {formattedDateHeader || ' '}
         </div>
         {timeSlots.map((slot, slotIndex) => (
           <div 
             key={slotIndex} 
-            className="border-b relative cursor-pointer hover:bg-muted/50 transition-colors"
+            className="border-b relative cursor-pointer hover:bg-muted/50 transition-colors" // Cells are white, hover makes them slightly gray
             style={{ height: `${slotHeightPx}px` }} 
             onClick={() => handleSlotClick(currentDate, slot)}
             role="button"
@@ -135,8 +138,9 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
               trigger={
                 <button
                   className={cn(
-                    "absolute left-1 right-1 p-1.5 text-left text-xs text-primary-foreground rounded shadow-md transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 hover:opacity-90",
-                    app.serviceColorClassName || 'bg-primary/90'
+                    "absolute left-1 right-1 p-1.5 text-left text-xs rounded shadow-md transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 hover:opacity-90",
+                    app.serviceColorClassName || 'bg-primary', // Use primary (dynamic color)
+                    'text-primary-foreground' // Text on appointment is primary-foreground (white)
                   )}
                   style={{
                     top: `${topOffset}px`, 
@@ -174,20 +178,21 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
     const daysOfWeek = eachDayOfInterval({ start: weekStart, end: endOfWeek(weekStart, { weekStartsOn: 1, locale: fr }) });
 
     return (
-      <div className="border rounded-lg shadow-sm overflow-x-auto">
-        <div className="h-10 flex items-center justify-center p-2 text-sm font-semibold sticky top-0 bg-card z-30 border-b">
+      // Week view grid on white page background
+      <div className="border rounded-lg shadow-sm overflow-x-auto bg-background text-foreground">
+        <div className="h-10 flex items-center justify-center p-2 text-sm font-semibold sticky top-0 bg-muted z-30 border-b text-foreground"> {/* Header muted on white */}
             {formattedDateHeader || ' '}
         </div>
         <div className="grid grid-cols-[auto_repeat(7,minmax(140px,1fr))] gap-px bg-border">
             <div 
-              className="sticky left-0 top-10 z-20 bg-card h-12 border-b flex items-center justify-center p-2 text-sm font-medium text-muted-foreground"
+              className="sticky left-0 top-10 z-20 bg-muted h-12 border-b flex items-center justify-center p-2 text-sm font-medium text-muted-foreground" // Time col header
             >
                 Heure
             </div>
             {daysOfWeek.map(day => (
                 <div 
                   key={`header-${day.toISOString()}`} 
-                  className="sticky top-10 z-20 bg-card h-12 border-b p-2 text-xs font-medium text-center flex flex-col items-center justify-center"
+                  className="sticky top-10 z-20 bg-muted h-12 border-b p-2 text-xs font-medium text-center flex flex-col items-center justify-center text-foreground" // Day headers
                 >
                   <span className="font-semibold">{format(day, 'EEE', { locale: fr })}</span>
                   <span className="font-normal text-lg">{format(day, 'd', { locale: fr })}</span>
@@ -197,7 +202,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
             {timeSlots.map((slot) => (
                 <React.Fragment key={`timeslot-row-${slot}`}>
                     <div 
-                        className="sticky left-0 z-10 bg-card p-2 text-xs flex items-center justify-center font-semibold"
+                        className="sticky left-0 z-10 bg-muted p-2 text-xs flex items-center justify-center font-semibold text-foreground" // Time slots
                         style={{ height: `${slotHeightPx}px` }}
                     >
                         {slot}
@@ -206,7 +211,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                     {daysOfWeek.map(day => (
                         <div 
                             key={`slot-${day.toISOString()}-${slot}`} 
-                            className="bg-card relative cursor-pointer hover:bg-muted/50 transition-colors"
+                            className="bg-background relative cursor-pointer hover:bg-muted/50 transition-colors border-r border-b" // Day cells are white
                             style={{ height: `${slotHeightPx}px` }}
                             onClick={() => handleSlotClick(day, slot)}
                             role="button"
@@ -225,7 +230,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                     className="relative" 
                     style={{ 
                         gridColumnStart: dayIndex + 2, 
-                        gridRowStart: 3, 
+                        gridRowStart: 3, // After header row and day name row
                         gridRowEnd: timeSlots.length + 3, 
                      }}
                 >
@@ -247,8 +252,9 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                                     trigger={
                                         <button
                                           className={cn(
-                                            "absolute left-1 right-1 p-1 text-left text-xs text-primary-foreground rounded shadow-md transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 hover:opacity-90",
-                                            app.serviceColorClassName || 'bg-primary/90'
+                                            "absolute left-1 right-1 p-1 text-left text-xs rounded shadow-md transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 hover:opacity-90",
+                                            app.serviceColorClassName || 'bg-primary', // Colored appointments
+                                            'text-primary-foreground' // White text on appointments
                                           )}
                                           style={{
                                                 top: `${topOffset}px`,
@@ -285,22 +291,24 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
 
   const renderMonthView = () => {
     const monthStart = startOfMonth(currentDate);
-    const gridStartDay = startOfWeek(monthStart, { weekStartsOn: 1, locale: fr }); // Monday
+    const gridStartDay = startOfWeek(monthStart, { weekStartsOn: 1, locale: fr }); 
     const gridEndDay = endOfWeek(endOfMonth(monthStart), { weekStartsOn: 1, locale: fr });
     const daysInGrid = eachDayOfInterval({ start: gridStartDay, end: gridEndDay });
     const dayHeaders = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
     return (
-      <Card className="shadow-md">
-        <CardHeader>
-          <CardTitle className="font-headline text-center text-xl">
+      // Month view card itself is on white page bg, but it will become colored as it's a Card.
+      // Let's change the outer Card to a div with standard page background styling.
+      <div className="shadow-md border rounded-lg bg-background text-foreground">
+        <div className="p-4 border-b"> {/* Header for month view title */}
+          <h2 className="font-headline text-center text-xl text-foreground">
             {formattedDateHeader || "Mois"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-1 sm:p-2 md:p-4">
+          </h2>
+        </div>
+        <div className="p-1 sm:p-2 md:p-4">
           <div className="grid grid-cols-7 gap-px bg-border border rounded-md overflow-hidden">
             {dayHeaders.map(header => (
-              <div key={header} className="text-center font-medium text-sm py-2 bg-card text-muted-foreground">
+              <div key={header} className="text-center font-medium text-sm py-2 bg-muted text-muted-foreground"> {/* Day headers light gray */}
                 {header}
               </div>
             ))}
@@ -313,8 +321,9 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                 <div
                   key={day.toString()}
                   className={cn(
-                    "min-h-[100px] sm:min-h-[120px] bg-card p-1.5 sm:p-2 relative flex flex-col cursor-pointer hover:bg-muted/30 transition-colors",
-                    !isSameMonth(day, currentDate) && "bg-muted/40"
+                    "min-h-[100px] sm:min-h-[120px] p-1.5 sm:p-2 relative flex flex-col cursor-pointer hover:bg-muted/30 transition-colors",
+                    isSameMonth(day, currentDate) ? "bg-background" : "bg-muted/40", // Day cells white, off-month gray
+                    "border-r border-b" // Add borders to cells
                   )}
                   onClick={() => handleSlotClick(day)}
                   role="button"
@@ -326,7 +335,7 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                     className={cn(
                       "text-xs sm:text-sm font-medium self-start",
                       !isSameMonth(day, currentDate) && "text-muted-foreground/70",
-                      isSameDay(day, new Date()) && "text-primary font-bold"
+                      isSameDay(day, new Date()) && "text-primary font-bold" // Today highlighted with primary color (dynamic)
                     )}
                   >
                     {format(day, 'd')}
@@ -340,10 +349,11 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                           trigger={
                             <button 
                               className={cn(
-                                "w-full text-left text-[10px] sm:text-xs text-primary-foreground rounded px-1 py-0.5 block truncate focus:outline-none focus:ring-1 focus:ring-ring hover:opacity-90",
-                                app.serviceColorClassName || 'bg-primary/80'
+                                "w-full text-left text-[10px] sm:text-xs rounded px-1 py-0.5 block truncate focus:outline-none focus:ring-1 focus:ring-ring hover:opacity-90",
+                                app.serviceColorClassName || 'bg-primary', // Appointments colored
+                                'text-primary-foreground' // Text on appointments white
                               )}
-                              onClick={(e) => e.stopPropagation()} // Prevent day click when clicking appointment
+                              onClick={(e) => e.stopPropagation()} 
                               aria-label={`Rendez-vous: ${app.clientName || app.serviceName} de ${app.startTime} à ${app.endTime}`}
                             >
                               {app.startTime} {app.clientName || app.serviceName || 'RDV'}
@@ -372,8 +382,8 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
                 }}
             />
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   };
 
@@ -396,5 +406,3 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
       return renderDayView();
   }
 }
-
-    

@@ -3,22 +3,19 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { CalendarDays, Users, FileText, DollarSign, PlusCircle, LineChart, MapPin, Phone, CalendarClock } from "lucide-react";
 import Link from "next/link";
-import { format } from "date-fns"; // For formatting today's date if needed for mock data
+import { format } from "date-fns"; 
 
-// Define an interface for today's appointments
 interface TodayAppointment {
   id: string;
   clientName: string;
   serviceName: string;
-  startTime: string; // "HH:mm"
-  endTime: string;   // "HH:mm"
+  startTime: string; 
+  endTime: string;   
   address: string;
   phone: string;
-  status?: "À venir" | "Terminé" | "En cours"; // Optional status
+  status?: "À venir" | "Terminé" | "En cours"; 
 }
 
-// Mock data for today's appointments
-// In a real app, you would fetch this data
 const today = new Date();
 const mockTodaysAppointments: TodayAppointment[] = [
   { id: "rdv1", clientName: "Jean Dupont", serviceName: "Nettoyage Standard", startTime: "09:00", endTime: "10:30", address: "123 Rue Principale, 75001 Paris", phone: "0123456789", status: "À venir" },
@@ -28,26 +25,26 @@ const mockTodaysAppointments: TodayAppointment[] = [
 
 export default function DashboardPage() {
   const summaryCards = [
-    { title: "Rendez-vous Aujourd'hui", value: mockTodaysAppointments.length.toString(), icon: CalendarDays, color: "text-primary-foreground", bgColor: "bg-primary-foreground/10", description: `${mockTodaysAppointments.filter(a => a.status === "À venir").length} à venir` },
-    { title: "Devis en Attente", value: "12", icon: FileText, color: "text-accent", bgColor: "bg-accent/10", description: "À traiter rapidement" }, // Accent color for this card might need review if card bg is primary
-    { title: "Clients Actifs", value: "128", icon: Users, color: "text-green-500", bgColor: "bg-green-500/10", description: "+5 cette semaine" }, // This will be green on primary bg
-    { title: "Revenus (Mois)", value: "CAD$ 7,250", icon: DollarSign, color: "text-purple-500", bgColor: "bg-purple-500/10", description: "Objectif: CAD$10,000" }, // This will be purple on primary bg
+    { title: "Rendez-vous Aujourd'hui", value: mockTodaysAppointments.length.toString(), icon: CalendarDays, description: `${mockTodaysAppointments.filter(a => a.status === "À venir").length} à venir` },
+    { title: "Devis en Attente", value: "12", icon: FileText, description: "À traiter rapidement" },
+    { title: "Clients Actifs", value: "128", icon: Users, description: "+5 cette semaine" },
+    { title: "Revenus (Mois)", value: "CAD$ 7,250", icon: DollarSign, description: "Objectif: CAD$10,000" },
   ];
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight font-headline">Tableau de Bord</h1>
-          <p className="text-primary-foreground">Bienvenue sur Polimik Gestion ! Voici un aperçu de votre activité.</p>
+          <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Tableau de Bord</h1>
+          <p className="text-muted-foreground">Bienvenue sur Polimik Gestion ! Voici un aperçu de votre activité.</p>
         </div>
         <div className="flex gap-2">
-          <Button asChild className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+          <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
             <Link href="/agenda?action=nouveau">
               <PlusCircle className="mr-2 h-4 w-4" /> Nouveau Rendez-vous
             </Link>
           </Button>
-          <Button variant="outline" asChild className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+          <Button variant="outline" asChild className="text-foreground border-foreground/30 hover:bg-foreground/10 hover:text-foreground">
              <Link href="/devis/demandes">
               <PlusCircle className="mr-2 h-4 w-4" /> Nouveau Devis
             </Link>
@@ -55,31 +52,31 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Today's Appointments Section (Full Width) */}
+      
       <div className="grid gap-6">
-        <Card>
+        <Card className="bg-card text-card-foreground"> {/* Card is now colored */}
           <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2 text-xl">
-              <CalendarClock className="h-6 w-6 text-primary-foreground" />
+              <CalendarClock className="h-6 w-6 text-card-foreground" />
               Rendez-vous du Jour
             </CardTitle>
-            <CardDescription>Vos interventions prévues pour aujourd'hui.</CardDescription>
+            <CardDescription className="text-card-foreground opacity-75">Vos interventions prévues pour aujourd'hui.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {mockTodaysAppointments.length > 0 ? (
               mockTodaysAppointments.map((appt) => (
-                <Card key={appt.id} className="shadow-md border-primary-foreground/30 overflow-hidden hover:shadow-lg transition-shadow bg-card-foreground/5">
-                  <CardHeader className="p-4 bg-card-foreground/10">
-                    <CardTitle className="text-lg font-semibold text-primary-foreground">{appt.clientName}</CardTitle>
-                    <CardDescription className="text-sm">{appt.serviceName}</CardDescription>
+                <Card key={appt.id} className="shadow-md border-card-foreground/30 overflow-hidden hover:shadow-lg transition-shadow bg-card-foreground/10 text-card-foreground"> {/* Inner card, lighter shade */}
+                  <CardHeader className="p-4 bg-card-foreground/20"> {/* Slightly darker header for inner card */}
+                    <CardTitle className="text-lg font-semibold text-card-foreground">{appt.clientName}</CardTitle>
+                    <CardDescription className="text-sm text-card-foreground opacity-80">{appt.serviceName}</CardDescription>
                   </CardHeader>
                   <CardContent className="p-4 space-y-3">
-                    <div className="flex items-center text-sm">
-                      <CalendarDays className="h-4 w-4 mr-2 text-primary-foreground/80" />
+                    <div className="flex items-center text-sm text-card-foreground">
+                      <CalendarDays className="h-4 w-4 mr-2 opacity-80" />
                       <span>{appt.startTime} - {appt.endTime}</span>
                       {appt.status && (
                         <span className={`ml-auto text-xs font-semibold px-2 py-0.5 rounded-full ${
-                          appt.status === "À venir" ? "bg-blue-500 text-white" : // These explicit colors will stand out
+                          appt.status === "À venir" ? "bg-blue-500 text-white" : 
                           appt.status === "En cours" ? "bg-yellow-500 text-black" :
                           "bg-green-500 text-white"
                         }`}>
@@ -87,22 +84,22 @@ export default function DashboardPage() {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-start text-sm">
-                      <MapPin className="h-4 w-4 mr-2 mt-0.5 text-primary-foreground/80 shrink-0" />
+                    <div className="flex items-start text-sm text-card-foreground">
+                      <MapPin className="h-4 w-4 mr-2 mt-0.5 opacity-80 shrink-0" />
                       <Link 
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(appt.address)}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="hover:text-primary-foreground/80 hover:underline transition-colors"
+                        className="hover:opacity-80 hover:underline transition-colors"
                       >
                         {appt.address}
                       </Link>
                     </div>
-                    <div className="flex items-center text-sm">
-                      <Phone className="h-4 w-4 mr-2 text-primary-foreground/80" />
+                    <div className="flex items-center text-sm text-card-foreground">
+                      <Phone className="h-4 w-4 mr-2 opacity-80" />
                       <Link 
                         href={`tel:${appt.phone}`}
-                        className="hover:text-primary-foreground/80 hover:underline transition-colors"
+                        className="hover:opacity-80 hover:underline transition-colors"
                       >
                         {appt.phone}
                       </Link>
@@ -111,26 +108,26 @@ export default function DashboardPage() {
                 </Card>
               ))
             ) : (
-              <p className="text-primary-foreground/80 text-center py-4">Aucun rendez-vous programmé pour aujourd'hui.</p>
+              <p className="text-card-foreground opacity-80 text-center py-4">Aucun rendez-vous programmé pour aujourd'hui.</p>
             )}
-            <Button variant="outline" className="mt-4 w-full border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10" asChild>
+            <Button variant="outline" className="mt-4 w-full border-card-foreground/50 text-card-foreground hover:bg-card-foreground/10" asChild>
               <Link href="/agenda">Voir l'agenda complet</Link>
             </Button>
           </CardContent>
         </Card>
       </div>
 
-      {/* Summary Cards */}
+      
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {summaryCards.map((item, index) => (
-          <Card key={index} className="shadow-md hover:shadow-lg transition-shadow duration-300 border-primary-foreground/30">
+          <Card key={index} className="shadow-md hover:shadow-lg transition-shadow duration-300 bg-card text-card-foreground border-card-foreground/30">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
-              <item.icon className={`h-5 w-5 ${item.color}`} />
+              <CardTitle className="text-sm font-medium text-card-foreground">{item.title}</CardTitle>
+              <item.icon className="h-5 w-5 text-card-foreground opacity-80" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{item.value}</div>
-              <p className="text-xs opacity-75">{item.description}</p>
+              <div className="text-2xl font-bold text-card-foreground">{item.value}</div>
+              <p className="text-xs text-card-foreground opacity-75">{item.description}</p>
             </CardContent>
           </Card>
         ))}

@@ -1,24 +1,16 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+// Removed useState and useEffect as background is now static white controlled by RootLayout and globals.css
 
 export default function AppPagesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   return (
     <main
-      className={`flex-1 p-4 sm:p-6 md:p-8 overflow-auto relative w-full ${
-        isClient ? 'bg-primary text-primary-foreground' : 'bg-background text-foreground'
-      }`}
+      className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto relative w-full bg-background text-foreground"
     >
       {children}
     </main>

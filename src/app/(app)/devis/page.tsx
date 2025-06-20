@@ -1,6 +1,3 @@
-// This page can serve as a container or redirect for quote-related sub-pages.
-// For now, we can redirect to the quote list or provide an overview.
-// Let's make it a simple overview for now.
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,56 +8,56 @@ export default function DevisPage() {
   return (
     <div className="flex flex-col gap-6">
        <div>
-        <h1 className="text-3xl font-bold tracking-tight font-headline">Gestion des Devis</h1>
-        <p className="text-primary-foreground">Créez, envoyez et suivez vos devis clients.</p>
+        <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Gestion des Devis</h1>
+        <p className="text-muted-foreground">Créez, envoyez et suivez vos devis clients.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="shadow-md hover:shadow-xl transition-shadow duration-300">
+        <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 bg-card text-card-foreground">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-headline">
-              <PlusCircle className="h-6 w-6 text-primary" />
+              <PlusCircle className="h-6 w-6 text-card-foreground opacity-90" />
               Nouvelle Demande de Devis
             </CardTitle>
-            <CardDescription>Permettez à vos clients de soumettre des demandes en ligne ou créez-en une manuellement.</CardDescription>
+            <CardDescription className="opacity-75">Permettez à vos clients de soumettre des demandes en ligne ou créez-en une manuellement.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+            <Button asChild className="w-full bg-card-foreground text-card hover:bg-card-foreground/90">
               <Link href="/devis/demandes">Créer / Voir Formulaire</Link>
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="shadow-md hover:shadow-xl transition-shadow duration-300">
+        <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 bg-card text-card-foreground">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-headline">
-              <ListChecks className="h-6 w-6 text-primary" />
+              <ListChecks className="h-6 w-6 text-card-foreground opacity-90" />
               Liste des Devis
             </CardTitle>
-            <CardDescription>Consultez tous les devis soumis, suivez leur statut et convertissez-les en rendez-vous.</CardDescription>
+            <CardDescription className="opacity-75">Consultez tous les devis soumis, suivez leur statut et convertissez-les en rendez-vous.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild className="w-full">
+            <Button asChild className="w-full bg-card-foreground text-card hover:bg-card-foreground/90">
               <Link href="/devis/liste">Voir la Liste des Devis</Link>
             </Button>
           </CardContent>
         </Card>
         
-        <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 lg:col-span-1">
+        <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 lg:col-span-1 bg-card text-card-foreground">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-headline">
-              <FileText className="h-6 w-6 text-primary" />
+              <FileText className="h-6 w-6 text-card-foreground opacity-90" />
               Statistiques Devis
             </CardTitle>
-            <CardDescription>Aperçu rapide: X devis en attente, Y acceptés, Z refusés.</CardDescription>
+            <CardDescription className="opacity-75">Aperçu rapide: X devis en attente, Y acceptés, Z refusés.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-card-foreground opacity-75">
                 <p><strong>En attente:</strong> 5</p>
                 <p><strong>Acceptés:</strong> 23</p>
                 <p><strong>Refusés:</strong> 2</p>
             </div>
-             <Button variant="outline" className="w-full mt-4">Voir Rapports Détaillés</Button>
+             <Button variant="outline" className="w-full mt-4 border-card-foreground/50 text-card-foreground hover:bg-card-foreground/10">Voir Rapports Détaillés</Button>
           </CardContent>
         </Card>
       </div>

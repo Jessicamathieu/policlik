@@ -41,14 +41,16 @@ export function AgendaControls({
   setPrintEndDate
 }: AgendaControlsProps) {
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-4 bg-card rounded-lg shadow">
+    // This control bar is itself a card, so it will be colored
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-4 bg-card text-card-foreground rounded-lg shadow">
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-card-foreground hidden sm:inline">Vue :</span>
+        <span className="text-sm font-medium text-card-foreground hidden sm:inline opacity-90">Vue :</span>
+        {/* SelectTrigger uses bg-background so it will be light on the colored card */}
         <Select value={currentView} onValueChange={(value: "day" | "week" | "month") => onViewChange(value)}>
-          <SelectTrigger className="w-[120px] sm:w-[150px]">
+          <SelectTrigger className="w-[120px] sm:w-[150px] bg-background text-foreground border-input">
             <SelectValue placeholder="Choisir la vue" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent> {/* Popover content remains light/dark themed */}
             <SelectItem value="day"><CalendarIconLucide className="inline-block mr-2 h-4 w-4" /> Jour</SelectItem>
             <SelectItem value="week"><Rows className="inline-block mr-2 h-4 w-4" /> Semaine</SelectItem>
             <SelectItem value="month"><Columns className="inline-block mr-2 h-4 w-4" /> Mois</SelectItem>
@@ -64,7 +66,7 @@ export function AgendaControls({
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-full sm:w-[150px] justify-start text-left font-normal",
+                    "w-full sm:w-[150px] justify-start text-left font-normal bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground", // Light button
                     !printStartDate && "text-muted-foreground"
                   )}
                 >
@@ -87,7 +89,7 @@ export function AgendaControls({
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-full sm:w-[150px] justify-start text-left font-normal",
+                    "w-full sm:w-[150px] justify-start text-left font-normal bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground", // Light button
                     !printEndDate && "text-muted-foreground"
                   )}
                 >
@@ -110,12 +112,14 @@ export function AgendaControls({
             </Popover>
           </>
         )}
-        <Button variant="outline" onClick={onPrintAppointments}>
+        {/* Button "Imprimer" should contrast with the colored card */}
+        <Button variant="outline" onClick={onPrintAppointments} className="bg-card-foreground text-card hover:bg-card-foreground/90 border-card-foreground/50">
           <Printer className="mr-2 h-4 w-4" /> Imprimer
         </Button>
         <AppointmentModal
           trigger={
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+            // Button "Nouveau Rendez-vous" should contrast with the colored card
+            <Button className="bg-card-foreground text-card hover:bg-card-foreground/90">
               <PlusCircle className="mr-2 h-5 w-5" /> Nouveau Rendez-vous
             </Button>
           }

@@ -21,11 +21,12 @@ import { cn } from "@/lib/utils";
 type PaymentStatus = "Réussi" | "En attente" | "Échoué" | "Remboursé";
 type PaymentMethod = "Carte de crédit" | "Virement bancaire" | "PayPal" | "Espèces";
 
+// Badge colors updated for contrast on dynamic card background
 const paymentStatusColors: Record<PaymentStatus, string> = {
-  "Réussi": "bg-green-500 text-white border-green-700",
-  "En attente": "bg-yellow-400 text-black border-yellow-600",
-  "Échoué": "bg-red-500 text-white border-red-700",
-  "Remboursé": "bg-purple-500 text-white border-purple-700",
+  "Réussi": "bg-emerald-100 text-emerald-800 border-emerald-300",
+  "En attente": "bg-amber-100 text-amber-800 border-amber-300",
+  "Échoué": "bg-rose-100 text-rose-800 border-rose-300",
+  "Remboursé": "bg-violet-100 text-violet-800 border-violet-300",
 };
 
 // Mock payment data
@@ -42,34 +43,34 @@ export default function PaiementsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight font-headline">Suivi des Paiements</h1>
-          <p className="text-primary-foreground">Consultez l'historique et le statut de tous les paiements.</p>
+          <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Suivi des Paiements</h1>
+          <p className="text-muted-foreground">Consultez l'historique et le statut de tous les paiements.</p>
         </div>
-         <Button variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+         <Button variant="outline" className="text-foreground border-foreground/30 hover:bg-accent hover:text-accent-foreground">
             <FileDown className="mr-2 h-4 w-4" /> Exporter
           </Button>
       </div>
 
-      <Card>
+      <Card className="bg-card text-card-foreground"> {/* Card is now colored */}
          <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <CardTitle>Historique des Paiements</CardTitle>
-                <CardDescription>Suivez tous les paiements reçus et leur statut.</CardDescription>
+                <CardDescription className="opacity-75">Suivez tous les paiements reçus et leur statut.</CardDescription>
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-grow sm:flex-grow-0">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-card-foreground opacity-50" />
                     <Input 
                       placeholder="Rechercher paiement..." 
-                      className="pl-8 w-full sm:w-auto bg-background border-input text-foreground placeholder:text-muted-foreground" 
+                      className="pl-8 w-full sm:w-auto bg-background border-input text-foreground placeholder:text-muted-foreground" /* Input is light */
                     />
                 </div>
                  <Select defaultValue="all">
-                    <SelectTrigger className="w-full sm:w-[180px] bg-background border-input text-foreground">
+                    <SelectTrigger className="w-full sm:w-[180px] bg-background border-input text-foreground"> {/* Select is light */}
                         <SelectValue placeholder="Filtrer par statut" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent> {/* Popover content */}
                         <SelectItem value="all">Tous les statuts</SelectItem>
                         {Object.keys(paymentStatusColors).map(status => (
                             <SelectItem key={status} value={status.toLowerCase().replace(' ', '-')}>{status}</SelectItem>
@@ -82,28 +83,28 @@ export default function PaiementsPage() {
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow className="border-primary-foreground/30">
-                <TableHead className="text-primary-foreground/80">Date</TableHead>
-                <TableHead className="text-primary-foreground/80">Client</TableHead>
-                <TableHead className="hidden sm:table-cell text-primary-foreground/80">Facture ID</TableHead>
-                <TableHead className="hidden md:table-cell text-primary-foreground/80">Méthode</TableHead>
-                <TableHead className="text-right text-primary-foreground/80">Montant</TableHead>
-                <TableHead className="text-center text-primary-foreground/80">Statut</TableHead>
-                <TableHead className="text-right text-primary-foreground/80">Actions</TableHead>
+              <TableRow className="border-b-card-foreground/30">
+                <TableHead className="text-card-foreground opacity-80">Date</TableHead>
+                <TableHead className="text-card-foreground opacity-80">Client</TableHead>
+                <TableHead className="hidden sm:table-cell text-card-foreground opacity-80">Facture ID</TableHead>
+                <TableHead className="hidden md:table-cell text-card-foreground opacity-80">Méthode</TableHead>
+                <TableHead className="text-right text-card-foreground opacity-80">Montant</TableHead>
+                <TableHead className="text-center text-card-foreground opacity-80">Statut</TableHead>
+                <TableHead className="text-right text-card-foreground opacity-80">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {payments.map((payment) => (
-                <TableRow key={payment.id} className="border-primary-foreground/20">
-                  <TableCell>{format(payment.date, "dd MMM yyyy", { locale: fr })}</TableCell>
-                  <TableCell className="font-medium">{payment.clientName}</TableCell>
+                <TableRow key={payment.id} className="border-b-card-foreground/20">
+                  <TableCell className="text-card-foreground">{format(payment.date, "dd MMM yyyy", { locale: fr })}</TableCell>
+                  <TableCell className="font-medium text-card-foreground">{payment.clientName}</TableCell>
                   <TableCell className="hidden sm:table-cell">
-                     <Link href={`/factures/${payment.invoiceId}`} className="hover:underline text-primary-foreground">
+                     <Link href={`/factures/${payment.invoiceId}`} className="hover:underline text-card-foreground opacity-90">
                         {payment.invoiceId}
                      </Link>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">{payment.method}</TableCell>
-                  <TableCell className={`text-right font-semibold ${payment.amount < 0 ? 'text-red-400' : 'text-green-400'}`}> {/* Adjusted for visibility on primary bg */}
+                  <TableCell className="hidden md:table-cell text-card-foreground">{payment.method}</TableCell>
+                  <TableCell className={`text-right font-semibold ${payment.amount < 0 ? 'text-rose-300' : 'text-emerald-300'}`}>
                     CAD${payment.amount.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-center">
@@ -114,12 +115,12 @@ export default function PaiementsPage() {
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
+                        <Button aria-haspopup="true" size="icon" variant="ghost" className="text-card-foreground hover:bg-card-foreground/10">
                           <MoreHorizontal className="h-4 w-4" />
                           <span className="sr-only">Actions pour paiement {payment.id}</span>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end"> {/* Popover content */}
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem>
                           <Eye className="mr-2 h-4 w-4" /> Voir Détails
@@ -129,7 +130,6 @@ export default function PaiementsPage() {
                             <Receipt className="mr-2 h-4 w-4" /> Voir Facture Associée
                            </Link>
                         </DropdownMenuItem>
-                        {/* Add more actions like "Rembourser", "Envoyer reçu" etc. */}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
