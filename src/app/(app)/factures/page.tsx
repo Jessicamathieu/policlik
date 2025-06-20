@@ -20,13 +20,15 @@ import { cn } from "@/lib/utils";
 
 type InvoiceStatus = "Brouillon" | "Envoyée" | "Payée" | "Non Payée" | "Partiellement Payée" | "En Retard";
 
+// Status colors will be applied on top of the card's primary background.
+// Ensure these have enough contrast or consider making them text colors if badges are transparent.
 const statusColors: Record<InvoiceStatus, string> = {
-  "Brouillon": "bg-gray-100 text-gray-700 border-gray-300",
-  "Envoyée": "bg-blue-100 text-blue-700 border-blue-300",
-  "Payée": "bg-green-100 text-green-700 border-green-300",
-  "Non Payée": "bg-yellow-100 text-yellow-700 border-yellow-300",
-  "Partiellement Payée": "bg-orange-100 text-orange-700 border-orange-300",
-  "En Retard": "bg-red-100 text-red-700 border-red-300",
+  "Brouillon": "bg-gray-400 text-black border-gray-500", // Darker gray for visibility
+  "Envoyée": "bg-blue-500 text-white border-blue-700",
+  "Payée": "bg-green-500 text-white border-green-700",
+  "Non Payée": "bg-yellow-400 text-black border-yellow-600", // Brighter yellow
+  "Partiellement Payée": "bg-orange-400 text-black border-orange-600", // Brighter orange
+  "En Retard": "bg-red-500 text-white border-red-700",
 };
 
 
@@ -49,10 +51,10 @@ export default function FacturesPage() {
           <p className="text-primary-foreground">Créez, suivez et gérez vos factures clients.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <Button variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
             <FileDown className="mr-2 h-4 w-4" /> Exporter
           </Button>
-          <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
+          <Button asChild className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
             <Link href="/factures/nouveau">
               <PlusCircle className="mr-2 h-4 w-4" /> Nouvelle Facture
             </Link>
@@ -60,7 +62,7 @@ export default function FacturesPage() {
         </div>
       </div>
 
-      <Card className="shadow-md">
+      <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -69,14 +71,17 @@ export default function FacturesPage() {
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-grow sm:flex-grow-0">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Rechercher facture..." className="pl-8 w-full sm:w-auto" />
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-card-foreground opacity-50" />
+                    <Input 
+                      placeholder="Rechercher facture..." 
+                      className="pl-8 w-full sm:w-auto bg-background border-input text-foreground placeholder:text-muted-foreground" 
+                    />
                 </div>
                  <Select defaultValue="all">
-                    <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectTrigger className="w-full sm:w-[180px] bg-background border-input text-foreground">
                         <SelectValue placeholder="Filtrer par statut" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent> {/* Popover content, should remain light/dark based on its own theme */}
                         <SelectItem value="all">Tous les statuts</SelectItem>
                         {Object.keys(statusColors).map(status => (
                             <SelectItem key={status} value={status.toLowerCase().replace(' ', '-')}>{status}</SelectItem>
@@ -89,21 +94,21 @@ export default function FacturesPage() {
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>ID Facture</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead className="hidden sm:table-cell">Date Émission</TableHead>
-                <TableHead className="hidden md:table-cell">Date Échéance</TableHead>
-                <TableHead className="text-right">Montant</TableHead>
-                <TableHead className="text-center">Statut</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+              <TableRow className="border-primary-foreground/30">
+                <TableHead className="text-primary-foreground/80">ID Facture</TableHead>
+                <TableHead className="text-primary-foreground/80">Client</TableHead>
+                <TableHead className="hidden sm:table-cell text-primary-foreground/80">Date Émission</TableHead>
+                <TableHead className="hidden md:table-cell text-primary-foreground/80">Date Échéance</TableHead>
+                <TableHead className="text-right text-primary-foreground/80">Montant</TableHead>
+                <TableHead className="text-center text-primary-foreground/80">Statut</TableHead>
+                <TableHead className="text-right text-primary-foreground/80">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {invoices.map((invoice) => (
-                <TableRow key={invoice.id}>
+                <TableRow key={invoice.id} className="border-primary-foreground/20">
                   <TableCell className="font-medium">
-                    <Link href={`/factures/${invoice.id}`} className="hover:underline text-primary">
+                    <Link href={`/factures/${invoice.id}`} className="hover:underline text-primary-foreground">
                       {invoice.id}
                     </Link>
                   </TableCell>
@@ -119,7 +124,7 @@ export default function FacturesPage() {
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost">
+                        <Button aria-haspopup="true" size="icon" variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
                           <MoreHorizontal className="h-4 w-4" />
                           <span className="sr-only">Actions pour {invoice.id}</span>
                         </Button>

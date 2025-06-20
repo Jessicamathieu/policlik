@@ -18,29 +18,39 @@
     --primary: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
     --primary-foreground: hsl(var(--primary-foreground-h), var(--primary-foreground-s), var(--primary-foreground-l));
 
-    /* Static Background & Foreground for light theme */
+    /* Static Background & Foreground for light theme (used if page is not themed dynamically) */
     --background-hsl: 210 20% 98%; /* Very Light Cool Off-White HSL values */
     --foreground-hsl: 220 40% 15%; /* Dark Slate Blue for text HSL values */
     --background: hsl(var(--background-hsl));
     --foreground: hsl(var(--foreground-hsl));
 
+    /* Card will now use primary colors */
+    --card-h: var(--primary-h);
+    --card-s: var(--primary-s);
+    --card-l: var(--primary-l);
+    --card-hsl: var(--card-h) var(--card-s) var(--card-l);
+    --card-foreground-h: var(--primary-foreground-h);
+    --card-foreground-s: var(--primary-foreground-s);
+    --card-foreground-l: var(--primary-foreground-l);
+    --card-foreground-hsl: var(--card-foreground-h) var(--card-foreground-s) var(--card-foreground-l);
+    
+    --card: hsl(var(--card-hsl));
+    --card-foreground: hsl(var(--card-foreground-hsl));
+
+    --popover-hsl: 0 0% 100%; /* Popovers remain white */
+    --popover-foreground-hsl: 220 40% 15%;
+    --popover: hsl(var(--popover-hsl));
+    --popover-foreground: hsl(var(--popover-foreground-hsl));
+
+    /* Muted colors - global definition */
     --muted-hsl: 210 40% 94%;
     --muted-foreground-hsl: 210 30% 45%;
     --muted: hsl(var(--muted-hsl));
     --muted-foreground: hsl(var(--muted-foreground-hsl));
 
-    --popover-hsl: 0 0% 100%;
-    --popover-foreground-hsl: 220 40% 15%;
-    --popover: hsl(var(--popover-hsl));
-    --popover-foreground: hsl(var(--popover-foreground-hsl));
-
-    --card-hsl: 0 0% 100%;
-    --card-foreground-hsl: 220 40% 15%;
-    --card: hsl(var(--card-hsl));
-    --card-foreground: hsl(var(--card-foreground-hsl));
 
     --border-hsl: 210 25% 88%;
-    --input-hsl: 210 30% 92%;
+    --input-hsl: 210 30% 92%; /* Inputs will remain light by default */
     --border: hsl(var(--border-hsl));
     --input: hsl(var(--input-hsl));
 
@@ -107,27 +117,34 @@
   }
 
   .dark {
+    /* Dark Theme Primary (Slightly lighter blue for better visibility on dark bg) */
     --primary-h: 225;
     --primary-s: 70%;
-    --primary-l: 65%;
+    --primary-l: 65%; 
     --primary-foreground-h: 0;
     --primary-foreground-s: 0%;
     --primary-foreground-l: 100%;
     
+    /* Dark Theme Background & Foreground */
     --background-hsl: 220 20% 10%; 
     --foreground-hsl: 210 40% 95%; 
+
+    /* Card will now use primary colors in dark theme too */
+    --card-h: var(--primary-h);
+    --card-s: var(--primary-s);
+    --card-l: var(--primary-l);
+    --card-foreground-h: var(--primary-foreground-h);
+    --card-foreground-s: var(--primary-foreground-s);
+    --card-foreground-l: var(--primary-foreground-l);
+
+    --popover-hsl: 220 25% 10%; /* Dark popovers */
+    --popover-foreground-hsl: 210 40% 95%;
 
     --muted-hsl: 220 20% 20%;
     --muted-foreground-hsl: 210 30% 70%;
 
-    --popover-hsl: 220 25% 10%;
-    --popover-foreground-hsl: 210 40% 95%;
-
-    --card-hsl: 220 25% 15%;
-    --card-foreground-hsl: 210 40% 95%;
-
     --border-hsl: 220 15% 30%;
-    --input-hsl: 220 15% 28%;
+    --input-hsl: 220 15% 28%; /* Dark inputs */
 
     --accent-h: 35;
     --accent-s: 100%;
@@ -158,7 +175,6 @@
     
     --sidebar-background-hsl: 220 25% 14%;
     --sidebar-foreground-hsl: 210 40% 92%;
-    /* Sidebar primary/accent will follow main theme in dark mode too */
     --sidebar-border-hsl: 220 15% 25%;
   }
 }
@@ -189,3 +205,4 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: hsl(var(--primary-h) var(--primary-s) var(--primary-l)); /* Full primary HSL on hover */
 }
+

@@ -22,10 +22,10 @@ type PaymentStatus = "Réussi" | "En attente" | "Échoué" | "Remboursé";
 type PaymentMethod = "Carte de crédit" | "Virement bancaire" | "PayPal" | "Espèces";
 
 const paymentStatusColors: Record<PaymentStatus, string> = {
-  "Réussi": "bg-green-100 text-green-700 border-green-300",
-  "En attente": "bg-yellow-100 text-yellow-700 border-yellow-300",
-  "Échoué": "bg-red-100 text-red-700 border-red-300",
-  "Remboursé": "bg-purple-100 text-purple-700 border-purple-300",
+  "Réussi": "bg-green-500 text-white border-green-700",
+  "En attente": "bg-yellow-400 text-black border-yellow-600",
+  "Échoué": "bg-red-500 text-white border-red-700",
+  "Remboursé": "bg-purple-500 text-white border-purple-700",
 };
 
 // Mock payment data
@@ -45,12 +45,12 @@ export default function PaiementsPage() {
           <h1 className="text-3xl font-bold tracking-tight font-headline">Suivi des Paiements</h1>
           <p className="text-primary-foreground">Consultez l'historique et le statut de tous les paiements.</p>
         </div>
-         <Button variant="outline">
+         <Button variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
             <FileDown className="mr-2 h-4 w-4" /> Exporter
           </Button>
       </div>
 
-      <Card className="shadow-md">
+      <Card>
          <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -59,11 +59,14 @@ export default function PaiementsPage() {
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-grow sm:flex-grow-0">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Rechercher paiement..." className="pl-8 w-full sm:w-auto" />
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-card-foreground opacity-50" />
+                    <Input 
+                      placeholder="Rechercher paiement..." 
+                      className="pl-8 w-full sm:w-auto bg-background border-input text-foreground placeholder:text-muted-foreground" 
+                    />
                 </div>
                  <Select defaultValue="all">
-                    <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectTrigger className="w-full sm:w-[180px] bg-background border-input text-foreground">
                         <SelectValue placeholder="Filtrer par statut" />
                     </SelectTrigger>
                     <SelectContent>
@@ -79,28 +82,28 @@ export default function PaiementsPage() {
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead className="hidden sm:table-cell">Facture ID</TableHead>
-                <TableHead className="hidden md:table-cell">Méthode</TableHead>
-                <TableHead className="text-right">Montant</TableHead>
-                <TableHead className="text-center">Statut</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+              <TableRow className="border-primary-foreground/30">
+                <TableHead className="text-primary-foreground/80">Date</TableHead>
+                <TableHead className="text-primary-foreground/80">Client</TableHead>
+                <TableHead className="hidden sm:table-cell text-primary-foreground/80">Facture ID</TableHead>
+                <TableHead className="hidden md:table-cell text-primary-foreground/80">Méthode</TableHead>
+                <TableHead className="text-right text-primary-foreground/80">Montant</TableHead>
+                <TableHead className="text-center text-primary-foreground/80">Statut</TableHead>
+                <TableHead className="text-right text-primary-foreground/80">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {payments.map((payment) => (
-                <TableRow key={payment.id}>
+                <TableRow key={payment.id} className="border-primary-foreground/20">
                   <TableCell>{format(payment.date, "dd MMM yyyy", { locale: fr })}</TableCell>
                   <TableCell className="font-medium">{payment.clientName}</TableCell>
                   <TableCell className="hidden sm:table-cell">
-                     <Link href={`/factures/${payment.invoiceId}`} className="hover:underline text-primary">
+                     <Link href={`/factures/${payment.invoiceId}`} className="hover:underline text-primary-foreground">
                         {payment.invoiceId}
                      </Link>
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{payment.method}</TableCell>
-                  <TableCell className={`text-right font-semibold ${payment.amount < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                  <TableCell className={`text-right font-semibold ${payment.amount < 0 ? 'text-red-400' : 'text-green-400'}`}> {/* Adjusted for visibility on primary bg */}
                     CAD${payment.amount.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-center">
@@ -111,7 +114,7 @@ export default function PaiementsPage() {
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost">
+                        <Button aria-haspopup="true" size="icon" variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
                           <MoreHorizontal className="h-4 w-4" />
                           <span className="sr-only">Actions pour paiement {payment.id}</span>
                         </Button>

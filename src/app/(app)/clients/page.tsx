@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, PlusCircle, Search, FileDown, Edit, CalendarPlus, FilePlus, Trash2, Phone, MapPin, Mail as MailIcon } from "lucide-react"; // Added Edit, CalendarPlus, FilePlus, Phone, MapPin, MailIcon
+import { MoreHorizontal, PlusCircle, Search, FileDown, Edit, CalendarPlus, FilePlus, Trash2, Phone, MapPin, Mail as MailIcon } from "lucide-react";
 import Link from "next/link";
 
 // Mock client data
@@ -20,7 +20,7 @@ export default function ClientsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline">Gestion des Clients</h1>
-          <p className="text-foreground">Consultez et gérez votre base de données clients.</p>
+          <p className="text-primary-foreground">Consultez et gérez votre base de données clients.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="text-foreground">
@@ -32,35 +32,38 @@ export default function ClientsPage() {
         </div>
       </div>
 
-      <Card className="shadow-md">
+      <Card>
         <CardHeader>
           <CardTitle>Liste des Clients</CardTitle>
           <CardDescription>Recherchez, filtrez et gérez vos clients.</CardDescription>
           <div className="relative mt-4">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Rechercher un client par nom, email, adresse..." className="pl-8 w-full sm:w-1/2 lg:w-1/3" />
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-card-foreground opacity-50" />
+            <Input 
+              placeholder="Rechercher un client par nom, email, adresse..." 
+              className="pl-8 w-full sm:w-1/2 lg:w-1/3 bg-background border-input text-foreground placeholder:text-muted-foreground" 
+            />
           </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
             {clients.map((client) => (
-              <Card key={client.id} className="flex flex-col shadow-md hover:shadow-lg transition-shadow duration-200 rounded-xl overflow-hidden border border-border/70">
-                <CardHeader className="flex flex-row items-start justify-between space-y-0 p-4 bg-muted/30">
+              <Card key={client.id} className="flex flex-col shadow-md hover:shadow-lg transition-shadow duration-200 rounded-xl overflow-hidden border-border/70">
+                <CardHeader className="flex flex-row items-start justify-between space-y-0 p-4 bg-card-foreground/10">
                   <div>
                     <CardTitle className="text-lg font-semibold leading-tight">
-                      <Link href={`/clients/${client.id}`} className="hover:underline text-primary">
+                      <Link href={`/clients/${client.id}`} className="hover:underline text-primary-foreground">
                         {client.name}
                       </Link>
                     </CardTitle>
                     {client.email && (
-                       <Link href={`mailto:${client.email}`} className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1">
+                       <Link href={`mailto:${client.email}`} className="text-xs text-primary-foreground/80 hover:text-primary-foreground flex items-center gap-1">
                          <MailIcon className="h-3 w-3"/> {client.email}
                        </Link>
                     )}
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8 -mt-1 -mr-1">
+                      <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8 -mt-1 -mr-1 text-primary-foreground hover:bg-primary-foreground/10">
                         <MoreHorizontal className="h-4 w-4" />
                         <span className="sr-only">Ouvrir menu pour {client.name}</span>
                       </Button>
@@ -92,18 +95,18 @@ export default function ClientsPage() {
                 <CardContent className="p-4 text-sm space-y-2.5 flex-grow">
                   {client.phone && (
                     <div className="flex items-center">
-                      <Phone className="h-4 w-4 mr-2.5 text-muted-foreground" />
-                      <Link href={`tel:${client.phone}`} className="hover:text-primary">{client.phone}</Link>
+                      <Phone className="h-4 w-4 mr-2.5 text-primary-foreground/80" />
+                      <Link href={`tel:${client.phone}`} className="hover:text-primary-foreground/80">{client.phone}</Link>
                     </div>
                   )}
                   {client.address && (
                     <div className="flex items-start">
-                      <MapPin className="h-4 w-4 mr-2.5 mt-0.5 text-muted-foreground shrink-0" />
+                      <MapPin className="h-4 w-4 mr-2.5 mt-0.5 text-primary-foreground/80 shrink-0" />
                       <Link 
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(client.address)}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex-1 hover:text-primary"
+                        className="flex-1 hover:text-primary-foreground/80"
                       >
                         {client.address}
                       </Link>
@@ -111,10 +114,10 @@ export default function ClientsPage() {
                   )}
                 </CardContent>
                 {client.totalSpent && (
-                  <CardFooter className="p-4 bg-muted/30 text-sm border-t">
+                  <CardFooter className="p-4 bg-card-foreground/10 text-sm border-t border-primary-foreground/20">
                     <div className="flex items-center justify-between w-full">
-                      <span className="text-muted-foreground">Total Dépensé:</span>
-                      <span className="font-semibold text-primary">{client.totalSpent}</span>
+                      <span className="text-primary-foreground/80">Total Dépensé:</span>
+                      <span className="font-semibold text-primary-foreground">{client.totalSpent}</span>
                     </div>
                   </CardFooter>
                 )}
