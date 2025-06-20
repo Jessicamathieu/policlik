@@ -16,7 +16,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Icons } from "@/components/icons";
 import { LogOut, UserCircle, Settings } from "lucide-react";
-import { appNavItems, pageColors as navPageColors } from "@/config/nav"; // Import pageColors
+import { appNavItems, pageColors as navPageColors } from "@/config/nav";
 import type { NavItem } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -26,16 +26,14 @@ const getCurrentBasePathForTabs = (currentPathname: string, navItems: NavItem[])
   const sortedNavItems = [...navItems].sort((a, b) => (b.href?.length || 0) - (a.href?.length || 0));
   for (const item of sortedNavItems) {
     if (item.href && currentPathname.startsWith(item.href)) {
-      // If it has items, usually the top-level href is the tab value
       return item.href;
     }
   }
-  // Fallback for sub-items if no direct parent match was found above (though typically parent href should match)
   for (const item of sortedNavItems) {
     if (item.items) {
       for (const subItem of item.items) {
         if (subItem.href && currentPathname.startsWith(subItem.href)) {
-          return item.href!; // Return parent href for tab group
+          return item.href!; 
         }
       }
     }
@@ -56,9 +54,9 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-30 flex w-full flex-col bg-background shadow-sm">
       {/* Top Part: Logo and User Actions */}
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-0">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
         <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-          <Icons.Logo className="h-6 w-6 text-primary" /> {/* text-primary will now be dynamic */}
+          <Icons.Logo className="h-6 w-6 text-primary" />
           <span className="font-headline text-lg">Polimik Gestion</span>
         </Link>
         
@@ -104,11 +102,11 @@ export function AppHeader() {
       </div>
 
       {/* Bottom Part: Navigation Tabs */}
-      <nav className="w-full bg-background"> {/* Removed border-t */}
+      <nav className="w-full bg-background">
         <Tabs value={activeTabValue} className="w-full">
-          <TabsList className="container mx-auto h-12 justify-start rounded-none bg-transparent p-0 -mb-px overflow-x-auto">
+          <TabsList className="container mx-auto h-12 justify-start rounded-none bg-transparent p-0 -mb-px overflow-x-auto px-4 sm:px-6 md:px-8">
             {appNavItems.map((item) => {
-              if (!item.href) return null; // Skip items that are just group titles
+              if (!item.href) return null; 
               const Icon = item.icon;
               const isActive = activeTabValue === item.href;
 
@@ -118,29 +116,20 @@ export function AppHeader() {
                   value={item.href}
                   asChild
                   className={cn(
-                    "h-full rounded-none px-4 text-sm font-medium transition-all duration-150 ease-in-out",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2", // Focus ring will use --item-focus-ring-color
-                    isActive
-                      ? '' // Removed shadow indicator
-                      : 'text-muted-foreground hover:opacity-90' 
+                    "h-full rounded-none px-4 text-sm transition-all duration-150 ease-in-out",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+                    isActive ? "font-medium" : "hover:opacity-100"
                   )}
                   style={
                     {
-                      ...(isActive && { 
-                        backgroundColor: item.color || 'var(--page-main-color)', 
-                        color: item.contrastColor || 'var(--page-main-contrast-color)',
-                      }),
-                      '--item-focus-ring-color': item.color || 'hsl(var(--primary))', // Default to global primary if item.color not set
-                      ...( !isActive && {
-                        // @ts-ignore
-                        '&:hover': {
-                           color: item.color || 'var(--page-main-color)',
-                        }
-                      })
+                      backgroundColor: item.color,
+                      color: item.contrastColor,
+                      '--item-focus-ring-color': item.color,
+                      ...(!isActive && { opacity: 0.85 }), 
                     } as React.CSSProperties
                   }
                 >
-                  <Link href={item.href} style={{color: isActive ? item.contrastColor : undefined }}>
+                  <Link href={item.href} style={{color: item.contrastColor }}>
                     {Icon && <Icon className="mr-2 h-4 w-4 shrink-0" />}
                     {item.title}
                   </Link>
@@ -150,7 +139,7 @@ export function AppHeader() {
           </TabsList>
         </Tabs>
         {/* Spilled Paint SVG Separator */}
-        <div className="relative w-full h-3 md:h-4 -mt-px"> {/* Adjusted height and negative margin */}
+        <div className="relative w-full h-3 md:h-4 -mt-px"> 
           <svg width="100%" height="100%" viewBox="0 0 1200 15" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="pageColorGradient" x1="0%" y1="0%" x2="100%" y2="0%">
