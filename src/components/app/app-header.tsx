@@ -19,6 +19,7 @@ import { LogOut, UserCircle, Settings } from "lucide-react";
 import { appNavItems, pageColors as navPageColors } from "@/config/nav";
 import type { NavItem } from "@/types";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/auth-context";
 
 
 // Helper function to determine the active tab base href for Tabs value
@@ -44,6 +45,7 @@ const getCurrentBasePathForTabs = (currentPathname: string, navItems: NavItem[])
 
 export function AppHeader() {
   const pathname = usePathname();
+  const { user, signOut } = useAuth();
   const activeTabValue = getCurrentBasePathForTabs(pathname, appNavItems);
 
   const gradientStops = navPageColors.map((pc, index, arr) => ({
@@ -64,20 +66,26 @@ export function AppHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-9 w-9">
-                <AvatarImage src="https://placehold.co/100x100.png" alt="Avatar utilisateur" data-ai-hint="user avatar" />
-                <AvatarFallback>PG</AvatarFallback>
+                <AvatarImage src={user?.photoURL || "https://placehold.co/100x100.png"} alt="Avatar utilisateur" data-ai-hint="user avatar" />
+                <AvatarFallback>{user?.email?.[0].toUpperCase() || 'U'}</AvatarFallback>
               </Avatar>
               <span className="sr-only">Ouvrir le menu utilisateur</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Utilisateur Test</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  test@example.com
-                </p>
-              </div>
+              {user ? (
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user.displayName || user.email}</p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user.displayName ? user.email : ''}
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">Chargement...</p>
+                </div>
+              )}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
@@ -93,7 +101,7 @@ export function AppHeader() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => { window.location.href = '/login';}}>
+            <DropdownMenuItem onClick={signOut}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Déconnexion</span>
             </DropdownMenuItem>

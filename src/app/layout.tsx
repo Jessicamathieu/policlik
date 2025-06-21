@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getActiveNavItemConfig } from "@/config/nav";
 import { hexToHSL } from "@/lib/utils";
+import { AuthProvider } from "@/context/auth-context";
 
 const ptSans = PT_Sans({
   subsets: ["latin"],
@@ -77,6 +78,8 @@ export default function RootLayout({
     }
   }, [pathname, isMounted]);
 
+  const isAuthPage = pathname.startsWith('/login');
+
   return (
     <html lang="fr" className={ptSans.variable} suppressHydrationWarning>
       <head>
@@ -84,9 +87,11 @@ export default function RootLayout({
         <meta name="description" content="Application de gestion pour Polimik." />
       </head>
       <body className={`font-body antialiased bg-background text-foreground`}>
-        <AppHeader />
-        {children}
-        <Toaster />
+        <AuthProvider>
+          {!isAuthPage && <AppHeader />}
+          {children}
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );

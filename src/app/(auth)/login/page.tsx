@@ -1,9 +1,6 @@
 
-import { redirect } from 'next/navigation';
+import { LoginForm } from '@/components/auth/login-form';
 
 export default function LoginPage() {
-  redirect('/dashboard');
-  // Le contenu ci-dessous ne sera jamais atteint en raison de la redirection.
-  // Il est conservé ici à des fins de référence au cas où la redirection serait supprimée.
-  return null;
+  return <LoginForm />;
 }

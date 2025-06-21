@@ -5,7 +5,7 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useRouter } from "next/navigation"; // Corrected import for App Router
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,8 +18,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast"; // Assuming useToast is for displaying errors
+import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Adresse e-mail invalide." }),
@@ -32,6 +33,7 @@ export function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
+  const { signIn } = useAuth();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -43,20 +45,18 @@ export function LoginForm() {
 
   async function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
-
-    // In a real app, you would handle authentication here
-    // For now, redirect to dashboard on successful-looking fake login
-    if (data.email === "test@example.com" && data.password === "password") {
+    try {
+      await signIn(data.email, data.password);
       router.push("/dashboard");
-    } else {
+    } catch (error) {
+      console.error(error);
       toast({
         title: "Erreur de connexion",
-        description: "Adresse e-mail ou mot de passe incorrect.",
+        description: "L'adresse e-mail ou le mot de passe est incorrect. Veuillez réessayer.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -102,12 +102,6 @@ export function LoginForm() {
             </Button>
           </form>
         </Form>
-        {/* <div className="mt-4 text-center text-sm">
-          Pas encore de compte?{' '}
-          <Link href="/register" className="underline text-primary hover:text-primary/80">
-            S'inscrire
-          </Link>
-        </div> */}
       </CardContent>
     </Card>
   );

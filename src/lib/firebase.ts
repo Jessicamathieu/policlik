@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 // La configuration est maintenant chargée à partir des variables d'environnement.
 // Assurez-vous que votre fichier .env contient les bonnes valeurs.
@@ -23,5 +24,6 @@ if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
 // La vérification getApps().length empêche la ré-initialisation lors du rechargement à chaud en développement.
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
-export { app, db };
+export { app, db, auth };
