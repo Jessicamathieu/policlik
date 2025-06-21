@@ -1,167 +1,71 @@
 
-"use client";
-
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { CalendarDays, Users, FileText, DollarSign, PlusCircle, LineChart, MapPin, Phone, CalendarClock } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { format, isToday, parseISO } from "date-fns"; 
-import { getAppointments, type Appointment } from "@/lib/data";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
-  const [todaysAppointments, setTodaysAppointments] = useState<Appointment[]>([]);
-  const [summaryStats, setSummaryStats] = useState({
-    appointmentsToday: "0",
-    upcomingAppointments: "0",
-    pendingQuotes: "12",
-    activeClients: "128",
-    monthlyRevenue: "CAD$ 7,250",
-  });
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const appointments = getAppointments();
-    const filteredAppointments = appointments.filter(appt => isToday(parseISO(appt.date)));
-    
-    setTodaysAppointments(filteredAppointments);
-    setSummaryStats(prev => ({
-        ...prev,
-        appointmentsToday: filteredAppointments.length.toString(),
-        upcomingAppointments: filteredAppointments.filter(a => a.status === "À venir").length.toString(),
-    }));
-    setIsLoading(false);
-  }, []);
-
-  const summaryCards = [
-    { title: "Rendez-vous Aujourd'hui", value: summaryStats.appointmentsToday, icon: CalendarDays, description: `${summaryStats.upcomingAppointments} à venir` },
-    { title: "Devis en Attente", value: summaryStats.pendingQuotes, icon: FileText, description: "À traiter rapidement" },
-    { title: "Clients Actifs", value: summaryStats.activeClients, icon: Users, description: "+5 cette semaine" },
-    { title: "Revenus (Mois)", value: summaryStats.monthlyRevenue, icon: DollarSign, description: "Objectif: CAD$10,000" },
-  ];
-
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Tableau de Bord</h1>
-          <p className="text-primary-foreground">Bienvenue sur Polimik Gestion ! Voici un aperçu de votre activité.</p>
-        </div>
-        <div className="flex gap-2">
-          <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
-            <Link href="/agenda?action=nouveau">
-              <PlusCircle className="mr-2 h-4 w-4" /> Nouveau Rendez-vous
-            </Link>
-          </Button>
-          <Button variant="outline" asChild className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
-             <Link href="/devis/demandes">
-              <PlusCircle className="mr-2 h-4 w-4" /> Nouveau Devis
-            </Link>
-          </Button>
-        </div>
-      </div>
+    <div className="flex flex-col gap-8 items-center justify-center min-h-[60vh]">
+      <Card className="w-full max-w-2xl shadow-lg bg-card text-card-foreground">
+        <CardHeader>
+          <CardTitle className="text-2xl font-headline text-center">Bienvenue dans Polimik Gestion !</CardTitle>
+          <CardDescription className="text-center pt-2">
+            Pour le moment, vos bases de données de services et de produits sont vides, en attente que vous y ajoutiez des données.
+            <br />
+            Voici comment faire :
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-8 text-sm">
+          <div>
+            <h3 className="font-semibold text-lg mb-3">1. Pour importer vos services :</h3>
+            <ul className="list-disc list-outside pl-5 space-y-3 text-muted-foreground">
+              <li>
+                Allez sur la page <Link href="/services" className="text-primary font-semibold hover:underline">Services</Link>.
+              </li>
+              <li>
+                Cliquez sur le bouton <strong>"Importer"</strong>.
+              </li>
+              <li>
+                Sélectionnez votre fichier CSV avec les en-têtes suivants :
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  <Badge variant="secondary">service nom</Badge>
+                  <Badge variant="secondary">categorie</Badge>
+                  <Badge variant="secondary">sous_categorie</Badge>
+                  <Badge variant="secondary">couleur_code</Badge>
+                  <Badge variant="secondary">prix</Badge>
+                </div>
+              </li>
+            </ul>
+          </div>
 
-      
-      <div className="grid gap-6">
-        <Card className="bg-card text-card-foreground"> 
-          <CardHeader>
-            <CardTitle className="font-headline flex items-center gap-2 text-xl text-card-foreground">
-              <CalendarClock className="h-6 w-6 text-card-foreground" />
-              Rendez-vous du Jour
-            </CardTitle>
-            <CardDescription className="text-card-foreground opacity-75">Vos interventions prévues pour aujourd'hui.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {isLoading ? (
-                Array.from({ length: 2 }).map((_, index) => (
-                    <Card key={index} className="shadow-md border bg-background text-foreground overflow-hidden">
-                        <CardHeader className="p-4 bg-muted/50 border-b"><Skeleton className="h-5 w-3/5" /></CardHeader>
-                        <CardContent className="p-4 space-y-3">
-                            <Skeleton className="h-4 w-4/5" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-1/2" />
-                        </CardContent>
-                    </Card>
-                ))
-            ) : todaysAppointments.length > 0 ? (
-              todaysAppointments.map((appt) => (
-                <Card key={appt.id} className="shadow-md border bg-background text-foreground overflow-hidden hover:shadow-lg transition-shadow"> 
-                  <CardHeader className="p-4 bg-muted/50 border-b"> 
-                    <CardTitle className="text-lg font-semibold text-foreground">{appt.clientName}</CardTitle>
-                    <CardDescription className="text-sm text-muted-foreground">{appt.serviceName}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-4 space-y-3">
-                    <div className="flex items-center text-sm text-foreground">
-                      <CalendarDays className="h-4 w-4 mr-2 opacity-70" />
-                      <span>{appt.startTime} - {appt.endTime}</span>
-                      {appt.status && (
-                        <span className={`ml-auto text-xs font-semibold px-2 py-0.5 rounded-full ${
-                          appt.status === "À venir" ? "bg-blue-500 text-white" : 
-                          appt.status === "En cours" ? "bg-yellow-500 text-black" :
-                          "bg-green-500 text-white"
-                        }`}>
-                          {appt.status}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-start text-sm text-foreground">
-                      <MapPin className="h-4 w-4 mr-2 mt-0.5 opacity-70 shrink-0" />
-                      <Link 
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(appt.address || '')}`} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="hover:text-primary transition-colors"
-                      >
-                        {appt.address}
-                      </Link>
-                    </div>
-                    <div className="flex items-center text-sm text-foreground">
-                      <Phone className="h-4 w-4 mr-2 opacity-70" />
-                      <Link 
-                        href={`tel:${appt.phone}`}
-                        className="hover:text-primary transition-colors"
-                      >
-                        {appt.phone}
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <p className="text-muted-foreground text-center py-4">Aucun rendez-vous programmé pour aujourd'hui.</p>
-            )}
-            <Button variant="outline" className="mt-4 w-full border-input text-foreground hover:bg-accent hover:text-accent-foreground" asChild>
-              <Link href="/agenda">Voir l'agenda complet</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+          <div>
+            <h3 className="font-semibold text-lg mb-3">2. Pour importer vos produits :</h3>
+            <ul className="list-disc list-outside pl-5 space-y-3 text-muted-foreground">
+               <li>
+                Allez sur la page <Link href="/produits" className="text-primary font-semibold hover:underline">Produits</Link>.
+              </li>
+              <li>
+                Cliquez sur le bouton <strong>"Importer"</strong>.
+              </li>
+              <li>
+                Sélectionnez votre fichier CSV avec les en-têtes suivants :
+                 <div className="flex flex-wrap gap-1.5 mt-2">
+                  <Badge variant="secondary">categorie</Badge>
+                  <Badge variant="secondary">sous_categorie</Badge>
+                  <Badge variant="secondary">code</Badge>
+                  <Badge variant="secondary">nom</Badge>
+                  <Badge variant="secondary">prix</Badge>
+                </div>
+              </li>
+            </ul>
+          </div>
+            
+          <div className="pt-4 text-center text-muted-foreground border-t">
+            <p>Une fois vos données importées, votre tableau de bord affichera un résumé de votre activité.</p>
+          </div>
 
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {summaryCards.map((item, index) => (
-          <Card key={index} className="shadow-md hover:shadow-lg transition-shadow duration-300 bg-card text-card-foreground border">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-card-foreground">{item.title}</CardTitle>
-              <item.icon className="h-5 w-5 text-card-foreground opacity-70" />
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                  <>
-                    <Skeleton className="h-7 w-1/3 mb-1.5" />
-                    <Skeleton className="h-3 w-4/5" />
-                  </>
-              ) : (
-                  <>
-                    <div className="text-2xl font-bold text-card-foreground">{item.value}</div>
-                    <p className="text-xs text-card-foreground opacity-75">{item.description}</p>
-                  </>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
