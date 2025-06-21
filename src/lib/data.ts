@@ -108,16 +108,22 @@ export const products: Product[] = [];
 
 // Wrapped in a function to avoid top-level new Date() calls
 export const getAppointments = (): Appointment[] => {
-  const today_date = new Date();
-  const todayStr = `${today_date.getFullYear()}-${String(today_date.getMonth() + 1).padStart(2, '0')}-${String(today_date.getDate()).padStart(2, '0')}`;
-  const tomorrow = new Date(today_date);
-  tomorrow.setDate(today_date.getDate() + 1);
-  const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const nextWeek = new Date(today);
+  nextWeek.setDate(today.getDate() + 7);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
 
   return [
-    { id: '1', clientId: '1', clientName: 'Jean Dupont', serviceId: 'SERV001', serviceName: 'Nettoyage Standard Résidentiel', date: todayStr, startTime: '09:00', endTime: '10:00', description: 'Nettoyage standard', workDone: '', address: '123 Rue Principale, 75001 Paris', phone: '0123456789', smsReminder: false, serviceColorClassName: 'bg-blue-500', status: "À venir" },
-    { id: '2', clientId: '2', clientName: 'Marie Curie', serviceId: 'SERV002', serviceName: 'Grand Ménage de Printemps', date: todayStr, startTime: '11:00', endTime: '12:30', description: 'Grand ménage', workDone: 'Tout est propre', address: '456 Avenue des Sciences, Lyon', phone: '0987654321', smsReminder: true, serviceColorClassName: 'bg-green-500', status: "En cours" },
-    { id: '3', clientId: '3', clientName: 'Pierre Martin', serviceId: 'SERV005', serviceName: 'Lavage de Vitres', date: tomorrowStr, startTime: '14:00', endTime: '15:00', description: 'Nettoyage vitres', workDone: '', address: '789 Boulevard Liberté, Marseille', phone: '0612345678', smsReminder: false, serviceColorClassName: 'bg-sky-500', status: "À venir" },
+    { id: '1', clientId: '1', clientName: 'Jean Dupont', serviceId: 'SERV001', serviceName: 'Nettoyage Standard', date: formatDate(today), startTime: '09:00', endTime: '10:00', description: 'Nettoyage standard', workDone: '', address: '123 Rue Principale, 75001 Paris', phone: '0123456789', smsReminder: false, serviceColorClassName: 'bg-blue-500', status: "À venir" },
+    { id: '2', clientId: '2', clientName: 'Marie Curie', serviceId: 'SERV002', serviceName: 'Grand Ménage', date: formatDate(today), startTime: '11:00', endTime: '12:30', description: 'Grand ménage', workDone: 'Tout est propre', address: '456 Avenue des Sciences, Lyon', phone: '0987654321', smsReminder: true, serviceColorClassName: 'bg-green-500', status: "En cours" },
+    { id: '3', clientId: '3', clientName: 'Pierre Martin', serviceId: 'SERV005', serviceName: 'Lavage de Vitres', date: formatDate(tomorrow), startTime: '14:00', endTime: '15:00', description: 'Nettoyage vitres', workDone: '', address: '789 Boulevard Liberté, Marseille', phone: '0612345678', smsReminder: false, serviceColorClassName: 'bg-sky-500', status: "À venir" },
+    { id: '4', clientId: '1', clientName: 'Jean Dupont', serviceId: 'SERV005', serviceName: 'Lavage de Vitres', date: formatDate(yesterday), startTime: '10:00', endTime: '11:00', description: 'Nettoyage vitres', workDone: 'Fait', address: '123 Rue Principale, Paris', phone: '0123456789', smsReminder: false, serviceColorClassName: 'bg-sky-500', status: "Terminé" },
+    { id: '5', clientId: '2', clientName: 'Marie Curie', serviceId: 'SERV001', serviceName: 'Nettoyage Standard', date: formatDate(nextWeek), startTime: '10:00', endTime: '11:00', description: 'Follow-up vitres', workDone: '', address: '456 Avenue des Sciences, Lyon', phone: '0987654321', smsReminder: true, serviceColorClassName: 'bg-blue-500', status: "À venir" },
   ];
 };
 
