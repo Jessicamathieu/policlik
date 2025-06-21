@@ -6,9 +6,9 @@ import Link from "next/link";
 import { format, isToday, parseISO } from "date-fns"; 
 import { getAppointments } from "@/lib/data";
 
-const mockTodaysAppointments = getAppointments().filter(appt => isToday(parseISO(appt.date)));
-
 export default function DashboardPage() {
+  const mockTodaysAppointments = getAppointments().filter(appt => isToday(parseISO(appt.date)));
+
   const summaryCards = [
     { title: "Rendez-vous Aujourd'hui", value: mockTodaysAppointments.length.toString(), icon: CalendarDays, description: `${mockTodaysAppointments.filter(a => a.status === "À venir").length} à venir` },
     { title: "Devis en Attente", value: "12", icon: FileText, description: "À traiter rapidement" },
