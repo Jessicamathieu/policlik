@@ -1,3 +1,4 @@
+
 // src/lib/data.ts
 import { format, isToday, parseISO } from "date-fns";
 
@@ -23,6 +24,15 @@ export interface Service {
   price?: number;
   colorCode?: string;
   colorClassName?: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  code: string;
+  category: string;
+  subCategory?: string;
+  price?: number;
 }
 
 export interface Appointment {
@@ -99,6 +109,11 @@ export const services: Service[] = [
   { id: "SERV004", name: "Nettoyage Après Chantier", category: "Nettoyage Spécialisé", rate: "Devis", unit: "sur devis", description: "Remise en état après travaux de construction ou rénovation.", price: 300, colorClassName: 'bg-purple-500' },
   { id: "SERV005", name: "Lavage de Vitres", category: "Nettoyage Spécialisé", rate: "CAD$5/fenêtre", unit: "fenêtre", description: "Nettoyage intérieur et extérieur des vitres.", price: 5, colorClassName: 'bg-sky-500' },
   { id: "PROD001", name: "Produit Nettoyant XYZ", category: "Produit", rate: "CAD$15/unité", unit: "unité", description: "Produit de nettoyage multi-surfaces.", price: 15, colorClassName: "bg-gray-500" },
+];
+
+export const products: Product[] = [
+    { id: "PROD001", name: "Bouteille Nettoyant Vitres", code: "NV-500ML", category: "Produits de Nettoyage", subCategory: "Vitre", price: 12.99 },
+    { id: "PROD002", name: "Chiffon Microfibre (Lot de 5)", code: "MF-5PK", category: "Matériel", subCategory: "Tissus", price: 25.00 },
 ];
 
 const today_date = new Date();

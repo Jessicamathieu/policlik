@@ -21,7 +21,10 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -32,7 +35,10 @@ import { CalendarIcon, PlusCircle, Trash2, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, addDays } from "date-fns";
 import { fr } from "date-fns/locale";
-import { clients as mockClients, services as mockServices } from "@/lib/data";
+import { clients as mockClients } from "@/lib/data";
+import { getServices } from "@/services/service-service";
+import { getProducts } from "@/services/product-service";
+import type { Service, Product } from "@/lib/data";
 
 const lineItemSchema = z.object({
   serviceId: z.string().min(1, "Veuillez sélectionner un service/produit."),
@@ -53,12 +59,56 @@ const invoiceSchema = z.object({
 
 type InvoiceFormValues = z.infer<typeof invoiceSchema>;
 
+type ItemForInvoice = {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    type: 'Service' | 'Produit';
+};
+
 export function InvoiceForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
   const [clientSearch, setClientSearch] = React.useState("");
+  const [availableItems, setAvailableItems] = React.useState<ItemForInvoice[]>([]);
+
+  React.useEffect(() => {
+    const fetchItems = async () => {
+        try {
+            const [services, products] = await Promise.all([getServices(), getProducts()]);
+            
+            const formattedServices: ItemForInvoice[] = services.map(s => ({
+                id: `service-${s.id}`,
+                name: s.name,
+                description: s.name,
+                price: s.price || 0,
+                type: 'Service'
+            }));
+            
+            const formattedProducts: ItemForInvoice[] = products.map(p => ({
+                id: `product-${p.id}`,
+                name: p.name,
+                description: p.name,
+                price: p.price || 0,
+                type: 'Produit'
+            }));
+
+            setAvailableItems([...formattedServices, ...formattedProducts]);
+        } catch (error) {
+            console.error("Failed to fetch services or products", error);
+            toast({ 
+                title: "Erreur de chargement", 
+                description: "Impossible de charger la liste des services et produits.",
+                variant: "destructive"
+            })
+        }
+    };
+    fetchItems();
+  }, [toast]);
+
 
   const filteredClients = mockClients.filter(client =>
     client.name.toLowerCase().includes(clientSearch.toLowerCase())
@@ -111,14 +161,14 @@ export function InvoiceForm() {
     router.push("/factures");
   }
 
-  const handleServiceChange = (index: number, serviceId: string) => {
-    const service = mockServices.find(s => s.id === serviceId);
-    if (service) {
+  const handleItemChange = (index: number, itemId: string) => {
+    const item = availableItems.find(i => i.id === itemId);
+    if (item) {
       update(index, {
         ...watchLineItems[index],
-        serviceId: service.id,
-        description: service.name,
-        unitPrice: service.price,
+        serviceId: itemId,
+        description: item.description,
+        unitPrice: item.price,
       });
     }
   };
@@ -273,19 +323,29 @@ export function InvoiceForm() {
                       <Select
                         onValueChange={(value) => {
                           field.onChange(value);
-                          handleServiceChange(index, value);
+                          handleItemChange(index, value);
                         }}
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Choisir un service" />
+                            <SelectValue placeholder="Choisir un item" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {mockServices.map(service => (
-                            <SelectItem key={service.id} value={service.id}>{service.name}</SelectItem>
-                          ))}
+                          <SelectGroup>
+                            <SelectLabel>Services</SelectLabel>
+                            {availableItems.filter(i => i.type === 'Service').map(item => (
+                                <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
+                            ))}
+                          </SelectGroup>
+                           <SelectSeparator />
+                          <SelectGroup>
+                            <SelectLabel>Produits</SelectLabel>
+                            {availableItems.filter(i => i.type === 'Produit').map(item => (
+                                <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
+                            ))}
+                          </SelectGroup>
                         </SelectContent>
                       </Select>
                       <FormMessage />
