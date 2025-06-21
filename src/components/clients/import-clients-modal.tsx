@@ -116,7 +116,7 @@ export function ImportClientsModal({ children, onImportSuccess }: ImportClientsM
     return !requiredHeaders.every(rh => presentHeaders.includes(rh.toLowerCase()));
   }, [headers, file]);
 
-  const handleImport = async () => {
+  const handleImport = useCallback(async () => {
     if (hasMissingHeaders) {
       toast({
         title: "En-têtes manquants",
@@ -152,7 +152,7 @@ export function ImportClientsModal({ children, onImportSuccess }: ImportClientsM
     } finally {
         setIsLoading(false);
     }
-  };
+  }, [hasMissingHeaders, parsedData, onImportSuccess, toast]);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();

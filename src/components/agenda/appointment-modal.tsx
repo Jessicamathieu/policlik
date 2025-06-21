@@ -28,7 +28,7 @@ import { CalendarIcon, MapPin, Phone, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
-import React from "react";
+import React, { useCallback } from "react";
 import { type Service, type Client } from "@/lib/data";
 import { getClients } from "@/services/client-service";
 import { getServices } from "@/services/service-service";
@@ -135,7 +135,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
     client.address.toLowerCase().includes(clientSearch.toLowerCase())
   );
   
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     const clientData = clients.find(c => c.id === selectedClient);
     const serviceData = services.find(s => s.id === selectedService);
     const appointmentData: Partial<Appointment> = {
@@ -156,9 +156,25 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
     };
     onSave(appointmentData);
     if(setCurrentOpen) setCurrentOpen(false);
-  };
+  }, [
+      appointment?.id, 
+      selectedClient, 
+      selectedService, 
+      appointmentDate, 
+      startTime, 
+      endTime, 
+      description, 
+      workDone, 
+      address, 
+      phone, 
+      smsReminder, 
+      clients, 
+      services, 
+      onSave, 
+      setCurrentOpen
+  ]);
 
-  const handleClientChange = (clientId: string) => {
+  const handleClientChange = useCallback((clientId: string) => {
     setSelectedClient(clientId);
     const client = clients.find(c => c.id === clientId);
     if (client) {
@@ -168,7 +184,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
       setAddress("");
       setPhone("");
     }
-  };
+  }, [clients]);
 
   const dialogContent = (
     <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
