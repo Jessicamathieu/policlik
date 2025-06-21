@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, PlusCircle, Search, FileDown, Filter, Camera, Edit3, Trash2 } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Search, FileDown, Filter, Camera, Edit3, Trash2, ArrowUpDown } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils";
 import { getExpenses, type Expense } from "@/lib/data";
+import { useSortableData } from "@/hooks/use-sortable-data";
 
 const statusBadgeColors = {
   "Vérifié": "bg-emerald-100 text-emerald-800 border-emerald-300",
@@ -29,10 +30,18 @@ const statusBadgeColors = {
 
 export default function DepensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const { items: sortedExpenses, requestSort, sortConfig } = useSortableData(expenses, { key: 'date', direction: 'descending' });
 
   useEffect(() => {
     setExpenses(getExpenses());
   }, []);
+
+  const getSortIndicator = (key: keyof Expense) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground/50" />;
+    }
+    return sortConfig.direction === 'ascending' ? '▲' : '▼';
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -82,17 +91,33 @@ export default function DepensesPage() {
           <Table>
             <TableHeader>
               <TableRow className="border-b-border">
-                <TableHead className="text-muted-foreground">Date</TableHead>
-                <TableHead className="text-muted-foreground">Catégorie</TableHead>
+                <TableHead className="text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('date')}>
+                    Date {getSortIndicator('date')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('category')}>
+                    Catégorie {getSortIndicator('category')}
+                  </Button>
+                </TableHead>
                 <TableHead className="hidden md:table-cell text-muted-foreground">Description</TableHead>
-                <TableHead className="text-right text-muted-foreground">Montant</TableHead>
+                <TableHead className="text-right text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('amount')}>
+                    Montant {getSortIndicator('amount')}
+                  </Button>
+                </TableHead>
                 <TableHead className="text-center hidden sm:table-cell text-muted-foreground">Reçu</TableHead>
-                <TableHead className="text-center text-muted-foreground">Statut</TableHead>
+                <TableHead className="text-center text-muted-foreground">
+                   <Button variant="ghost" onClick={() => requestSort('status')}>
+                    Statut {getSortIndicator('status')}
+                  </Button>
+                </TableHead>
                 <TableHead className="text-right text-muted-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {expenses.map((expense) => (
+              {sortedExpenses.map((expense) => (
                 <TableRow key={expense.id} className="border-b-border">
                   <TableCell className="text-card-foreground">{format(parseISO(expense.date), "dd MMM yyyy", { locale: fr })}</TableCell>
                   <TableCell className="text-card-foreground">{expense.category}</TableCell>

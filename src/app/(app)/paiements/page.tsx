@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Search, FileDown, Filter, Eye, Receipt } from "lucide-react";
+import { MoreHorizontal, Search, FileDown, Filter, Eye, Receipt, ArrowUpDown } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import Link from "next/link";
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { type Payment, type PaymentStatus, type PaymentMethod, getPayments } from "@/lib/data";
+import { useSortableData } from "@/hooks/use-sortable-data";
 
 const paymentStatusColors: Record<PaymentStatus, string> = {
   "Réussi": "bg-emerald-100 text-emerald-800 border-emerald-300",
@@ -31,10 +32,18 @@ const paymentStatusColors: Record<PaymentStatus, string> = {
 
 export default function PaiementsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
+  const { items: sortedPayments, requestSort, sortConfig } = useSortableData(payments, { key: 'date', direction: 'descending' });
 
   useEffect(() => {
     setPayments(getPayments());
   }, []);
+
+  const getSortIndicator = (key: keyof Payment) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground/50" />;
+    }
+    return sortConfig.direction === 'ascending' ? '▲' : '▼';
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -81,17 +90,41 @@ export default function PaiementsPage() {
           <Table>
             <TableHeader>
               <TableRow className="border-b-border">
-                <TableHead className="text-muted-foreground">Date</TableHead>
-                <TableHead className="text-muted-foreground">Client</TableHead>
-                <TableHead className="hidden sm:table-cell text-muted-foreground">Facture ID</TableHead>
-                <TableHead className="hidden md:table-cell text-muted-foreground">Méthode</TableHead>
-                <TableHead className="text-right text-muted-foreground">Montant</TableHead>
-                <TableHead className="text-center text-muted-foreground">Statut</TableHead>
+                <TableHead className="text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('date')}>
+                    Date {getSortIndicator('date')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-muted-foreground">
+                   <Button variant="ghost" onClick={() => requestSort('clientName')}>
+                    Client {getSortIndicator('clientName')}
+                  </Button>
+                </TableHead>
+                <TableHead className="hidden sm:table-cell text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('invoiceId')}>
+                    Facture ID {getSortIndicator('invoiceId')}
+                  </Button>
+                </TableHead>
+                <TableHead className="hidden md:table-cell text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('method')}>
+                    Méthode {getSortIndicator('method')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-right text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('amount')}>
+                    Montant {getSortIndicator('amount')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-center text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('status')}>
+                    Statut {getSortIndicator('status')}
+                  </Button>
+                </TableHead>
                 <TableHead className="text-right text-muted-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {payments.map((payment) => (
+              {sortedPayments.map((payment) => (
                 <TableRow key={payment.id} className="border-b-border">
                   <TableCell className="text-card-foreground">{format(parseISO(payment.date), "dd MMM yyyy", { locale: fr })}</TableCell>
                   <TableCell className="font-medium text-card-foreground">{payment.clientName}</TableCell>

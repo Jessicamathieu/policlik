@@ -7,11 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, PlusCircle, Search, Edit3, Trash2, FileDown, Upload } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Search, Edit3, Trash2, FileDown, Upload, ArrowUpDown } from "lucide-react";
 import { type Service } from "@/lib/data";
 import { getServices } from "@/services/service-service";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSortableData } from "@/hooks/use-sortable-data";
+import { cn } from "@/lib/utils";
 
 const ImportServicesModal = lazy(() => 
   import("@/components/services/import-services-modal").then(module => ({ default: module.ImportServicesModal }))
@@ -28,7 +30,6 @@ export default function ServicesPage() {
     setIsLoading(true);
     try {
       const fetchedServices = await getServices();
-      fetchedServices.sort((a, b) => a.name.localeCompare(b.name));
       setServices(fetchedServices);
     } catch (error) {
       console.error("Échec de la récupération des services:", error);
@@ -57,6 +58,15 @@ export default function ServicesPage() {
     (service.subCategory && service.subCategory.toLowerCase().includes(searchTerm.toLowerCase()))
   ), [services, searchTerm]);
 
+  const { items: sortedServices, requestSort, sortConfig } = useSortableData(filteredServices, { key: 'name', direction: 'ascending' });
+  
+  const getSortIndicator = (key: keyof Service) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground/50" />;
+    }
+    return sortConfig.direction === 'ascending' ? '▲' : '▼';
+  };
+
   const renderTableContent = () => {
     if (isLoading) {
       return Array.from({ length: 5 }).map((_, index) => (
@@ -70,7 +80,7 @@ export default function ServicesPage() {
       ));
     }
 
-    if (filteredServices.length === 0) {
+    if (sortedServices.length === 0) {
         return (
             <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
@@ -80,7 +90,7 @@ export default function ServicesPage() {
         );
     }
 
-    return filteredServices.map((service) => (
+    return sortedServices.map((service) => (
       <TableRow key={service.id} className="border-b-border">
         <TableCell className="font-medium text-foreground">{service.name}</TableCell>
         <TableCell className="text-foreground">{service.category}</TableCell>
@@ -157,10 +167,26 @@ export default function ServicesPage() {
           <Table>
             <TableHeader>
               <TableRow className="border-b-border">
-                <TableHead className="text-muted-foreground">Nom du Service</TableHead>
-                <TableHead className="text-muted-foreground">Catégorie</TableHead>
-                <TableHead className="hidden sm:table-cell text-muted-foreground">Sous-Catégorie</TableHead>
-                <TableHead className="hidden md:table-cell text-muted-foreground">Prix</TableHead>
+                <TableHead className="text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('name')}>
+                    Nom du Service {getSortIndicator('name')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('category')}>
+                    Catégorie {getSortIndicator('category')}
+                  </Button>
+                </TableHead>
+                <TableHead className="hidden sm:table-cell text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('subCategory')}>
+                    Sous-Catégorie {getSortIndicator('subCategory')}
+                  </Button>
+                </TableHead>
+                <TableHead className="hidden md:table-cell text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('price')}>
+                    Prix {getSortIndicator('price')}
+                  </Button>
+                </TableHead>
                 <TableHead className="text-right text-muted-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>

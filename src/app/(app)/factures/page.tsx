@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, PlusCircle, Search, FileDown, Filter, Printer, CreditCard, Mail, FileText as FileTextIcon, MessageSquare } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Search, FileDown, Filter, Printer, CreditCard, Mail, FileText as FileTextIcon, MessageSquare, ArrowUpDown } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import Link from "next/link";
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils";
 import { type Invoice, type InvoiceStatus, getInvoices } from "@/lib/data";
+import { useSortableData } from "@/hooks/use-sortable-data";
 
 const statusColors: Record<InvoiceStatus, string> = {
   "Brouillon": "bg-gray-100 text-gray-800 border-gray-300", 
@@ -33,10 +34,19 @@ const statusColors: Record<InvoiceStatus, string> = {
 
 export default function FacturesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const { items: sortedInvoices, requestSort, sortConfig } = useSortableData(invoices, { key: 'dateEmission', direction: 'descending' });
   
   useEffect(() => {
     setInvoices(getInvoices());
   }, []);
+
+  const getSortIndicator = (key: keyof Invoice) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground/50" />;
+    }
+    return sortConfig.direction === 'ascending' ? '▲' : '▼';
+  };
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -90,17 +100,41 @@ export default function FacturesPage() {
           <Table>
             <TableHeader>
               <TableRow className="border-b-border">
-                <TableHead className="text-muted-foreground">ID Facture</TableHead>
-                <TableHead className="text-muted-foreground">Client</TableHead>
-                <TableHead className="hidden sm:table-cell text-muted-foreground">Date Émission</TableHead>
-                <TableHead className="hidden md:table-cell text-muted-foreground">Date Échéance</TableHead>
-                <TableHead className="text-right text-muted-foreground">Montant</TableHead>
-                <TableHead className="text-center text-muted-foreground">Statut</TableHead>
+                <TableHead className="text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('id')}>
+                    ID Facture {getSortIndicator('id')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('clientName')}>
+                    Client {getSortIndicator('clientName')}
+                  </Button>
+                </TableHead>
+                <TableHead className="hidden sm:table-cell text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('dateEmission')}>
+                    Date Émission {getSortIndicator('dateEmission')}
+                  </Button>
+                </TableHead>
+                <TableHead className="hidden md:table-cell text-muted-foreground">
+                   <Button variant="ghost" onClick={() => requestSort('dateEcheance')}>
+                    Date Échéance {getSortIndicator('dateEcheance')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-right text-muted-foreground">
+                   <Button variant="ghost" onClick={() => requestSort('amount')}>
+                    Montant {getSortIndicator('amount')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-center text-muted-foreground">
+                   <Button variant="ghost" onClick={() => requestSort('status')}>
+                    Statut {getSortIndicator('status')}
+                  </Button>
+                </TableHead>
                 <TableHead className="text-right text-muted-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {invoices.map((invoice) => (
+              {sortedInvoices.map((invoice) => (
                 <TableRow key={invoice.id} className="border-b-border">
                   <TableCell className="font-medium text-card-foreground">
                     <Link href={`/factures/${invoice.id}`} className="hover:text-primary">

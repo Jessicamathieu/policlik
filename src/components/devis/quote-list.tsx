@@ -13,11 +13,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, FileText, CheckCircle, XCircle, Mail, CalendarPlus, Trash2, Edit3 } from "lucide-react";
+import { MoreHorizontal, FileText, CheckCircle, XCircle, Mail, CalendarPlus, Trash2, Edit3, ArrowUpDown } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { getQuotes, type Quote, type QuoteStatus } from "@/lib/data";
+import { useSortableData } from "@/hooks/use-sortable-data";
 
 // Badge colors updated for contrast on dynamic card background
 const statusColors: Record<QuoteStatus, string> = {
@@ -31,6 +32,7 @@ const statusColors: Record<QuoteStatus, string> = {
 
 export function QuoteList() {
   const [quotes, setQuotes] = React.useState<Quote[]>([]);
+  const { items: sortedQuotes, requestSort, sortConfig } = useSortableData(quotes);
   
   React.useEffect(() => {
     setQuotes(getQuotes());
@@ -40,21 +42,48 @@ export function QuoteList() {
   const handleConvertToAppointment = (quoteId: string) => alert(`Convertir devis ${quoteId} en RDV`);
   const handleEditQuote = (quoteId: string) => alert(`Modifier devis ${quoteId}`);
   const handleDeleteQuote = (quoteId: string) => alert(`Supprimer devis ${quoteId}`);
+  
+  const getSortIndicator = (key: keyof Quote) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground/50" />;
+    }
+    return sortConfig.direction === 'ascending' ? '▲' : '▼';
+  };
 
   return (
     <Table>
       <TableHeader>
         <TableRow className="border-b-card-foreground/30">
-          <TableHead className="text-card-foreground opacity-80">ID Devis</TableHead>
-          <TableHead className="text-card-foreground opacity-80">Client</TableHead>
-          <TableHead className="text-card-foreground opacity-80">Date</TableHead>
-          <TableHead className="text-right text-card-foreground opacity-80">Montant</TableHead>
-          <TableHead className="text-center text-card-foreground opacity-80">Statut</TableHead>
+          <TableHead className="text-card-foreground opacity-80">
+            <Button variant="ghost" onClick={() => requestSort('id')}>
+                ID Devis {getSortIndicator('id')}
+            </Button>
+          </TableHead>
+          <TableHead className="text-card-foreground opacity-80">
+            <Button variant="ghost" onClick={() => requestSort('clientName')}>
+                Client {getSortIndicator('clientName')}
+            </Button>
+          </TableHead>
+          <TableHead className="text-card-foreground opacity-80">
+            <Button variant="ghost" onClick={() => requestSort('date')}>
+                Date {getSortIndicator('date')}
+            </Button>
+          </TableHead>
+          <TableHead className="text-right text-card-foreground opacity-80">
+            <Button variant="ghost" onClick={() => requestSort('amount')}>
+                Montant {getSortIndicator('amount')}
+            </Button>
+          </TableHead>
+          <TableHead className="text-center text-card-foreground opacity-80">
+            <Button variant="ghost" onClick={() => requestSort('status')}>
+                Statut {getSortIndicator('status')}
+            </Button>
+          </TableHead>
           <TableHead className="text-right text-card-foreground opacity-80">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {quotes.map((quote) => (
+        {sortedQuotes.map((quote) => (
           <TableRow key={quote.id} className="border-b-card-foreground/20">
             <TableCell className="font-medium text-card-foreground">{quote.id}</TableCell>
             <TableCell className="text-card-foreground">{quote.clientName}</TableCell>

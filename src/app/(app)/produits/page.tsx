@@ -7,11 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, PlusCircle, Search, Edit3, Trash2, FileDown, Upload } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Search, Edit3, Trash2, FileDown, Upload, ArrowUpDown } from "lucide-react";
 import { type Product } from "@/lib/data";
 import { getProducts } from "@/services/product-service";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSortableData } from "@/hooks/use-sortable-data";
+import { cn } from "@/lib/utils";
 
 const ImportProduitsModal = lazy(() => 
   import("@/components/produits/import-produits-modal").then(module => ({ default: module.ImportProduitsModal }))
@@ -28,7 +30,6 @@ export default function ProduitsPage() {
     setIsLoading(true);
     try {
       const fetchedProducts = await getProducts();
-      fetchedProducts.sort((a, b) => a.name.localeCompare(b.name));
       setProducts(fetchedProducts);
     } catch (error) {
       console.error("Échec de la récupération des produits:", error);
@@ -58,6 +59,15 @@ export default function ProduitsPage() {
     (product.subCategory && product.subCategory.toLowerCase().includes(searchTerm.toLowerCase()))
   ), [products, searchTerm]);
 
+  const { items: sortedProducts, requestSort, sortConfig } = useSortableData(filteredProducts, { key: 'name', direction: 'ascending' });
+  
+  const getSortIndicator = (key: keyof Product) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground/50" />;
+    }
+    return sortConfig.direction === 'ascending' ? '▲' : '▼';
+  };
+
   const renderTableContent = () => {
     if (isLoading) {
       return Array.from({ length: 5 }).map((_, index) => (
@@ -72,7 +82,7 @@ export default function ProduitsPage() {
       ));
     }
 
-    if (filteredProducts.length === 0) {
+    if (sortedProducts.length === 0) {
         return (
             <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
@@ -82,7 +92,7 @@ export default function ProduitsPage() {
         );
     }
 
-    return filteredProducts.map((product) => (
+    return sortedProducts.map((product) => (
       <TableRow key={product.id} className="border-b-border">
         <TableCell className="font-medium text-foreground">{product.name}</TableCell>
         <TableCell className="text-foreground">{product.code}</TableCell>
@@ -160,11 +170,31 @@ export default function ProduitsPage() {
           <Table>
             <TableHeader>
               <TableRow className="border-b-border">
-                <TableHead className="text-muted-foreground">Nom du Produit</TableHead>
-                <TableHead className="text-muted-foreground">Code</TableHead>
-                <TableHead className="hidden sm:table-cell text-muted-foreground">Catégorie</TableHead>
-                <TableHead className="hidden md:table-cell text-muted-foreground">Sous-Catégorie</TableHead>
-                <TableHead className="hidden md:table-cell text-muted-foreground">Prix</TableHead>
+                <TableHead className="text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('name')}>
+                    Nom du Produit {getSortIndicator('name')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-muted-foreground">
+                   <Button variant="ghost" onClick={() => requestSort('code')}>
+                    Code {getSortIndicator('code')}
+                  </Button>
+                </TableHead>
+                <TableHead className="hidden sm:table-cell text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('category')}>
+                    Catégorie {getSortIndicator('category')}
+                  </Button>
+                </TableHead>
+                <TableHead className="hidden md:table-cell text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('subCategory')}>
+                    Sous-Catégorie {getSortIndicator('subCategory')}
+                  </Button>
+                </TableHead>
+                <TableHead className="hidden md:table-cell text-muted-foreground">
+                  <Button variant="ghost" onClick={() => requestSort('price')}>
+                    Prix {getSortIndicator('price')}
+                  </Button>
+                </TableHead>
                 <TableHead className="text-right text-muted-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
