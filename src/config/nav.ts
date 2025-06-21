@@ -1,6 +1,6 @@
 
 import type { NavItem } from '@/types';
-import { LayoutDashboard, CalendarDays, Users, FileText, Briefcase, Settings, CreditCard, DollarSign, FilePlus2, Package } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, Users, FileText, Briefcase, Settings, CreditCard, DollarSign, FilePlus2, Package, BookMarked } from 'lucide-react';
 
 // Définition des couleurs et de leurs contrastes
 // Exporting pageColors to be used in AppHeader for the gradient and RootLayout for HSL updates
@@ -80,17 +80,10 @@ export const appNavItems: NavItem[] = [
     ]
   },
   {
-    title: 'Services',
+    title: 'Catalogue',
     href: '/services',
-    icon: Briefcase,
+    icon: BookMarked,
     color: pageColors[1].color, 
-    contrastColor: pageColors[1].contrastColor,
-  },
-  {
-    title: 'Produits',
-    href: '/produits',
-    icon: Package,
-    color: pageColors[1].color,
     contrastColor: pageColors[1].contrastColor,
   },
   {
