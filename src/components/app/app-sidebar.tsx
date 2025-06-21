@@ -33,7 +33,7 @@ export function AppSidebar() {
       <SidebarHeader className="p-4 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
           <Icons.Logo className="h-7 w-7 text-primary" />
-          <span className="font-bold text-lg font-headline">Polimik</span>
+          <span className="font-bold text-lg font-headline">PolicliK</span>
         </Link>
          <div className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-full hidden">
            <Icons.Logo className="h-7 w-7 text-primary"/>

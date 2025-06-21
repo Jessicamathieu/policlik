@@ -11,12 +11,12 @@ export default function AuthLayout({
       <div className="absolute top-8 left-8">
         <Link href="/" className="flex items-center space-x-2 text-primary hover:opacity-80 transition-opacity">
           <Icons.Logo className="h-8 w-8" />
-          <span className="font-bold text-xl font-headline">Polimik Gestion</span>
+          <span className="font-bold text-xl font-headline">PolicliK</span>
         </Link>
       </div>
       {children}
       <footer className="absolute bottom-8 text-center text-sm text-muted-foreground">
-        &copy; {new Date().getFullYear()} Polimik Gestion. Tous droits réservés.
+        &copy; {new Date().getFullYear()} PolicliK. Tous droits réservés.
       </footer>
     </div>
   );

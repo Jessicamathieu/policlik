@@ -59,7 +59,7 @@ export function AppHeader() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
         <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
           <Icons.Logo className="h-6 w-6 text-primary" />
-          <span className="font-headline text-lg">Polimik Gestion</span>
+          <span className="font-headline text-lg">PolicliK</span>
         </Link>
         
         <DropdownMenu>

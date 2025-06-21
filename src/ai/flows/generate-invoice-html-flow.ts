@@ -20,7 +20,7 @@ const InvoiceLineItemSchema = z.object({
 export type InvoiceLineItem = z.infer<typeof InvoiceLineItemSchema>;
 
 const GenerateInvoiceHtmlInputSchema = z.object({
-  companyName: z.string().default('Service Polimik').describe("Nom de l'entreprise émettrice."),
+  companyName: z.string().default('PolicliK').describe("Nom de l'entreprise émettrice."),
   companyAddressL1: z.string().default('200 33e Rue').describe("Ligne 1 de l'adresse de l'entreprise."),
   companyAddressL2: z.string().default('Notre-Dame-des-Pins G0M 1K0').describe("Ligne 2 de l'adresse de l'entreprise."),
   companyPhone: z.string().default('418-774-1548').describe("Téléphone de l'entreprise."),
@@ -46,7 +46,7 @@ const GenerateInvoiceHtmlInputSchema = z.object({
   total: z.string().describe('Total général (ex: "CAD$229.95").'),
 
   termsAndConditions: z.string().default('Le paiement est dû à réception de la facture.').describe('Termes et conditions.'),
-  footerMessage: z.string().default('Merci pour votre confiance envers Service Polimik – lavage à l’eau pure 💧').describe('Message en pied de page.'),
+  footerMessage: z.string().default('Merci pour votre confiance envers PolicliK – lavage à l’eau pure 💧').describe('Message en pied de page.'),
 });
 export type GenerateInvoiceHtmlInput = z.infer<typeof GenerateInvoiceHtmlInputSchema>;
 
@@ -80,7 +80,7 @@ const generateInvoiceHtmlFlow = ai.defineFlow(
     const textColor = '#1f2937'; // Texte foncé
     const whiteColor = '#ffffff';
 
-    let logoHtml = '<!-- Logo Service Polimik -->';
+    let logoHtml = '<!-- Logo Service PolicliK -->';
     if (companyLogoUrl) {
       logoHtml = `<img src="${companyLogoUrl}" alt="${companyName} Logo" style="max-height: 80px; width: auto; margin-bottom: 20px;" />`;
     } else {

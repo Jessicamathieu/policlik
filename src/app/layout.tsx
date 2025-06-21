@@ -83,8 +83,8 @@ export default function RootLayout({
   return (
     <html lang="fr" className={ptSans.variable} suppressHydrationWarning>
       <head>
-        <title>Polimik Gestion</title>
-        <meta name="description" content="Application de gestion pour Polimik." />
+        <title>PolicliK</title>
+        <meta name="description" content="Application de gestion pour PolicliK." />
       </head>
       <body className={`font-body antialiased bg-background text-foreground`}>
         <AuthProvider>

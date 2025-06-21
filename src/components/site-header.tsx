@@ -9,7 +9,7 @@ export function SiteHeader() {
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <Icons.Logo className="h-6 w-6 text-primary" />
           <span className="font-bold sm:inline-block font-headline">
-            Polimik Gestion
+            PolicliK
           </span>
         </Link>
         <div className="flex flex-1 items-center justify-end space-x-4">

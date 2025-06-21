@@ -20,7 +20,7 @@ const QuoteLineItemSchema = z.object({
 export type QuoteLineItem = z.infer<typeof QuoteLineItemSchema>;
 
 const GenerateQuoteHtmlInputSchema = z.object({
-  companyName: z.string().default('Service Polimik').describe("Nom de l'entreprise émettrice."),
+  companyName: z.string().default('PolicliK').describe("Nom de l'entreprise émettrice."),
   companyAddressL1: z.string().default('200 33e Rue').describe("Ligne 1 de l'adresse de l'entreprise."),
   companyAddressL2: z.string().default('Notre-Dame-des-Pins G0M 1K0').describe("Ligne 2 de l'adresse de l'entreprise."),
   companyPhone: z.string().default('418-774-1548').describe("Téléphone de l'entreprise."),
@@ -46,7 +46,7 @@ const GenerateQuoteHtmlInputSchema = z.object({
   total: z.string().describe('Total général (ex: "CAD$229.95").'),
 
   termsAndConditions: z.string().default('Cette soumission est valide pour une période de 30 jours. Les prix sont sujets à changement après cette période.').describe('Termes et conditions de la soumission.'),
-  footerMessage: z.string().default('Merci pour votre confiance envers Service Polimik – lavage à l’eau pure 💧').describe('Message en pied de page.'),
+  footerMessage: z.string().default('Merci pour votre confiance envers PolicliK – lavage à l’eau pure 💧').describe('Message en pied de page.'),
 });
 export type GenerateQuoteHtmlInput = z.infer<typeof GenerateQuoteHtmlInputSchema>;
 
@@ -80,7 +80,7 @@ const generateQuoteHtmlFlow = ai.defineFlow(
     const textColor = '#1f2937'; 
     const whiteColor = '#ffffff';
 
-    let logoHtml = '<!-- Logo Service Polimik -->';
+    let logoHtml = '<!-- Logo PolicliK -->';
     if (companyLogoUrl) {
       logoHtml = `<img src="${companyLogoUrl}" alt="${companyName} Logo" style="max-height: 80px; width: auto; margin-bottom: 20px;" />`;
     } else {
