@@ -14,12 +14,13 @@ import { getFirestore } from "firebase/firestore";
 // 6. Copiez les valeurs de l'objet de configuration et collez-les ici.
 //
 const firebaseConfig = {
-  apiKey: "VOTRE_API_KEY", // <-- REMPLACEZ CECI
-  authDomain: "VOTRE_PROJECT_ID.firebaseapp.com", // <-- REMPLACEZ CECI
-  projectId: "VOTRE_PROJECT_ID", // <-- REMPLACEZ CECI
-  storageBucket: "VOTRE_PROJECT_ID.appspot.com", // <-- REMPLACEZ CECI
-  messagingSenderId: "VOTRE_MESSAGING_SENDER_ID", // <-- REMPLACEZ CECI
-  appId: "VOTRE_APP_ID" // <-- REMPLACEZ CECI
+  apiKey: "AIzaSyDUYlyo80qdoSR6BGigx0lvTj8DUwoGK7w",
+  authDomain: "appli-c2d60.firebaseapp.com",
+  projectId: "appli-c2d60",
+  storageBucket: "appli-c2d60.appspot.com",
+  messagingSenderId: "232907452033",
+  appId: "1:232907452033:web:7170f4b75c4f668eb6e780",
+  measurementId: "G-YGDC2J7GY5"
 };
 
 // Initialise Firebase
@@ -31,9 +32,4 @@ try {
   console.error("Erreur d'initialisation de Firebase. Vérifiez que firebaseConfig est correct.", e);
   // Si l'initialisation échoue, on crée un objet 'app' factice pour éviter d'autres erreurs,
   // mais l'application ne fonctionnera pas avec la base de données.
-  app = {}; 
-}
-
-const db = getFirestore(app);
-
-export { app, db };
+  app = {};
