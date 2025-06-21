@@ -29,7 +29,7 @@ export interface AgendaControlsProps {
   setPrintEndDate: (date?: Date) => void;
 }
 
-export function AgendaControls({ 
+export const AgendaControls = React.memo(function AgendaControls({ 
   currentView, 
   onViewChange, 
   onNewAppointmentSave, 
@@ -123,4 +123,4 @@ export function AgendaControls({
       </div>
     </div>
   );
-}
+});

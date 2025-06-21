@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { AgendaControls } from '@/components/agenda/agenda-controls';
 import { CalendarView } from '@/components/agenda/calendar-view';
 import { useToast } from '@/hooks/use-toast';
@@ -45,7 +45,7 @@ export default function AgendaPage() {
     });
   }, [toast]);
 
-  const displayedAppointments = appointments.filter(app => {
+  const displayedAppointments = useMemo(() => appointments.filter(app => {
     if (!currentDate) return false;
     // Assurez-vous que la date de l'application est traitée comme une date locale, et non UTC, en ajoutant T00:00:00
     const appDate = new Date(app.date + "T00:00:00"); 
@@ -68,7 +68,7 @@ export default function AgendaPage() {
       return appDate.getFullYear() === currentDate.getFullYear() && appDate.getMonth() === currentDate.getMonth();
     }
     return true; 
-  });
+  }), [appointments, currentDate, currentView]);
 
   const handlePrintAppointments = useCallback(() => {
     if (!currentDate) return;

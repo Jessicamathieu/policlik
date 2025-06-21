@@ -51,7 +51,7 @@ const timeToMinutes = (time: string): number => {
 const slotHeightPx = 50; 
 const startHourGrid = 6; 
 
-export function CalendarView({ appointments, currentDate, view, onAppointmentUpdate, onNewAppointmentSave }: CalendarViewProps) {
+export const CalendarView = React.memo(function CalendarView({ appointments, currentDate, view, onAppointmentUpdate, onNewAppointmentSave }: CalendarViewProps) {
   const timeSlots = generateTimeSlots(startHourGrid, 20, 30); 
 
   const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
@@ -405,4 +405,4 @@ export function CalendarView({ appointments, currentDate, view, onAppointmentUpd
     default:
       return renderDayView();
   }
-}
+});

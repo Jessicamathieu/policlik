@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -43,11 +43,11 @@ export default function ClientsPage() {
     fetchClients();
   }, []);
 
-  const filteredClients = clients.filter(client =>
+  const filteredClients = useMemo(() => clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
     client.address.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ), [clients, searchTerm]);
 
   const renderClientCards = () => {
     if (isLoading) {

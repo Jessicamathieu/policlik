@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -42,11 +42,11 @@ export default function ServicesPage() {
     fetchServices();
   }, []);
 
-  const filteredServices = services.filter(service =>
+  const filteredServices = useMemo(() => services.filter(service =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     service.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (service.subCategory && service.subCategory.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  ), [services, searchTerm]);
 
   const renderTableContent = () => {
     if (isLoading) {
