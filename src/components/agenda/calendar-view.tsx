@@ -31,8 +31,7 @@ interface CalendarViewProps {
   appointments: Appointment[];
   currentDate: Date; 
   view: "day" | "week" | "month";
-  onAppointmentUpdate: (appointmentData: Partial<Appointment>) => void;
-  onNewAppointmentSave: (appointmentData: Partial<Appointment>) => void;
+  onSaveSuccess: (appointmentData: Partial<Appointment>) => void;
 }
 
 const generateTimeSlots = (startHour: number, endHour: number, interval: number): string[] => {
@@ -53,7 +52,7 @@ const timeToMinutes = (time: string): number => {
 const slotHeightPx = 50; 
 const startHourGrid = 6; 
 
-export const CalendarView = React.memo(function CalendarView({ appointments, currentDate, view, onAppointmentUpdate, onNewAppointmentSave }: CalendarViewProps) {
+export const CalendarView = React.memo(function CalendarView({ appointments, currentDate, view, onSaveSuccess }: CalendarViewProps) {
   const timeSlots = generateTimeSlots(startHourGrid, 20, 30); 
 
   const [modalState, setModalState] = useState<{
@@ -87,14 +86,10 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
     setModalState({ isOpen: true, appointmentData: data });
   }, []);
 
-  const handleModalSave = useCallback((data: Partial<Appointment>) => {
-    if (data.id) {
-      onAppointmentUpdate(data);
-    } else {
-      onNewAppointmentSave(data);
-    }
+  const handleModalSave = useCallback(() => {
+    onSaveSuccess({});
     setModalState({ isOpen: false });
-  }, [onAppointmentUpdate, onNewAppointmentSave]);
+  }, [onSaveSuccess]);
 
   const handleModalClose = useCallback(() => {
     setModalState({ isOpen: false });
@@ -377,7 +372,7 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
                   if(!open) handleModalClose();
                 }}
                 appointment={modalState.appointmentData}
-                onSave={handleModalSave}
+                onSaveSuccess={handleModalSave}
             />
         </Suspense>
       )}

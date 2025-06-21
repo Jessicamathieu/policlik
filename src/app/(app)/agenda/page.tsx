@@ -7,43 +7,56 @@ import { CalendarView } from '@/components/agenda/calendar-view';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { type Appointment, getAppointments } from '@/lib/data';
+import { type Appointment } from '@/lib/data';
+import { getAppointmentsForUser } from '@/services/appointment-service';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/context/auth-context';
 
 export default function AgendaPage() {
+  const { user } = useAuth();
   const [currentView, setCurrentView] = useState<"day" | "week" | "month">("day");
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState<Date | null>(null); 
   const [printStartDate, setPrintStartDate] = useState<Date | undefined>(undefined);
   const [printEndDate, setPrintEndDate] = useState<Date | undefined>(undefined);
   const { toast } = useToast();
 
+  const fetchAppointments = useCallback(async (userId: string) => {
+    setIsLoading(true);
+    try {
+      const fetchedAppointments = await getAppointmentsForUser(userId);
+      setAppointments(fetchedAppointments);
+    } catch (error) {
+      console.error("Failed to fetch appointments:", error);
+      toast({
+        title: "Erreur de chargement",
+        description: "Impossible de charger les rendez-vous.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
+
   useEffect(() => {
-    // Récupère les rendez-vous initiaux et définit la date actuelle uniquement sur le client pour éviter les erreurs d'hydratation.
-    setAppointments(getAppointments());
+    if (user?.uid) {
+      fetchAppointments(user.uid);
+    }
+     // Définit la date actuelle uniquement sur le client pour éviter les erreurs d'hydratation.
     setCurrentDate(new Date());
-  }, []);
+  }, [user, fetchAppointments]);
 
   const handleViewChange = useCallback((view: "day" | "week" | "month") => {
     setCurrentView(view);
   }, []);
 
-  const handleNewAppointmentSave = useCallback((appointmentData: Appointment) => {
-    console.log("Nouveau rendez-vous:", appointmentData);
-    setAppointments(prev => [...prev, { ...appointmentData, id: String(Date.now()) }]);
-    toast({
-      title: "Rendez-vous créé",
-      description: `Le rendez-vous pour ${appointmentData.clientName || 'un client'} concernant ${appointmentData.serviceName || 'un service'} a été ajouté.`,
-    });
-  }, [toast]);
+  const handleSaveSuccess = useCallback(() => {
+    if (user?.uid) {
+      fetchAppointments(user.uid);
+    }
+  }, [user, fetchAppointments]);
 
-  const handleAppointmentUpdate = useCallback((updatedAppointmentData: Appointment) => {
-    setAppointments(prev => prev.map(app => app.id === updatedAppointmentData.id ? updatedAppointmentData : app));
-    toast({
-      title: "Rendez-vous mis à jour",
-      description: `Le rendez-vous pour ${updatedAppointmentData.clientName || 'un client'} concernant ${updatedAppointmentData.serviceName || 'un service'} a été modifié.`,
-    });
-  }, [toast]);
 
   const displayedAppointments = useMemo(() => appointments.filter(app => {
     if (!currentDate) return false;
@@ -96,7 +109,7 @@ export default function AgendaPage() {
   }, [currentView, appointments, displayedAppointments, printStartDate, printEndDate, currentDate]);
 
   // Affiche un squelette de chargement jusqu'à ce que la date actuelle soit définie côté client
-  if (!currentDate) {
+  if (!currentDate || isLoading) {
     return (
       <div className="flex flex-col h-full">
         <h1 className="text-3xl font-bold tracking-tight mb-6 font-headline text-foreground">Agenda des Rendez-vous</h1>
@@ -120,7 +133,7 @@ export default function AgendaPage() {
       <AgendaControls 
         currentView={currentView} 
         onViewChange={handleViewChange}
-        onNewAppointmentSave={handleNewAppointmentSave} 
+        onSaveSuccess={handleSaveSuccess}
         onPrintAppointments={handlePrintAppointments}
         printStartDate={printStartDate}
         setPrintStartDate={setPrintStartDate}
@@ -132,8 +145,7 @@ export default function AgendaPage() {
           appointments={displayedAppointments} 
           currentDate={currentDate} 
           view={currentView}
-          onAppointmentUpdate={handleAppointmentUpdate}
-          onNewAppointmentSave={handleNewAppointmentSave}
+          onSaveSuccess={handleSaveSuccess}
         />
       </div>
     </div>

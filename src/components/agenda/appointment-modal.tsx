@@ -23,15 +23,18 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, MapPin, Phone, PlusCircle } from "lucide-react";
+import { CalendarIcon, Loader2, MapPin, Phone, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { type Service, type Client } from "@/lib/data";
 import { getClients } from "@/services/client-service";
 import { getServices } from "@/services/service-service";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/auth-context";
+import { saveAppointment, type SaveAppointmentInput } from "@/ai/flows/save-appointment-flow";
+
 
 interface Appointment {
   id?: string;
@@ -48,17 +51,20 @@ interface Appointment {
   phone?: string;
   smsReminder?: boolean;
   serviceColorClassName?: string;
+  servicePrice?: number;
 }
 
 interface AppointmentModalProps {
   appointment?: Partial<Appointment>;
-  onSave: (appointmentData: Partial<Appointment>) => void;
+  onSaveSuccess: () => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function AppointmentModal({ appointment, onSave, open, onOpenChange }: AppointmentModalProps) {
+export function AppointmentModal({ appointment, onSaveSuccess, open, onOpenChange }: AppointmentModalProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [clients, setClients] = React.useState<Client[]>([]);
   const [services, setServices] = React.useState<Service[]>([]);
   const [selectedClient, setSelectedClient] = React.useState(appointment?.clientId || "");
@@ -75,10 +81,10 @@ export function AppointmentModal({ appointment, onSave, open, onOpenChange }: Ap
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (open) {
+      if (open && user?.uid) {
         try {
           const [fetchedClients, fetchedServices] = await Promise.all([
-            getClients(),
+            getClients(user.uid),
             getServices()
           ]);
           
@@ -99,7 +105,7 @@ export function AppointmentModal({ appointment, onSave, open, onOpenChange }: Ap
       }
     };
     fetchData();
-  }, [open, toast]);
+  }, [open, toast, user]);
 
   React.useEffect(() => {
     if (open) {
@@ -128,29 +134,57 @@ export function AppointmentModal({ appointment, onSave, open, onOpenChange }: Ap
     client.address.toLowerCase().includes(clientSearch.toLowerCase())
   );
   
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
+    if (!user?.uid) {
+      toast({ title: "Erreur", description: "Vous devez être connecté.", variant: "destructive" });
+      return;
+    }
+    if (!selectedClient || !selectedService || !appointmentDate) {
+        toast({ title: "Champs Requis", description: "Veuillez sélectionner un client, un service et une date.", variant: "destructive" });
+        return;
+    }
+
     const clientData = clients.find(c => c.id === selectedClient);
     const serviceData = services.find(s => s.id === selectedService);
-    const appointmentData: Partial<Appointment> = {
-      id: appointment?.id, 
+
+    if (!clientData || !serviceData) {
+        toast({ title: "Données Invalides", description: "Client ou service non trouvé.", variant: "destructive" });
+        return;
+    }
+
+    setIsLoading(true);
+
+    const appointmentData: SaveAppointmentInput = {
       clientId: selectedClient,
-      clientName: clientData?.name,
+      clientName: clientData.name,
       serviceId: selectedService,
-      serviceName: serviceData?.name,
-      date: appointmentDate ? format(appointmentDate, "yyyy-MM-dd") : undefined,
+      serviceName: serviceData.name,
+      servicePrice: serviceData.price || 0,
+      date: format(appointmentDate, "yyyy-MM-dd"),
       startTime,
       endTime,
       description,
       workDone,
-      address: address, 
-      phone: phone,     
+      address, 
+      phone,     
       smsReminder,
-      serviceColorClassName: serviceData?.colorClassName,
+      serviceColorClassName: serviceData.colorClassName,
+      ownerId: user.uid,
     };
-    onSave(appointmentData);
-    onOpenChange(false);
+    
+    try {
+        await saveAppointment(appointmentData);
+        toast({ title: "Rendez-vous Enregistré", description: `Le rendez-vous pour ${clientData.name} a été créé avec succès.` });
+        onSaveSuccess();
+        onOpenChange(false);
+    } catch(error) {
+        console.error("Failed to save appointment:", error);
+        toast({ title: "Erreur", description: "Impossible de sauvegarder le rendez-vous.", variant: "destructive" });
+    } finally {
+        setIsLoading(false);
+    }
+
   }, [
-      appointment?.id, 
       selectedClient, 
       selectedService, 
       appointmentDate, 
@@ -163,8 +197,10 @@ export function AppointmentModal({ appointment, onSave, open, onOpenChange }: Ap
       smsReminder, 
       clients, 
       services, 
-      onSave, 
-      onOpenChange
+      onSaveSuccess, 
+      onOpenChange,
+      user,
+      toast,
   ]);
 
   const handleClientChange = useCallback((clientId: string) => {
@@ -393,9 +429,9 @@ export function AppointmentModal({ appointment, onSave, open, onOpenChange }: Ap
 
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => onOpenChange(false)}>Annuler</Button>
-            <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              {appointment?.id ? "Sauvegarder" : "Créer Rendez-vous"}
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>Annuler</Button>
+            <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : (appointment?.id ? "Sauvegarder" : "Créer Rendez-vous")}
             </Button>
           </DialogFooter>
       </DialogContent>

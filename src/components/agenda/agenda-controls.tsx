@@ -15,14 +15,14 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import React, { useState, lazy, Suspense } from "react";
+import React, { useState, lazy, Suspense, useCallback } from "react";
 
 const AppointmentModal = lazy(() => import("./appointment-modal").then(module => ({ default: module.AppointmentModal })));
 
 export interface AgendaControlsProps {
   currentView: "day" | "week" | "month";
   onViewChange: (view: "day" | "week" | "month") => void;
-  onNewAppointmentSave: (appointmentData: any) => void;
+  onSaveSuccess: () => void;
   onPrintAppointments: () => void; 
   printStartDate?: Date;
   setPrintStartDate: (date?: Date) => void;
@@ -33,7 +33,7 @@ export interface AgendaControlsProps {
 export const AgendaControls = React.memo(function AgendaControls({ 
   currentView, 
   onViewChange, 
-  onNewAppointmentSave, 
+  onSaveSuccess, 
   onPrintAppointments,
   printStartDate,
   setPrintStartDate,
@@ -42,10 +42,10 @@ export const AgendaControls = React.memo(function AgendaControls({
 }: AgendaControlsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSave = (appointmentData: any) => {
-    onNewAppointmentSave(appointmentData);
+  const handleSave = useCallback(() => {
+    onSaveSuccess();
     setIsModalOpen(false);
-  };
+  },[onSaveSuccess]);
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-4 bg-card text-card-foreground rounded-lg shadow">
@@ -129,7 +129,7 @@ export const AgendaControls = React.memo(function AgendaControls({
                 <AppointmentModal
                     open={isModalOpen}
                     onOpenChange={setIsModalOpen}
-                    onSave={handleSave}
+                    onSaveSuccess={handleSave}
                 />
             </Suspense>
         )}

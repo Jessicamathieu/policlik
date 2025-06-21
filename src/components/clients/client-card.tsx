@@ -102,12 +102,15 @@ export function ClientCard({ client, isPrimaryColor }: ClientCardProps) {
           </div>
         )}
       </CardContent>
-      {client.totalSpent && (
-        <CardFooter className="p-4 bg-muted/30 text-sm border-t"> 
-          <div className="flex items-center justify-between w-full text-foreground">
-            <span className="text-muted-foreground">Total Dépensé:</span>
-            <span className="font-semibold">{client.totalSpent}</span>
-          </div>
+      <CardFooter className="p-4 bg-muted/30 text-sm border-t"> 
+        <div className="flex items-center justify-between w-full text-foreground">
+          <span className="text-muted-foreground">Total Dépensé:</span>
+          <span className="font-semibold">CAD${client.totalSpent.toFixed(2)}</span>
+        </div>
+      </CardFooter>
+      {client.lastService && (
+        <CardFooter className="p-4 text-xs border-t bg-muted/50 text-muted-foreground"> 
+            Dernier service : {client.lastService}
         </CardFooter>
       )}
     </Card>

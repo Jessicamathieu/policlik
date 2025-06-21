@@ -21,7 +21,9 @@ export const addClient = async (clientData: NewClientData, userId: string): Prom
   await addDoc(clientsCol, {
     ...clientData,
     ownerId: userId,
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
+    totalSpent: 0,
+    lastService: "Aucun service récent"
   });
 };
 
@@ -37,7 +39,13 @@ export const addClientsBatch = async (clients: NewClientData[], userId: string):
 
     clients.forEach(client => {
         const docRef = doc(clientsCol); // Firestore génère un nouvel ID
-        batch.set(docRef, { ...client, ownerId: userId, createdAt: serverTimestamp() });
+        batch.set(docRef, { 
+          ...client, 
+          ownerId: userId, 
+          createdAt: serverTimestamp(),
+          totalSpent: 0,
+          lastService: "Aucun service récent"
+        });
     });
 
     await batch.commit();
@@ -65,8 +73,8 @@ export const getClients = async (userId: string): Promise<Client[]> => {
         email: data.email || '',
         phone: data.phone || '',
         address: data.address || '',
-        lastService: data.lastService,
-        totalSpent: data.totalSpent,
+        lastService: data.lastService || 'Aucun service récent',
+        totalSpent: data.totalSpent || 0,
       };
     });
     return clientList;
