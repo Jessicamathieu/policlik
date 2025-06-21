@@ -1,29 +1,26 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
-// --- ATTENTION : ACTION REQUISE ---
-// Pour que l'application fonctionne, vous devez remplacer les valeurs ci-dessous
-// par la configuration de votre propre projet Firebase.
-//
-// Comment trouver ces informations :
-// 1. Allez sur la console Firebase : https://console.firebase.google.com/
-// 2. Sélectionnez votre projet.
-// 3. Cliquez sur l'icône d'engrenage (⚙️) à côté de "Project Overview" et allez dans "Project settings".
-// 4. Dans l'onglet "General", faites défiler jusqu'à la section "Your apps".
-// 5. Cliquez sur l'icône "</>" pour voir la configuration de votre application web.
-// 6. Copiez les valeurs de l'objet de configuration et collez-les ici.
-//
+// La configuration est maintenant chargée à partir des variables d'environnement.
+// Assurez-vous que votre fichier .env contient les bonnes valeurs.
 const firebaseConfig = {
-  apiKey: "AIzaSyDUYlyo80qdoSR6BGigx0lvTj8DUwoGK7w",
-  authDomain: "appli-c2d60.firebaseapp.com",
-  projectId: "appli-c2d60",
-  storageBucket: "appli-c2d60.appspot.com",
-  messagingSenderId: "232907452033",
-  appId: "1:232907452033:web:7170f4b75c4f668eb6e780",
-  measurementId: "G-YGDC2J7GY5"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
+// Une vérification pour s'assurer que le développeur a fourni les informations d'identification nécessaires.
+// Cela lève une erreur claire si la configuration est manquante.
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  throw new Error("La configuration de Firebase est manquante ou incomplète. Veuillez vérifier votre fichier .env et vous assurer que NEXT_PUBLIC_FIREBASE_API_KEY et NEXT_PUBLIC_FIREBASE_PROJECT_ID sont définis.");
+}
+
 // Initialise Firebase
+// La vérification getApps().length empêche la ré-initialisation lors du rechargement à chaud en développement.
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
