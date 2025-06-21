@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -39,6 +38,8 @@ import { getServices } from "@/services/service-service";
 import { getProducts } from "@/services/product-service";
 import { getClients } from "@/services/client-service";
 import type { Service, Product, Client } from "@/lib/data";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 const lineItemSchema = z.object({
   serviceId: z.string().min(1, "Veuillez sélectionner un service/produit."),
@@ -47,17 +48,17 @@ const lineItemSchema = z.object({
   unitPrice: z.coerce.number().min(0, "Le prix unitaire ne peut être négatif."),
 });
 
-const invoiceSchema = z.object({
-  invoiceId: z.string().min(1, "L'ID de la facture est requis."),
+const documentSchema = z.object({
+  documentId: z.string().min(1, "L'ID du document est requis."),
   clientId: z.string().min(1, "Veuillez sélectionner un client."),
   issueDate: z.date({ required_error: "La date d'émission est requise." }),
-  dueDate: z.date({ required_error: "La date d'échéance est requise." }),
-  lineItems: z.array(lineItemSchema).min(1, "Au moins une ligne de facture est requise."),
+  dueDate: z.date().optional(),
+  lineItems: z.array(lineItemSchema).min(1, "Au moins une ligne est requise."),
   notes: z.string().optional(),
-  taxRate: z.coerce.number().min(0).max(100).optional().default(0), // Tax rate in percentage
+  taxRate: z.coerce.number().min(0).max(100).optional().default(0),
 });
 
-type InvoiceFormValues = z.infer<typeof invoiceSchema>;
+type DocumentFormValues = z.infer<typeof documentSchema>;
 
 type ItemForInvoice = {
     id: string;
@@ -67,7 +68,7 @@ type ItemForInvoice = {
     type: 'Service' | 'Produit';
 };
 
-export function InvoiceForm() {
+export function DocumentForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -75,6 +76,9 @@ export function InvoiceForm() {
   const [clientSearch, setClientSearch] = React.useState("");
   const [availableItems, setAvailableItems] = React.useState<ItemForInvoice[]>([]);
   const [clients, setClients] = React.useState<Client[]>([]);
+  
+  const initialType = searchParams.get("type") === "devis" ? "quote" : "invoice";
+  const [documentType, setDocumentType] = React.useState<'invoice' | 'quote'>(initialType);
 
   React.useEffect(() => {
     const fetchItemsAndClients = async () => {
@@ -123,30 +127,30 @@ export function InvoiceForm() {
     client.name.toLowerCase().includes(clientSearch.toLowerCase())
   );
 
-  const form = useForm<InvoiceFormValues>({
-    resolver: zodResolver(invoiceSchema),
-    // Initialise les valeurs par défaut avec des données statiques pour éviter les erreurs d'hydratation.
-    // Elles seront réinitialisées dans useEffect côté client.
+  const form = useForm<DocumentFormValues>({
+    resolver: zodResolver(documentSchema),
     defaultValues: {
-      invoiceId: "",
+      documentId: "",
       clientId: "",
-      issueDate: new Date(),
-      dueDate: new Date(),
       lineItems: [{ serviceId: "", description: "", quantity: 1, unitPrice: 0 }],
       notes: "",
       taxRate: 0,
     },
   });
 
-  // Réinitialise le formulaire avec des valeurs dynamiques (comme la date actuelle) côté client.
   React.useEffect(() => {
+    const type = searchParams.get("type") === "devis" ? "quote" : "invoice";
+    setDocumentType(type);
+
     form.reset({
-      invoiceId: `FAC-${Date.now().toString().slice(-6)}`,
+      documentId: `${type === 'invoice' ? 'FAC' : 'DEV'}-${Date.now().toString().slice(-6)}`,
       clientId: searchParams.get("clientId") || "",
       issueDate: new Date(),
       dueDate: addDays(new Date(), 30),
       lineItems: [{ serviceId: "", description: "", quantity: 1, unitPrice: 0 }],
-      notes: "",
+      notes: type === 'quote' 
+        ? 'Cette soumission est valide pour une période de 30 jours. Les prix sont sujets à changement après cette période.'
+        : 'Le paiement est dû sous 30 jours. Merci pour votre confiance.',
       taxRate: 0,
     });
   }, [form, searchParams]);
@@ -172,20 +176,34 @@ export function InvoiceForm() {
     return subtotal + taxes;
   }, [subtotal, taxes]);
 
-  async function onSubmit(data: InvoiceFormValues) {
+  async function onSubmit(data: DocumentFormValues) {
     setIsLoading(true);
-    console.log("Données de la facture:", data);
+    const submissionData = { ...data, documentType };
+    console.log(`Données du document (${documentType}):`, submissionData);
     const clientName = clients.find(c=>c.id === data.clientId)?.name;
-    // Simulate API call
+    
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsLoading(false);
 
     toast({
-      title: "Facture Créée",
-      description: `La facture ${data.invoiceId} pour ${clientName} a été sauvegardée.`,
+        title: documentType === 'invoice' ? "Facture Créée" : "Devis Créé",
+        description: `Le document ${data.documentId} pour ${clientName} a été sauvegardé.`,
     });
-    router.push("/factures");
+    
+    const redirectUrl = documentType === 'invoice' ? "/factures" : "/devis/liste";
+    router.push(redirectUrl);
   }
+  
+  const handleDocumentTypeChange = (type: 'invoice' | 'quote') => {
+    if (type) {
+      setDocumentType(type);
+      const prefix = type === 'invoice' ? 'FAC' : 'DEV';
+      form.setValue('documentId', `${prefix}-${Date.now().toString().slice(-6)}`);
+      form.setValue('notes', type === 'quote' 
+        ? 'Cette soumission est valide pour une période de 30 jours. Les prix sont sujets à changement après cette période.'
+        : 'Le paiement est dû sous 30 jours. Merci pour votre confiance.');
+    }
+  };
 
   const handleItemChange = (index: number, itemId: string) => {
     const item = availableItems.find(i => i.id === itemId);
@@ -202,15 +220,38 @@ export function InvoiceForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div className="mb-8 p-4 bg-muted/50 rounded-lg">
+            <FormLabel className="font-semibold">Type de Document</FormLabel>
+            <RadioGroup
+                value={documentType}
+                onValueChange={(val) => handleDocumentTypeChange(val as 'invoice' | 'quote')}
+                className="flex items-center space-x-4 mt-2"
+            >
+                <FormItem className="flex items-center space-x-2 space-y-0">
+                <FormControl>
+                    <RadioGroupItem value="invoice" id="r-invoice" />
+                </FormControl>
+                <Label htmlFor="r-invoice" className="font-normal cursor-pointer">Facture</Label>
+                </FormItem>
+                <FormItem className="flex items-center space-x-2 space-y-0">
+                <FormControl>
+                    <RadioGroupItem value="quote" id="r-quote" />
+                </FormControl>
+                <Label htmlFor="r-quote" className="font-normal cursor-pointer">Devis / Soumission</Label>
+                </FormItem>
+            </RadioGroup>
+        </div>
+
+
         <div className="grid md:grid-cols-2 gap-8">
           <FormField
             control={form.control}
-            name="invoiceId"
+            name="documentId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>ID de la Facture</FormLabel>
+                <FormLabel>{documentType === 'invoice' ? 'ID de la Facture' : 'ID du Devis'}</FormLabel>
                 <FormControl>
-                  <Input placeholder="FAC-001" {...field} />
+                  <Input placeholder={documentType === 'invoice' ? 'FAC-001' : 'DEV-001'} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -222,7 +263,7 @@ export function InvoiceForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Client</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner un client" />
@@ -298,7 +339,7 @@ export function InvoiceForm() {
             name="dueDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Date d'Échéance</FormLabel>
+                <FormLabel>{documentType === 'invoice' ? "Date d'Échéance" : "Valide jusqu'au"}</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -336,7 +377,7 @@ export function InvoiceForm() {
 
         {/* Line Items Section */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium font-headline">Lignes de Facture</h3>
+          <h3 className="text-lg font-medium font-headline">Lignes du Document</h3>
           {fields.map((item, index) => (
             <div key={item.id} className="grid grid-cols-12 gap-x-4 gap-y-2 p-4 border rounded-md relative">
               <div className="col-span-12 md:col-span-3">
@@ -351,7 +392,7 @@ export function InvoiceForm() {
                           field.onChange(value);
                           handleItemChange(index, value);
                         }}
-                        defaultValue={field.value}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -495,7 +536,7 @@ export function InvoiceForm() {
           name="notes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Notes / Termes de Paiement</FormLabel>
+              <FormLabel>Notes / Termes et Conditions</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Ex: Paiement dû sous 30 jours. Merci pour votre confiance."
@@ -509,11 +550,11 @@ export function InvoiceForm() {
         />
 
         <div className="flex justify-end space-x-4">
-            <Button type="button" variant="outline" onClick={() => router.push('/factures')}>
+            <Button type="button" variant="outline" onClick={() => router.back()}>
                 Annuler
             </Button>
             <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
-                {isLoading ? "Sauvegarde..." : "Sauvegarder la Facture"}
+                {isLoading ? "Sauvegarde..." : `Sauvegarder ${documentType === 'invoice' ? 'la Facture' : 'le Devis'}`}
             </Button>
         </div>
       </form>

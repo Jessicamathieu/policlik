@@ -189,7 +189,7 @@ export default function DashboardPage() {
                 <p className="text-muted-foreground">Aperçu rapide de votre activité.</p>
             </div>
             <Button asChild>
-                <Link href="/factures/nouveau"><PlusCircle className="mr-2 h-4 w-4" />Créer une Facture</Link>
+                <Link href="/factures/nouveau?type=facture"><PlusCircle className="mr-2 h-4 w-4" />Créer une Facture</Link>
             </Button>
         </div>
 
@@ -224,7 +224,7 @@ export default function DashboardPage() {
                         </Link>
                     </Button>
                     <Button asChild variant="secondary" className="justify-start text-base py-6">
-                        <Link href="/devis/demandes">
+                        <Link href="/factures/nouveau?type=devis">
                            <FileText className="mr-2 h-5 w-5"/> Créer un Devis
                         </Link>
                     </Button>

@@ -72,7 +72,7 @@ export const appNavItems: NavItem[] = [
       },
       {
         title: 'Nouvelle Facture',
-        href: '/factures/nouveau',
+        href: '/factures/nouveau?type=facture',
         icon: FilePlus2, 
         color: pageColors[0].color,
         contrastColor: pageColors[0].contrastColor,

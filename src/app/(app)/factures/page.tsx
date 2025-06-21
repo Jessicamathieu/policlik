@@ -60,7 +60,7 @@ export default function FacturesPage() {
             <FileDown className="mr-2 h-4 w-4" /> Exporter
           </Button>
           <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
-            <Link href="/factures/nouveau">
+            <Link href="/factures/nouveau?type=facture">
               <PlusCircle className="mr-2 h-4 w-4" /> Nouvelle Facture
             </Link>
           </Button>

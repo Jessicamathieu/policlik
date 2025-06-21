@@ -27,7 +27,7 @@ export default function QuoteListPage() {
             <FileDown className="mr-2 h-4 w-4" /> Exporter
           </Button>
           <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
-            <Link href="/devis/demandes?action=nouveauManuel">
+            <Link href="/factures/nouveau?type=devis">
               <PlusCircle className="mr-2 h-4 w-4" /> Nouveau Devis Manuel
             </Link>
           </Button>
