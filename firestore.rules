@@ -1,11 +1,10 @@
-
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Règle de développement temporaire pour autoriser toutes les lectures et écritures.
-    // AVERTISSEMENT : Ne jamais utiliser en production. À remplacer par des règles d'authentification.
     match /{document=**} {
+      // ATTENTION : Ces règles sont pour le développement uniquement.
+      // Elles autorisent tout le monde à lire et à écrire dans votre base de données.
+      // Assurez-vous de les sécuriser avec l'authentification avant la mise en production.
       allow read, write: if true;
     }
   }
