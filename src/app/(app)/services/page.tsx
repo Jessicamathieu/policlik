@@ -141,7 +141,7 @@ export default function ServicesPage() {
 
       <Card className="shadow-md bg-card text-card-foreground"> 
         <CardHeader>
-          <CardTitle className="text-card-foreground">Services Proposés</CardTitle>
+          <CardTitle className="text-card-foreground">Services</CardTitle>
           <CardDescription className="opacity-75">Ajoutez, modifiez ou supprimez des services de votre catalogue.</CardDescription>
           <div className="relative mt-4">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
