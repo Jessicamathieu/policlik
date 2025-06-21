@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
@@ -18,13 +17,8 @@ import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Upload, AlertCircle } from "lucide-react";
 import Papa from "papaparse";
-
-interface ClientData {
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-}
+import { addClientsBatch } from "@/services/client-service";
+import type { NewClientData } from "@/services/client-service";
 
 interface CsvRowData {
   "Nom": string;
@@ -40,16 +34,17 @@ interface CsvRowData {
 
 interface ImportClientsModalProps {
   children: React.ReactNode;
+  onImportSuccess: () => void;
 }
 
 const requiredHeaders = ["Nom", "Adresse municipale", "Ville", "Province", "Code postal", "Telephone", "Courriel"];
 const previewTableHeaders = ["Nom", "Email", "Téléphone", "Adresse Complète"];
 
-export function ImportClientsModal({ children }: ImportClientsModalProps) {
+export function ImportClientsModal({ children, onImportSuccess }: ImportClientsModalProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [parsedData, setParsedData] = useState<ClientData[]>([]);
+  const [parsedData, setParsedData] = useState<NewClientData[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
   const { toast } = useToast();
 
@@ -129,19 +124,32 @@ export function ImportClientsModal({ children }: ImportClientsModalProps) {
       return;
     }
     setIsLoading(true);
-    console.log("Données à importer:", parsedData);
-    await new Promise(resolve => setTimeout(resolve, 1500));
     
-    toast({
-      title: "Importation réussie",
-      description: `${parsedData.length} clients ont été importés (simulation).`,
-    });
-    
-    setIsLoading(false);
-    setFile(null);
-    setParsedData([]);
-    setHeaders([]);
-    setOpen(false);
+    try {
+      await addClientsBatch(parsedData);
+      toast({
+        title: "Importation réussie",
+        description: `${parsedData.length} clients ont été ajoutés à la base de données.`,
+      });
+      setFile(null);
+      setParsedData([]);
+      setHeaders([]);
+      setOpen(false);
+      onImportSuccess();
+    } catch (error) {
+      console.error("Erreur lors de l'importation des clients:", error);
+      let errorMessage = "Une erreur est survenue lors de l'ajout des clients à la base de données.";
+      if (error instanceof Error && error.message.includes('permission-denied')) {
+          errorMessage = "Permission refusée. Vérifiez les règles de sécurité Firestore et votre configuration Firebase.";
+      }
+      toast({
+        title: "Erreur d'importation",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {

@@ -29,7 +29,8 @@ import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import React from "react";
-import { clients as mockClients, services as mockServices } from "@/lib/data";
+import { services as mockServices, type Client } from "@/lib/data";
+import { getClients } from "@/services/client-service";
 
 interface Appointment {
   id?: string;
@@ -62,6 +63,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
   const currentOpen = isControlled ? open : internalOpen;
   const setCurrentOpen = isControlled ? onOpenChange : setInternalOpen;
 
+  const [clients, setClients] = React.useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = React.useState(appointment?.clientId || "");
   const [selectedService, setSelectedService] = React.useState(appointment?.serviceId || "");
   const [appointmentDate, setAppointmentDate] = React.useState<Date | undefined>(
@@ -76,17 +78,28 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
   const [smsReminder, setSmsReminder] = React.useState(appointment?.smsReminder || false);
   const [clientSearch, setClientSearch] = React.useState("");
 
-  const filteredClients = mockClients.filter(client => 
-    client.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
-    client.address.toLowerCase().includes(clientSearch.toLowerCase())
-  );
-  
   React.useEffect(() => {
-    if (currentOpen) { 
+    const fetchClients = async () => {
+      if (currentOpen) {
+        try {
+          const fetchedClients = await getClients();
+          fetchedClients.sort((a, b) => a.name.localeCompare(b.name));
+          setClients(fetchedClients);
+        } catch (error) {
+          console.error("Failed to fetch clients for modal:", error);
+        }
+      }
+    };
+    fetchClients();
+  }, [currentOpen]);
+
+  React.useEffect(() => {
+    if (currentOpen) {
       const initialDate = appointment?.date 
         ? (typeof appointment.date === 'string' ? parseISO(appointment.date) : appointment.date) 
         : new Date();
-      const client = mockClients.find(c => c.id === (appointment?.clientId || selectedClient));
+      
+      const client = clients.find(c => c.id === appointment?.clientId);
 
       setSelectedClient(appointment?.clientId || "");
       setSelectedService(appointment?.serviceId || "");
@@ -98,12 +111,17 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
       setAddress(appointment?.address || client?.address || "");
       setPhone(appointment?.phone || client?.phone || "");
       setSmsReminder(appointment?.smsReminder || false);
-      if (!appointment?.clientId) setClientSearch(""); 
+      if (!appointment?.clientId) setClientSearch("");
     }
-  }, [appointment, currentOpen, selectedClient]); 
+  }, [appointment, currentOpen, clients]);
 
+  const filteredClients = clients.filter(client => 
+    client.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
+    client.address.toLowerCase().includes(clientSearch.toLowerCase())
+  );
+  
   const handleSave = () => {
-    const clientData = mockClients.find(c => c.id === selectedClient);
+    const clientData = clients.find(c => c.id === selectedClient);
     const serviceData = mockServices.find(s => s.id === selectedService);
     const appointmentData: Partial<Appointment> = {
       id: appointment?.id, 
@@ -127,7 +145,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
 
   const handleClientChange = (clientId: string) => {
     setSelectedClient(clientId);
-    const client = mockClients.find(c => c.id === clientId);
+    const client = clients.find(c => c.id === clientId);
     if (client) {
       setAddress(client.address);
       setPhone(client.phone || "");

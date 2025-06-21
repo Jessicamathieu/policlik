@@ -87,15 +87,8 @@ export interface Payment {
 
 
 // Mock Data
-
-export const clients: Client[] = [
-  { id: "1", name: "Jean Dupont", email: "jean.dupont@example.com", phone: "0123456789", address: "123 Rue Principale, 75001 Paris", lastService: "2023-10-15", totalSpent: "CAD$1,250" },
-  { id: "2", name: "Marie Curie", email: "marie.curie@example.com", phone: "0987654321", address: "456 Avenue des Sciences, 69007 Lyon", lastService: "2023-11-01", totalSpent: "CAD$875" },
-  { id: "3", name: "Pierre Martin", email: "pierre.martin@example.com", phone: "0612345678", address: "789 Boulevard Liberté, 13001 Marseille", lastService: "2023-09-20", totalSpent: "CAD$2,100" },
-  { id: "4", name: "Sophie Dubois", email: "sophie.dubois@example.com", phone: "0765432109", address: "10 Rue de la Paix, 33000 Bordeaux", lastService: "2023-11-10", totalSpent: "CAD$550" },
-  { id: "5", name: "Entreprise Alpha", email: "contact@alpha.com", phone: "0111223344", address: "11 Rue Alpha, Paris" },
-  { id: "6", name: "Société Beta", email: "info@beta.org", phone: "0222334455", address: "22 Avenue Beta, Lyon" },
-];
+// La liste de clients est maintenant gérée dans Firestore.
+// Les données ci-dessous sont conservées pour les autres parties de l'application.
 
 export const services: Service[] = [
   { id: "SERV001", name: "Nettoyage Standard Résidentiel", category: "Nettoyage Résidentiel", rate: "CAD$50/heure", unit: "heure", description: "Nettoyage de base pour appartements et maisons.", price: 50, colorClassName: 'bg-blue-500' },
