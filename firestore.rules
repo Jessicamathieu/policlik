@@ -2,10 +2,9 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ATTENTION : Ces règles sont ouvertes et conçues pour le développement.
-    // Elles autorisent n'importe qui à lire et écrire dans votre base de données.
-    // Vous devrez les sécuriser avec un système d'authentification
-    // avant de mettre votre application en production.
+    // Règle de développement : autorise la lecture et l'écriture sur tous les documents.
+    // ATTENTION : Cette règle n'est pas sécurisée et devra être remplacée par
+    // des règles d'authentification plus strictes avant la mise en production.
     match /{document=**} {
       allow read, write: if true;
     }
