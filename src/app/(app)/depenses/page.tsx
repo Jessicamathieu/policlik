@@ -1,4 +1,7 @@
 
+"use client";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils";
-import { getExpenses } from "@/lib/data";
+import { getExpenses, type Expense } from "@/lib/data";
 
 const statusBadgeColors = {
   "Vérifié": "bg-emerald-100 text-emerald-800 border-emerald-300",
@@ -25,7 +28,12 @@ const statusBadgeColors = {
 };
 
 export default function DepensesPage() {
-  const expenses = getExpenses();
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+
+  useEffect(() => {
+    setExpenses(getExpenses());
+  }, []);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

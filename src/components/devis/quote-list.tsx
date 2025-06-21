@@ -17,7 +17,7 @@ import { MoreHorizontal, FileText, CheckCircle, XCircle, Mail, CalendarPlus, Tra
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { getQuotes, type QuoteStatus } from "@/lib/data";
+import { getQuotes, type Quote, type QuoteStatus } from "@/lib/data";
 
 // Badge colors updated for contrast on dynamic card background
 const statusColors: Record<QuoteStatus, string> = {
@@ -30,12 +30,16 @@ const statusColors: Record<QuoteStatus, string> = {
 
 
 export function QuoteList() {
+  const [quotes, setQuotes] = React.useState<Quote[]>([]);
+  
+  React.useEffect(() => {
+    setQuotes(getQuotes());
+  }, []);
+
   const handleSendEmail = (quoteId: string) => alert(`Envoyer email pour devis ${quoteId}`);
   const handleConvertToAppointment = (quoteId: string) => alert(`Convertir devis ${quoteId} en RDV`);
   const handleEditQuote = (quoteId: string) => alert(`Modifier devis ${quoteId}`);
   const handleDeleteQuote = (quoteId: string) => alert(`Supprimer devis ${quoteId}`);
-  const mockQuotes = getQuotes();
-
 
   return (
     <Table>
@@ -50,7 +54,7 @@ export function QuoteList() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {mockQuotes.map((quote) => (
+        {quotes.map((quote) => (
           <TableRow key={quote.id} className="border-b-card-foreground/20">
             <TableCell className="font-medium text-card-foreground">{quote.id}</TableCell>
             <TableCell className="text-card-foreground">{quote.clientName}</TableCell>

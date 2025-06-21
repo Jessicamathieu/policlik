@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { AgendaControls, type AgendaControlsProps } from '@/components/agenda/agenda-controls';
+import { AgendaControls } from '@/components/agenda/agenda-controls';
 import { CalendarView } from '@/components/agenda/calendar-view';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -11,11 +11,16 @@ import { type Appointment, getAppointments } from '@/lib/data';
 
 export default function AgendaPage() {
   const [currentView, setCurrentView] = useState<"day" | "week" | "month">("day");
-  const [appointments, setAppointments] = useState<Appointment[]>(() => getAppointments());
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [currentDate, setCurrentDate] = useState<Date>(new Date()); 
   const [printStartDate, setPrintStartDate] = useState<Date | undefined>(undefined);
   const [printEndDate, setPrintEndDate] = useState<Date | undefined>(undefined);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Fetches initial appointments on component mount
+    setAppointments(getAppointments());
+  }, []);
 
   const handleViewChange = useCallback((view: "day" | "week" | "month") => {
     setCurrentView(view);
