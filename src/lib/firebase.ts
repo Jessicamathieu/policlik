@@ -15,9 +15,10 @@ const firebaseConfig = {
 };
 
 // Une vérification pour s'assurer que le développeur a fourni les informations d'identification nécessaires.
-// Cela lève une erreur claire si la configuration est manquante.
 if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-  throw new Error("La configuration de Firebase est manquante ou incomplète. Veuillez vérifier votre fichier .env et vous assurer que NEXT_PUBLIC_FIREBASE_API_KEY et NEXT_PUBLIC_FIREBASE_PROJECT_ID sont définis.");
+  // Remplacé l'erreur bloquante par un avertissement pour permettre le démarrage du serveur même sans config.
+  // L'application ne fonctionnera pas correctement sans ces clés.
+  console.warn("ATTENTION : La configuration de Firebase est manquante ou incomplète. Veuillez vérifier votre fichier .env et vous assurer que NEXT_PUBLIC_FIREBASE_API_KEY et NEXT_PUBLIC_FIREBASE_PROJECT_ID sont définis.");
 }
 
 // Initialise Firebase
