@@ -1,10 +1,13 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Règle de développement : Accès public complet
+    // ATTENTION : Cette règle est non sécurisée et ne doit être utilisée que pour le développement.
+    // Elle permet à n'importe qui de lire et d'écrire dans votre base de données.
+    // Pour la production, utilisez des règles basées sur l'authentification.
+    // Par exemple : allow read, write: if request.auth != null;
     match /{document=**} {
-      // ATTENTION : Ces règles sont pour le développement uniquement.
-      // Elles autorisent tout le monde à lire et à écrire dans votre base de données.
-      // Assurez-vous de les sécuriser avec l'authentification avant la mise en production.
       allow read, write: if true;
     }
   }
