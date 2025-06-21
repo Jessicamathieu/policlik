@@ -92,7 +92,7 @@ export function ClientCard({ client, isPrimaryColor }: ClientCardProps) {
           <div className="flex items-start">
             <MapPin className="h-4 w-4 mr-2.5 mt-0.5 text-muted-foreground shrink-0" />
             <Link 
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(client.address)}`} 
+              href={`https://maps.google.com/?q=${encodeURIComponent(client.address)}`} 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex-1 hover:text-primary"
