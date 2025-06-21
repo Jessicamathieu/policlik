@@ -1,19 +1,44 @@
 
+"use client";
+
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, Users, FileText, DollarSign, PlusCircle, LineChart, MapPin, Phone, CalendarClock } from "lucide-react";
 import Link from "next/link";
 import { format, isToday, parseISO } from "date-fns"; 
-import { getAppointments } from "@/lib/data";
+import { getAppointments, type Appointment } from "@/lib/data";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
-  const mockTodaysAppointments = getAppointments().filter(appt => isToday(parseISO(appt.date)));
+  const [todaysAppointments, setTodaysAppointments] = useState<Appointment[]>([]);
+  const [summaryStats, setSummaryStats] = useState({
+    appointmentsToday: "0",
+    upcomingAppointments: "0",
+    pendingQuotes: "12",
+    activeClients: "128",
+    monthlyRevenue: "CAD$ 7,250",
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const appointments = getAppointments();
+    const filteredAppointments = appointments.filter(appt => isToday(parseISO(appt.date)));
+    
+    setTodaysAppointments(filteredAppointments);
+    setSummaryStats(prev => ({
+        ...prev,
+        appointmentsToday: filteredAppointments.length.toString(),
+        upcomingAppointments: filteredAppointments.filter(a => a.status === "À venir").length.toString(),
+    }));
+    setIsLoading(false);
+  }, []);
 
   const summaryCards = [
-    { title: "Rendez-vous Aujourd'hui", value: mockTodaysAppointments.length.toString(), icon: CalendarDays, description: `${mockTodaysAppointments.filter(a => a.status === "À venir").length} à venir` },
-    { title: "Devis en Attente", value: "12", icon: FileText, description: "À traiter rapidement" },
-    { title: "Clients Actifs", value: "128", icon: Users, description: "+5 cette semaine" },
-    { title: "Revenus (Mois)", value: "CAD$ 7,250", icon: DollarSign, description: "Objectif: CAD$10,000" },
+    { title: "Rendez-vous Aujourd'hui", value: summaryStats.appointmentsToday, icon: CalendarDays, description: `${summaryStats.upcomingAppointments} à venir` },
+    { title: "Devis en Attente", value: summaryStats.pendingQuotes, icon: FileText, description: "À traiter rapidement" },
+    { title: "Clients Actifs", value: summaryStats.activeClients, icon: Users, description: "+5 cette semaine" },
+    { title: "Revenus (Mois)", value: summaryStats.monthlyRevenue, icon: DollarSign, description: "Objectif: CAD$10,000" },
   ];
 
   return (
@@ -48,8 +73,19 @@ export default function DashboardPage() {
             <CardDescription className="text-card-foreground opacity-75">Vos interventions prévues pour aujourd'hui.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {mockTodaysAppointments.length > 0 ? (
-              mockTodaysAppointments.map((appt) => (
+            {isLoading ? (
+                Array.from({ length: 2 }).map((_, index) => (
+                    <Card key={index} className="shadow-md border bg-background text-foreground overflow-hidden">
+                        <CardHeader className="p-4 bg-muted/50 border-b"><Skeleton className="h-5 w-3/5" /></CardHeader>
+                        <CardContent className="p-4 space-y-3">
+                            <Skeleton className="h-4 w-4/5" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-1/2" />
+                        </CardContent>
+                    </Card>
+                ))
+            ) : todaysAppointments.length > 0 ? (
+              todaysAppointments.map((appt) => (
                 <Card key={appt.id} className="shadow-md border bg-background text-foreground overflow-hidden hover:shadow-lg transition-shadow"> 
                   <CardHeader className="p-4 bg-muted/50 border-b"> 
                     <CardTitle className="text-lg font-semibold text-foreground">{appt.clientName}</CardTitle>
@@ -111,8 +147,17 @@ export default function DashboardPage() {
               <item.icon className="h-5 w-5 text-card-foreground opacity-70" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-card-foreground">{item.value}</div>
-              <p className="text-xs text-card-foreground opacity-75">{item.description}</p>
+              {isLoading ? (
+                  <>
+                    <Skeleton className="h-7 w-1/3 mb-1.5" />
+                    <Skeleton className="h-3 w-4/5" />
+                  </>
+              ) : (
+                  <>
+                    <div className="text-2xl font-bold text-card-foreground">{item.value}</div>
+                    <p className="text-xs text-card-foreground opacity-75">{item.description}</p>
+                  </>
+              )}
             </CardContent>
           </Card>
         ))}
