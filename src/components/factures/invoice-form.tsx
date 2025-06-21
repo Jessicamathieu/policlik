@@ -48,7 +48,7 @@ const lineItemSchema = z.object({
 });
 
 const invoiceSchema = z.object({
-  invoiceId: z.string().min(1, "L'ID de la facture est requis.").default(`FAC-${Date.now().toString().slice(-6)}`),
+  invoiceId: z.string().min(1, "L'ID de la facture est requis."),
   clientId: z.string().min(1, "Veuillez sélectionner un client."),
   issueDate: z.date({ required_error: "La date d'émission est requise." }),
   dueDate: z.date({ required_error: "La date d'échéance est requise." }),
