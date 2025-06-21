@@ -29,8 +29,10 @@ import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import React from "react";
-import { services as mockServices, type Client } from "@/lib/data";
+import { type Service, type Client } from "@/lib/data";
 import { getClients } from "@/services/client-service";
+import { getServices } from "@/services/service-service";
+import { useToast } from "@/hooks/use-toast";
 
 interface Appointment {
   id?: string;
@@ -62,8 +64,10 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
   const isControlled = open !== undefined && onOpenChange !== undefined;
   const currentOpen = isControlled ? open : internalOpen;
   const setCurrentOpen = isControlled ? onOpenChange : setInternalOpen;
-
+  
+  const { toast } = useToast();
   const [clients, setClients] = React.useState<Client[]>([]);
+  const [services, setServices] = React.useState<Service[]>([]);
   const [selectedClient, setSelectedClient] = React.useState(appointment?.clientId || "");
   const [selectedService, setSelectedService] = React.useState(appointment?.serviceId || "");
   const [appointmentDate, setAppointmentDate] = React.useState<Date | undefined>(
@@ -79,19 +83,32 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
   const [clientSearch, setClientSearch] = React.useState("");
 
   React.useEffect(() => {
-    const fetchClients = async () => {
+    const fetchData = async () => {
       if (currentOpen) {
         try {
-          const fetchedClients = await getClients();
+          const [fetchedClients, fetchedServices] = await Promise.all([
+            getClients(),
+            getServices()
+          ]);
+          
           fetchedClients.sort((a, b) => a.name.localeCompare(b.name));
           setClients(fetchedClients);
+
+          fetchedServices.sort((a, b) => a.name.localeCompare(b.name));
+          setServices(fetchedServices);
+
         } catch (error) {
-          console.error("Failed to fetch clients for modal:", error);
+          console.error("Failed to fetch clients or services for modal:", error);
+          toast({
+            title: "Erreur de chargement",
+            description: "Impossible de charger les clients ou les services.",
+            variant: "destructive"
+          });
         }
       }
     };
-    fetchClients();
-  }, [currentOpen]);
+    fetchData();
+  }, [currentOpen, toast]);
 
   React.useEffect(() => {
     if (currentOpen) {
@@ -122,7 +139,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
   
   const handleSave = () => {
     const clientData = clients.find(c => c.id === selectedClient);
-    const serviceData = mockServices.find(s => s.id === selectedService);
+    const serviceData = services.find(s => s.id === selectedService);
     const appointmentData: Partial<Appointment> = {
       id: appointment?.id, 
       clientId: selectedClient,
@@ -205,10 +222,10 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
                   <SelectValue placeholder="Sélectionner un service" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockServices.map(service => (
+                  {services.map(service => (
                     <SelectItem key={service.id} value={service.id}>
                       <div className="flex items-center">
-                        <span className={cn("w-3 h-3 rounded-full mr-2", service.colorClassName)}></span>
+                        <span className={cn("w-3 h-3 rounded-full mr-2", service.colorClassName || 'bg-gray-400')}></span>
                         {service.name}
                       </div>
                     </SelectItem>

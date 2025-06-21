@@ -35,10 +35,10 @@ import { CalendarIcon, PlusCircle, Trash2, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, addDays } from "date-fns";
 import { fr } from "date-fns/locale";
-import { clients as mockClients } from "@/lib/data";
 import { getServices } from "@/services/service-service";
 import { getProducts } from "@/services/product-service";
-import type { Service, Product } from "@/lib/data";
+import { getClients } from "@/services/client-service";
+import type { Service, Product, Client } from "@/lib/data";
 
 const lineItemSchema = z.object({
   serviceId: z.string().min(1, "Veuillez sélectionner un service/produit."),
@@ -74,11 +74,16 @@ export function InvoiceForm() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [clientSearch, setClientSearch] = React.useState("");
   const [availableItems, setAvailableItems] = React.useState<ItemForInvoice[]>([]);
+  const [clients, setClients] = React.useState<Client[]>([]);
 
   React.useEffect(() => {
-    const fetchItems = async () => {
+    const fetchItemsAndClients = async () => {
         try {
-            const [services, products] = await Promise.all([getServices(), getProducts()]);
+            const [services, products, fetchedClients] = await Promise.all([
+                getServices(),
+                getProducts(),
+                getClients()
+            ]);
             
             const formattedServices: ItemForInvoice[] = services.map(s => ({
                 id: `service-${s.id}`,
@@ -97,20 +102,24 @@ export function InvoiceForm() {
             }));
 
             setAvailableItems([...formattedServices, ...formattedProducts]);
+            
+            fetchedClients.sort((a, b) => a.name.localeCompare(b.name));
+            setClients(fetchedClients);
+
         } catch (error) {
-            console.error("Failed to fetch services or products", error);
+            console.error("Failed to fetch data for invoice form", error);
             toast({ 
                 title: "Erreur de chargement", 
-                description: "Impossible de charger la liste des services et produits.",
+                description: "Impossible de charger les clients, services et produits.",
                 variant: "destructive"
             })
         }
     };
-    fetchItems();
+    fetchItemsAndClients();
   }, [toast]);
 
 
-  const filteredClients = mockClients.filter(client =>
+  const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(clientSearch.toLowerCase())
   );
 
@@ -150,13 +159,14 @@ export function InvoiceForm() {
   async function onSubmit(data: InvoiceFormValues) {
     setIsLoading(true);
     console.log("Données de la facture:", data);
+    const clientName = clients.find(c=>c.id === data.clientId)?.name;
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsLoading(false);
 
     toast({
       title: "Facture Créée",
-      description: `La facture ${data.invoiceId} pour ${mockClients.find(c=>c.id === data.clientId)?.name} a été sauvegardée.`,
+      description: `La facture ${data.invoiceId} pour ${clientName} a été sauvegardée.`,
     });
     router.push("/factures");
   }

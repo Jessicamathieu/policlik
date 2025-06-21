@@ -99,22 +99,12 @@ export interface Payment {
 
 
 // Mock Data
-// La liste de clients est maintenant gérée dans Firestore.
-// Les données ci-dessous sont conservées pour les autres parties de l'application.
+// Les listes de données ci-dessous sont conservées pour les parties de l'application
+// qui n'ont pas encore été migrées vers une base de données.
 
-export const services: Service[] = [
-  { id: "SERV001", name: "Nettoyage Standard Résidentiel", category: "Nettoyage Résidentiel", rate: "CAD$50/heure", unit: "heure", description: "Nettoyage de base pour appartements et maisons.", price: 50, colorClassName: 'bg-blue-500' },
-  { id: "SERV002", name: "Grand Ménage de Printemps", category: "Nettoyage Résidentiel", rate: "CAD$250", unit: "forfait", description: "Nettoyage en profondeur de toutes les pièces.", price: 250, colorClassName: 'bg-green-500' },
-  { id: "SERV003", name: "Nettoyage de Bureaux", category: "Nettoyage Commercial", rate: "CAD$0.15/m²", unit: "m²", description: "Entretien régulier des locaux professionnels.", price: 0.15, colorClassName: 'bg-indigo-500' },
-  { id: "SERV004", name: "Nettoyage Après Chantier", category: "Nettoyage Spécialisé", rate: "Devis", unit: "sur devis", description: "Remise en état après travaux de construction ou rénovation.", price: 300, colorClassName: 'bg-purple-500' },
-  { id: "SERV005", name: "Lavage de Vitres", category: "Nettoyage Spécialisé", rate: "CAD$5/fenêtre", unit: "fenêtre", description: "Nettoyage intérieur et extérieur des vitres.", price: 5, colorClassName: 'bg-sky-500' },
-  { id: "PROD001", name: "Produit Nettoyant XYZ", category: "Produit", rate: "CAD$15/unité", unit: "unité", description: "Produit de nettoyage multi-surfaces.", price: 15, colorClassName: "bg-gray-500" },
-];
+export const services: Service[] = [];
 
-export const products: Product[] = [
-    { id: "PROD001", name: "Bouteille Nettoyant Vitres", code: "NV-500ML", category: "Produits de Nettoyage", subCategory: "Vitre", price: 12.99 },
-    { id: "PROD002", name: "Chiffon Microfibre (Lot de 5)", code: "MF-5PK", category: "Matériel", subCategory: "Tissus", price: 25.00 },
-];
+export const products: Product[] = [];
 
 const today_date = new Date();
 const todayStr = `${today_date.getFullYear()}-${String(today_date.getMonth() + 1).padStart(2, '0')}-${String(today_date.getDate()).padStart(2, '0')}`;
