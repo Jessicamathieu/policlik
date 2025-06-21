@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { type PaymentStatus, type PaymentMethod, payments } from "@/lib/data";
+import { type PaymentStatus, type PaymentMethod, getPayments } from "@/lib/data";
 
 const paymentStatusColors: Record<PaymentStatus, string> = {
   "Réussi": "bg-emerald-100 text-emerald-800 border-emerald-300",
@@ -27,6 +27,7 @@ const paymentStatusColors: Record<PaymentStatus, string> = {
 };
 
 export default function PaiementsPage() {
+  const payments = getPayments();
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

@@ -121,14 +121,14 @@ export const getAppointments = (): Appointment[] => {
   ];
 };
 
-export const quotes: Quote[] = [
+export const getQuotes = (): Quote[] => [
   { id: "DEV001", clientName: "Entreprise Alpha", date: new Date(2023, 10, 15), amount: 1250.00, status: "Envoyé" },
   { id: "DEV002", clientName: "Société Beta", date: new Date(2023, 10, 20), amount: 875.50, status: "Accepté" },
   { id: "DEV003", clientName: "Organisation Gamma", date: new Date(2023, 11, 1), amount: 2100.75, status: "Refusé" },
   { id: "DEV004", clientName: "Particulier Delta", date: new Date(2023, 11, 5), amount: 350.00, status: "En attente" },
 ];
 
-export const invoices: Invoice[] = [
+export const getInvoices = (): Invoice[] => [
   { id: "FAC001", clientName: "Entreprise Alpha", dateEmission: new Date(2023, 10, 20), dateEcheance: new Date(2023, 11, 20), amount: 1500.00, status: "Payée" },
   { id: "FAC002", clientName: "Société Beta", dateEmission: new Date(2023, 11, 1), dateEcheance: new Date(2023, 12, 1), amount: 950.50, status: "Envoyée" },
   { id: "FAC003", clientName: "Organisation Gamma", dateEmission: new Date(2023, 9, 15), dateEcheance: new Date(2023, 10, 15), amount: 2500.75, status: "En Retard" },
@@ -136,14 +136,14 @@ export const invoices: Invoice[] = [
   { id: "FAC005", clientName: "Jean Dupont", dateEmission: new Date(2023, 10, 5), dateEcheance: new Date(2023, 11, 5), amount: 780.00, status: "Non Payée" },
 ];
 
-export const expenses: Expense[] = [
+export const getExpenses = (): Expense[] => [
     { id: "EXP001", date: new Date(2023, 10, 15), category: "Fournitures de bureau", description: "Achat de papier et stylos", amount: 45.50, receiptUrl: "https://placehold.co/100x100.png", status: "Vérifié" },
     { id: "EXP002", date: new Date(2023, 10, 18), category: "Carburant", description: "Plein d'essence véhicule utilitaire", amount: 72.30, receiptUrl: null, status: "En attente" },
     { id: "EXP003", date: new Date(2023, 11, 2), category: "Matériel de nettoyage", description: "Produits désinfectants", amount: 120.00, receiptUrl: "https://placehold.co/100x100.png", status: "Vérifié" },
     { id: "EXP004", date: new Date(2023, 11, 5), category: "Repas d'affaires", description: "Déjeuner client M. Dupont", amount: 35.80, receiptUrl: null, status: "Rejeté" },
 ];
 
-export const payments: Payment[] = [
+export const getPayments = (): Payment[] => [
     { id: "PAY001", invoiceId: "FAC001", clientName: "Entreprise Alpha", date: new Date(2023, 10, 20), amount: 1500.00, method: "Carte de crédit", status: "Réussi" },
     { id: "PAY002", invoiceId: "FAC002", clientName: "Société Beta", date: new Date(2023, 11, 5), amount: 950.50, method: "Virement bancaire", status: "En attente" },
     { id: "PAY003", invoiceId: "FAC00X", clientName: "Client Inconnu", date: new Date(2023, 9, 18), amount: 200.00, method: "PayPal", status: "Échoué" },

@@ -17,7 +17,7 @@ import { MoreHorizontal, FileText, CheckCircle, XCircle, Mail, CalendarPlus, Tra
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { quotes as mockQuotes, type QuoteStatus } from "@/lib/data";
+import { getQuotes, type QuoteStatus } from "@/lib/data";
 
 // Badge colors updated for contrast on dynamic card background
 const statusColors: Record<QuoteStatus, string> = {
@@ -34,6 +34,7 @@ export function QuoteList() {
   const handleConvertToAppointment = (quoteId: string) => alert(`Convertir devis ${quoteId} en RDV`);
   const handleEditQuote = (quoteId: string) => alert(`Modifier devis ${quoteId}`);
   const handleDeleteQuote = (quoteId: string) => alert(`Supprimer devis ${quoteId}`);
+  const mockQuotes = getQuotes();
 
 
   return (

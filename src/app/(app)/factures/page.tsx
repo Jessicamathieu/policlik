@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils";
-import { type InvoiceStatus, invoices } from "@/lib/data";
+import { type InvoiceStatus, getInvoices } from "@/lib/data";
 
 const statusColors: Record<InvoiceStatus, string> = {
   "Brouillon": "bg-gray-100 text-gray-800 border-gray-300", 
@@ -29,6 +29,7 @@ const statusColors: Record<InvoiceStatus, string> = {
 };
 
 export default function FacturesPage() {
+  const invoices = getInvoices();
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
