@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, Suspense, lazy } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,15 +12,19 @@ import { type Service } from "@/lib/data";
 import { getServices } from "@/services/service-service";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ImportServicesModal } from "@/components/services/import-services-modal";
+
+const ImportServicesModal = lazy(() => 
+  import("@/components/services/import-services-modal").then(module => ({ default: module.ImportServicesModal }))
+);
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const { toast } = useToast();
 
-  const fetchServices = async () => {
+  const fetchServices = useCallback(async () => {
     setIsLoading(true);
     try {
       const fetchedServices = await getServices();
@@ -36,11 +40,16 @@ export default function ServicesPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchServices();
-  }, []);
+  }, [fetchServices]);
+
+  const handleImportSuccess = useCallback(() => {
+    fetchServices();
+    setIsImportModalOpen(false);
+  }, [fetchServices]);
 
   const filteredServices = useMemo(() => services.filter(service =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -109,11 +118,18 @@ export default function ServicesPage() {
           <p className="text-muted-foreground">Gérez vos services prédéfinis et leurs tarifs associés.</p>
         </div>
         <div className="flex gap-2">
-            <ImportServicesModal onImportSuccess={fetchServices}>
-                <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
-                    <Upload className="mr-2 h-4 w-4" /> Importer
-                </Button>
-            </ImportServicesModal>
+            <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground" onClick={() => setIsImportModalOpen(true)}>
+                <Upload className="mr-2 h-4 w-4" /> Importer
+            </Button>
+            {isImportModalOpen && (
+              <Suspense fallback={null}>
+                <ImportServicesModal
+                  open={isImportModalOpen}
+                  onOpenChange={setIsImportModalOpen}
+                  onImportSuccess={handleImportSuccess}
+                />
+              </Suspense>
+            )}
             <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
                 <FileDown className="mr-2 h-4 w-4" /> Exporter
             </Button>

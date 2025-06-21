@@ -11,7 +11,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "@/components/ui/table";
@@ -26,15 +25,15 @@ interface CsvRowData {
 }
 
 interface ImportProduitsModalProps {
-  children: React.ReactNode;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onImportSuccess: () => void;
 }
 
 const requiredHeaders = ["categorie", "sous_categorie", "code", "nom", "prix"];
 const previewTableHeaders = ["Nom", "Code", "Catégorie", "Sous-Catégorie", "Prix"];
 
-export function ImportProduitsModal({ children, onImportSuccess }: ImportProduitsModalProps) {
-  const [open, setOpen] = useState(false);
+export function ImportProduitsModal({ open, onOpenChange, onImportSuccess }: ImportProduitsModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<NewProductData[]>([]);
@@ -129,7 +128,7 @@ export function ImportProduitsModal({ children, onImportSuccess }: ImportProduit
       setFile(null);
       setParsedData([]);
       setHeaders([]);
-      setOpen(false);
+      onOpenChange(false);
       onImportSuccess();
     } catch (error) {
       console.error("Erreur lors de l'importation des produits:", error);
@@ -145,7 +144,7 @@ export function ImportProduitsModal({ children, onImportSuccess }: ImportProduit
     } finally {
       setIsLoading(false);
     }
-  }, [hasMissingHeaders, parsedData, onImportSuccess, toast]);
+  }, [hasMissingHeaders, parsedData, onImportSuccess, toast, onOpenChange]);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -153,8 +152,7 @@ export function ImportProduitsModal({ children, onImportSuccess }: ImportProduit
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>Importer des Produits depuis un fichier CSV</DialogTitle>
@@ -221,7 +219,7 @@ export function ImportProduitsModal({ children, onImportSuccess }: ImportProduit
         )}
 
         <DialogFooter className="mt-6">
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
           <Button onClick={handleImport} disabled={isLoading || parsedData.length === 0 || hasMissingHeaders}>

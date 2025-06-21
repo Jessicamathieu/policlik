@@ -1,12 +1,14 @@
 
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AppointmentModal } from './appointment-modal'; 
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, addDays, isSameDay, parseISO, startOfMonth, endOfMonth, isSameMonth } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+
+const AppointmentModal = lazy(() => import('./appointment-modal').then(module => ({ default: module.AppointmentModal })));
+
 
 interface Appointment {
   id: string;
@@ -54,8 +56,11 @@ const startHourGrid = 6;
 export const CalendarView = React.memo(function CalendarView({ appointments, currentDate, view, onAppointmentUpdate, onNewAppointmentSave }: CalendarViewProps) {
   const timeSlots = generateTimeSlots(startHourGrid, 20, 30); 
 
-  const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
-  const [slotInitialData, setSlotInitialData] = useState<Partial<Appointment> | undefined>(undefined);
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    appointmentData?: Partial<Appointment>;
+  }>({ isOpen: false });
+  
   const [formattedDateHeader, setFormattedDateHeader] = useState<string>('');
 
   useEffect(() => {
@@ -78,20 +83,26 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
     }
   }, [currentDate, view]);
 
-  const handleSlotClick = useCallback((dateForSlot: Date, slotStartTime?: string) => {
-    setSlotInitialData({
-      date: format(dateForSlot, "yyyy-MM-dd"),
-      startTime: slotStartTime || "09:00", 
-    });
-    setIsSlotModalOpen(true);
+  const handleOpenModal = useCallback((data: Partial<Appointment>) => {
+    setModalState({ isOpen: true, appointmentData: data });
+  }, []);
+
+  const handleModalSave = useCallback((data: Partial<Appointment>) => {
+    if (data.id) {
+      onAppointmentUpdate(data);
+    } else {
+      onNewAppointmentSave(data);
+    }
+    setModalState({ isOpen: false });
+  }, [onAppointmentUpdate, onNewAppointmentSave]);
+
+  const handleModalClose = useCallback(() => {
+    setModalState({ isOpen: false });
   }, []);
   
   const renderDayView = () => (
-    // The calendar grid itself will be on the white page background.
-    // It uses `bg-card` for its cells, which is now dynamic/colored. This might be too much color.
-    // Let's make the grid cells use `bg-background` (white) and borders, then appointments are colored.
     <div className="grid grid-cols-[auto_1fr] gap-px bg-border border rounded-lg shadow-sm overflow-hidden">
-      <div className="sticky left-0 z-10 bg-muted text-foreground"> {/* Time column header and cells use muted/foreground for light bg */}
+      <div className="sticky left-0 z-10 bg-muted text-foreground">
         <div className="h-10 border-b flex items-center justify-center p-2 text-sm font-medium sticky top-0 bg-muted z-10">Heure</div>
         {timeSlots.map((slot) => (
           <div 
@@ -103,20 +114,20 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
           </div>
         ))}
       </div>
-      <div className="relative bg-background"> {/* Day column uses page background (white) */}
-        <div className="h-10 border-b flex items-center justify-center p-2 text-sm font-medium sticky top-0 bg-muted z-10 text-foreground"> {/* Day header use muted/foreground */}
+      <div className="relative bg-background">
+        <div className="h-10 border-b flex items-center justify-center p-2 text-sm font-medium sticky top-0 bg-muted z-10 text-foreground">
           {formattedDateHeader || ' '}
         </div>
         {timeSlots.map((slot, slotIndex) => (
           <div 
             key={slotIndex} 
-            className="border-b relative cursor-pointer hover:bg-muted/50 transition-colors" // Cells are white, hover makes them slightly gray
+            className="border-b relative cursor-pointer hover:bg-muted/50 transition-colors"
             style={{ height: `${slotHeightPx}px` }} 
-            onClick={() => handleSlotClick(currentDate, slot)}
+            onClick={() => handleOpenModal({ date: currentDate, startTime: slot })}
             role="button"
             tabIndex={0}
             aria-label={`Créer un rendez-vous à ${slot} le ${format(currentDate, 'dd/MM/yyyy', {locale: fr})}`}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSlotClick(currentDate, slot);}}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleOpenModal({ date: currentDate, startTime: slot });}}
           >
           </div>
         ))}
@@ -131,45 +142,29 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
           const height = (durationMinutes / 30) * slotHeightPx;
 
           return (
-            <AppointmentModal 
+            <button
               key={app.id}
-              appointment={app}
-              onSave={onAppointmentUpdate} 
-              trigger={
-                <button
-                  className={cn(
-                    "absolute left-1 right-1 p-1.5 text-left text-xs rounded shadow-md transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 hover:opacity-90",
-                    app.serviceColorClassName || 'bg-primary', // Use primary (dynamic color)
-                    'text-primary-foreground' // Text on appointment is primary-foreground (white)
-                  )}
-                  style={{
-                    top: `${topOffset}px`, 
-                    height: `${Math.max(height, slotHeightPx)}px`, 
-                    minHeight: `${slotHeightPx}px` 
-                  }}
-                  aria-label={`Rendez-vous: ${app.clientName} de ${app.startTime} à ${app.endTime}`}
-                >
-                  <p className="font-semibold truncate text-[11px] leading-tight">{app.clientName || 'Rendez-vous'}</p>
-                  <p className="truncate text-[10px] leading-tight">{app.startTime} - {app.endTime}</p>
-                  {app.serviceName && <p className="text-[10px] leading-tight truncate opacity-80">{app.serviceName}</p>}
-                  {!app.serviceName && app.description && <p className="text-[10px] leading-tight truncate opacity-80">{app.description}</p>}
-                </button>
-              }
-            />
+              onClick={() => handleOpenModal(app)}
+              className={cn(
+                "absolute left-1 right-1 p-1.5 text-left text-xs rounded shadow-md transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 hover:opacity-90",
+                app.serviceColorClassName || 'bg-primary',
+                'text-primary-foreground'
+              )}
+              style={{
+                top: `${topOffset}px`, 
+                height: `${Math.max(height, slotHeightPx)}px`, 
+                minHeight: `${slotHeightPx}px` 
+              }}
+              aria-label={`Rendez-vous: ${app.clientName} de ${app.startTime} à ${app.endTime}`}
+            >
+              <p className="font-semibold truncate text-[11px] leading-tight">{app.clientName || 'Rendez-vous'}</p>
+              <p className="truncate text-[10px] leading-tight">{app.startTime} - {app.endTime}</p>
+              {app.serviceName && <p className="text-[10px] leading-tight truncate opacity-80">{app.serviceName}</p>}
+              {!app.serviceName && app.description && <p className="text-[10px] leading-tight truncate opacity-80">{app.description}</p>}
+            </button>
           );
         })}
       </div>
-      {isSlotModalOpen && slotInitialData && (
-        <AppointmentModal
-          open={isSlotModalOpen}
-          onOpenChange={setIsSlotModalOpen}
-          appointment={slotInitialData} 
-          onSave={(newData) => {
-            onNewAppointmentSave(newData); 
-            setIsSlotModalOpen(false); 
-          }}
-        />
-      )}
     </div>
   );
 
@@ -178,21 +173,20 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
     const daysOfWeek = eachDayOfInterval({ start: weekStart, end: endOfWeek(weekStart, { weekStartsOn: 1, locale: fr }) });
 
     return (
-      // Week view grid on white page background
       <div className="border rounded-lg shadow-sm overflow-x-auto bg-background text-foreground">
-        <div className="h-10 flex items-center justify-center p-2 text-sm font-semibold sticky top-0 bg-muted z-30 border-b text-foreground"> {/* Header muted on white */}
+        <div className="h-10 flex items-center justify-center p-2 text-sm font-semibold sticky top-0 bg-muted z-30 border-b text-foreground">
             {formattedDateHeader || ' '}
         </div>
         <div className="grid grid-cols-[auto_repeat(7,minmax(140px,1fr))] gap-px bg-border">
             <div 
-              className="sticky left-0 top-10 z-20 bg-muted h-12 border-b flex items-center justify-center p-2 text-sm font-medium text-muted-foreground" // Time col header
+              className="sticky left-0 top-10 z-20 bg-muted h-12 border-b flex items-center justify-center p-2 text-sm font-medium text-muted-foreground"
             >
                 Heure
             </div>
             {daysOfWeek.map(day => (
                 <div 
                   key={`header-${day.toISOString()}`} 
-                  className="sticky top-10 z-20 bg-muted h-12 border-b p-2 text-xs font-medium text-center flex flex-col items-center justify-center text-foreground" // Day headers
+                  className="sticky top-10 z-20 bg-muted h-12 border-b p-2 text-xs font-medium text-center flex flex-col items-center justify-center text-foreground"
                 >
                   <span className="font-semibold">{format(day, 'EEE', { locale: fr })}</span>
                   <span className="font-normal text-lg">{format(day, 'd', { locale: fr })}</span>
@@ -202,7 +196,7 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
             {timeSlots.map((slot) => (
                 <React.Fragment key={`timeslot-row-${slot}`}>
                     <div 
-                        className="sticky left-0 z-10 bg-muted p-2 text-xs flex items-center justify-center font-semibold text-foreground" // Time slots
+                        className="sticky left-0 z-10 bg-muted p-2 text-xs flex items-center justify-center font-semibold text-foreground"
                         style={{ height: `${slotHeightPx}px` }}
                     >
                         {slot}
@@ -211,13 +205,13 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
                     {daysOfWeek.map(day => (
                         <div 
                             key={`slot-${day.toISOString()}-${slot}`} 
-                            className="bg-background relative cursor-pointer hover:bg-muted/50 transition-colors border-r border-b" // Day cells are white
+                            className="bg-background relative cursor-pointer hover:bg-muted/50 transition-colors border-r border-b"
                             style={{ height: `${slotHeightPx}px` }}
-                            onClick={() => handleSlotClick(day, slot)}
+                            onClick={() => handleOpenModal({ date: day, startTime: slot })}
                             role="button"
                             tabIndex={0}
                             aria-label={`Créer un rendez-vous à ${slot} le ${format(day, 'dd/MM/yyyy', {locale: fr})}`}
-                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSlotClick(day, slot);}}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleOpenModal({ date: day, startTime: slot });}}
                         >
                         </div>
                     ))}
@@ -230,7 +224,7 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
                     className="relative" 
                     style={{ 
                         gridColumnStart: dayIndex + 2, 
-                        gridRowStart: 3, // After header row and day name row
+                        gridRowStart: 3,
                         gridRowEnd: timeSlots.length + 3, 
                      }}
                 >
@@ -240,51 +234,34 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
                             const startMinutes = timeToMinutes(app.startTime);
                             const endMinutes = timeToMinutes(app.endTime);
                             const durationMinutes = endMinutes - startMinutes;
-
                             const topOffset = ((startMinutes - (startHourGrid * 60)) / 30) * slotHeightPx;
                             const height = (durationMinutes / 30) * slotHeightPx;
                             
                             return (
-                                <AppointmentModal
+                                <button
                                     key={app.id}
-                                    appointment={app}
-                                    onSave={onAppointmentUpdate}
-                                    trigger={
-                                        <button
-                                          className={cn(
-                                            "absolute left-1 right-1 p-1 text-left text-xs rounded shadow-md transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 hover:opacity-90",
-                                            app.serviceColorClassName || 'bg-primary', // Colored appointments
-                                            'text-primary-foreground' // White text on appointments
-                                          )}
-                                          style={{
-                                                top: `${topOffset}px`,
-                                                height: `${Math.max(height, slotHeightPx)}px`,
-                                                minHeight: `${slotHeightPx}px`,
-                                            }}
-                                            aria-label={`Rendez-vous: ${app.clientName} de ${app.startTime} à ${app.endTime}`}
-                                        >
-                                            <p className="font-semibold truncate text-[10px] leading-tight">{app.clientName || 'RDV'}</p>
-                                            <p className="truncate text-[9px] leading-tight">{app.startTime}-{app.endTime}</p>
-                                            {app.serviceName && <p className="text-[9px] leading-tight truncate opacity-80">{app.serviceName}</p>}
-                                        </button>
-                                    }
-                                />
+                                    onClick={() => handleOpenModal(app)}
+                                    className={cn(
+                                    "absolute left-1 right-1 p-1 text-left text-xs rounded shadow-md transition-colors duration-150 ease-in-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 hover:opacity-90",
+                                    app.serviceColorClassName || 'bg-primary',
+                                    'text-primary-foreground'
+                                    )}
+                                    style={{
+                                        top: `${topOffset}px`,
+                                        height: `${Math.max(height, slotHeightPx)}px`,
+                                        minHeight: `${slotHeightPx}px`,
+                                    }}
+                                    aria-label={`Rendez-vous: ${app.clientName} de ${app.startTime} à ${app.endTime}`}
+                                >
+                                    <p className="font-semibold truncate text-[10px] leading-tight">{app.clientName || 'RDV'}</p>
+                                    <p className="truncate text-[9px] leading-tight">{app.startTime}-{app.endTime}</p>
+                                    {app.serviceName && <p className="text-[9px] leading-tight truncate opacity-80">{app.serviceName}</p>}
+                                </button>
                             );
                         })}
                 </div>
             ))}
         </div>
-         {isSlotModalOpen && slotInitialData && (
-            <AppointmentModal
-                open={isSlotModalOpen}
-                onOpenChange={setIsSlotModalOpen}
-                appointment={slotInitialData} 
-                onSave={(newData) => {
-                    onNewAppointmentSave(newData); 
-                    setIsSlotModalOpen(false); 
-                }}
-            />
-        )}
       </div>
     );
   };
@@ -297,10 +274,8 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
     const dayHeaders = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
     return (
-      // Month view card itself is on white page bg, but it will become colored as it's a Card.
-      // Let's change the outer Card to a div with standard page background styling.
       <div className="shadow-md border rounded-lg bg-background text-foreground">
-        <div className="p-4 border-b"> {/* Header for month view title */}
+        <div className="p-4 border-b">
           <h2 className="font-headline text-center text-xl text-foreground">
             {formattedDateHeader || "Mois"}
           </h2>
@@ -308,11 +283,11 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
         <div className="p-1 sm:p-2 md:p-4">
           <div className="grid grid-cols-7 gap-px bg-border border rounded-md overflow-hidden">
             {dayHeaders.map(header => (
-              <div key={header} className="text-center font-medium text-sm py-2 bg-muted text-muted-foreground"> {/* Day headers light gray */}
+              <div key={header} className="text-center font-medium text-sm py-2 bg-muted text-muted-foreground">
                 {header}
               </div>
             ))}
-            {daysInGrid.map((day, index) => {
+            {daysInGrid.map((day) => {
               const appointmentsForDay = appointments.filter(app => 
                 isSameDay(parseISO(app.date + "T00:00:00"), day)
               ).sort((a,b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
@@ -322,44 +297,38 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
                   key={day.toString()}
                   className={cn(
                     "min-h-[100px] sm:min-h-[120px] p-1.5 sm:p-2 relative flex flex-col cursor-pointer hover:bg-muted/30 transition-colors",
-                    isSameMonth(day, currentDate) ? "bg-background" : "bg-muted/40", // Day cells white, off-month gray
-                    "border-r border-b" // Add borders to cells
+                    isSameMonth(day, currentDate) ? "bg-background" : "bg-muted/40",
+                    "border-r border-b"
                   )}
-                  onClick={() => handleSlotClick(day)}
+                  onClick={() => handleOpenModal({ date: day })}
                   role="button"
                   tabIndex={0}
                   aria-label={`Ajouter un rendez-vous le ${format(day, 'dd MMMM yyyy', {locale: fr})}`}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSlotClick(day);}}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleOpenModal({ date: day });}}
                 >
                   <span
                     className={cn(
                       "text-xs sm:text-sm font-medium self-start",
                       !isSameMonth(day, currentDate) && "text-muted-foreground/70",
-                      isSameDay(day, new Date()) && "text-primary font-bold" // Today highlighted with primary color (dynamic)
+                      isSameDay(day, new Date()) && "text-primary font-bold"
                     )}
                   >
                     {format(day, 'd')}
                   </span>
                   <div className="mt-1 space-y-0.5 overflow-y-auto flex-grow max-h-[80px] sm:max-h-[100px]">
                     {appointmentsForDay.slice(0, 2).map(app => (
-                       <AppointmentModal
+                        <button 
                           key={app.id}
-                          appointment={app}
-                          onSave={onAppointmentUpdate}
-                          trigger={
-                            <button 
-                              className={cn(
-                                "w-full text-left text-[10px] sm:text-xs rounded px-1 py-0.5 block truncate focus:outline-none focus:ring-1 focus:ring-ring hover:opacity-90",
-                                app.serviceColorClassName || 'bg-primary', // Appointments colored
-                                'text-primary-foreground' // Text on appointments white
-                              )}
-                              onClick={(e) => e.stopPropagation()} 
-                              aria-label={`Rendez-vous: ${app.clientName || app.serviceName} de ${app.startTime} à ${app.endTime}`}
-                            >
-                              {app.startTime} {app.clientName || app.serviceName || 'RDV'}
-                            </button>
-                          }
-                        />
+                          onClick={(e) => { e.stopPropagation(); handleOpenModal(app); }} 
+                          className={cn(
+                            "w-full text-left text-[10px] sm:text-xs rounded px-1 py-0.5 block truncate focus:outline-none focus:ring-1 focus:ring-ring hover:opacity-90",
+                            app.serviceColorClassName || 'bg-primary',
+                            'text-primary-foreground'
+                          )}
+                          aria-label={`Rendez-vous: ${app.clientName || app.serviceName} de ${app.startTime} à ${app.endTime}`}
+                        >
+                          {app.startTime} {app.clientName || app.serviceName || 'RDV'}
+                        </button>
                     ))}
                     {appointmentsForDay.length > 2 && (
                       <div className="text-[10px] sm:text-xs text-muted-foreground text-center pt-0.5">
@@ -371,17 +340,6 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
               );
             })}
           </div>
-          {isSlotModalOpen && slotInitialData && (
-            <AppointmentModal
-                open={isSlotModalOpen}
-                onOpenChange={setIsSlotModalOpen}
-                appointment={slotInitialData} 
-                onSave={(newData) => {
-                    onNewAppointmentSave(newData); 
-                    setIsSlotModalOpen(false); 
-                }}
-            />
-          )}
         </div>
       </div>
     );
@@ -395,14 +353,34 @@ export const CalendarView = React.memo(function CalendarView({ appointments, cur
     );
   }
 
-  switch (view) {
-    case "day":
-      return renderDayView();
-    case "week":
-      return renderWeekView();
-    case "month":
-      return renderMonthView();
-    default:
-      return renderDayView();
-  }
+  const renderContent = () => {
+    switch (view) {
+      case "day":
+        return renderDayView();
+      case "week":
+        return renderWeekView();
+      case "month":
+        return renderMonthView();
+      default:
+        return renderDayView();
+    }
+  };
+
+  return (
+    <>
+      {renderContent()}
+      {modalState.isOpen && (
+        <Suspense fallback={null}>
+            <AppointmentModal
+                open={modalState.isOpen}
+                onOpenChange={(open) => {
+                  if(!open) handleModalClose();
+                }}
+                appointment={modalState.appointmentData}
+                onSave={handleModalSave}
+            />
+        </Suspense>
+      )}
+    </>
+  );
 });

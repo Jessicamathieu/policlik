@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, Suspense, lazy } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,15 +12,19 @@ import { type Product } from "@/lib/data";
 import { getProducts } from "@/services/product-service";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ImportProduitsModal } from "@/components/produits/import-produits-modal";
+
+const ImportProduitsModal = lazy(() => 
+  import("@/components/produits/import-produits-modal").then(module => ({ default: module.ImportProduitsModal }))
+);
 
 export default function ProduitsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const { toast } = useToast();
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setIsLoading(true);
     try {
       const fetchedProducts = await getProducts();
@@ -36,11 +40,16 @@ export default function ProduitsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [fetchProducts]);
+  
+  const handleImportSuccess = useCallback(() => {
+    fetchProducts();
+    setIsImportModalOpen(false);
+  }, [fetchProducts]);
 
   const filteredProducts = useMemo(() => products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -112,11 +121,18 @@ export default function ProduitsPage() {
           <p className="text-muted-foreground">Gérez votre catalogue de produits et leurs tarifs.</p>
         </div>
         <div className="flex gap-2">
-            <ImportProduitsModal onImportSuccess={fetchProducts}>
-                <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
-                    <Upload className="mr-2 h-4 w-4" /> Importer
-                </Button>
-            </ImportProduitsModal>
+            <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground" onClick={() => setIsImportModalOpen(true)}>
+                <Upload className="mr-2 h-4 w-4" /> Importer
+            </Button>
+            {isImportModalOpen && (
+              <Suspense fallback={null}>
+                <ImportProduitsModal 
+                  open={isImportModalOpen} 
+                  onOpenChange={setIsImportModalOpen} 
+                  onImportSuccess={handleImportSuccess}
+                />
+              </Suspense>
+            )}
             <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
                 <FileDown className="mr-2 h-4 w-4" /> Exporter
             </Button>

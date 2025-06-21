@@ -11,7 +11,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "@/components/ui/table";
@@ -27,15 +26,15 @@ interface CsvRowData {
 
 
 interface ImportClientsModalProps {
-  children: React.ReactNode;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onImportSuccess: () => void;
 }
 
 const requiredHeaders = ["Nom", "Adresse municipale", "Ville", "Province", "Code postal", "Telephone", "Courriel"];
 const previewTableHeaders = ["Nom", "Email", "Téléphone", "Adresse Complète"];
 
-export function ImportClientsModal({ children, onImportSuccess }: ImportClientsModalProps) {
-  const [open, setOpen] = useState(false);
+export function ImportClientsModal({ open, onOpenChange, onImportSuccess }: ImportClientsModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<NewClientData[]>([]);
@@ -57,7 +56,6 @@ export function ImportClientsModal({ children, onImportSuccess }: ImportClientsM
         const fileHeaders = results.meta.fields || [];
         setHeaders(fileHeaders);
         
-        // Helper to find the actual header in the file, ignoring case and whitespace
         const getRowValue = (row: CsvRowData, headerName: string): string => {
             const actualHeader = fileHeaders.find(fh => fh.trim().toLowerCase() === headerName.toLowerCase());
             return actualHeader ? row[actualHeader] || "" : "";
@@ -136,7 +134,7 @@ export function ImportClientsModal({ children, onImportSuccess }: ImportClientsM
       setFile(null);
       setParsedData([]);
       setHeaders([]);
-      setOpen(false);
+      onOpenChange(false);
       onImportSuccess();
     } catch (error) {
       console.error("Erreur lors de l'importation des clients:", error);
@@ -152,7 +150,7 @@ export function ImportClientsModal({ children, onImportSuccess }: ImportClientsM
     } finally {
         setIsLoading(false);
     }
-  }, [hasMissingHeaders, parsedData, onImportSuccess, toast]);
+  }, [hasMissingHeaders, parsedData, onImportSuccess, toast, onOpenChange]);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -160,8 +158,7 @@ export function ImportClientsModal({ children, onImportSuccess }: ImportClientsM
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>Importer des Clients depuis un fichier CSV</DialogTitle>
@@ -227,7 +224,7 @@ export function ImportClientsModal({ children, onImportSuccess }: ImportClientsM
         )}
 
         <DialogFooter className="mt-6">
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
           <Button onClick={handleImport} disabled={isLoading || parsedData.length === 0 || hasMissingHeaders}>

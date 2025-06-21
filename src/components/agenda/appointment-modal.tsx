@@ -9,7 +9,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,19 +51,13 @@ interface Appointment {
 }
 
 interface AppointmentModalProps {
-  trigger?: React.ReactNode;
-  appointment?: Partial<Appointment>; // Can be partial for new or for initial data
+  appointment?: Partial<Appointment>;
   onSave: (appointmentData: Partial<Appointment>) => void;
-  open?: boolean; // To control modal programmatically
-  onOpenChange?: (open: boolean) => void; // To control modal programmatically
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function AppointmentModal({ trigger, appointment, onSave, open, onOpenChange }: AppointmentModalProps) {
-  const [internalOpen, setInternalOpen] = React.useState(false);
-  const isControlled = open !== undefined && onOpenChange !== undefined;
-  const currentOpen = isControlled ? open : internalOpen;
-  const setCurrentOpen = isControlled ? onOpenChange : setInternalOpen;
-  
+export function AppointmentModal({ appointment, onSave, open, onOpenChange }: AppointmentModalProps) {
   const { toast } = useToast();
   const [clients, setClients] = React.useState<Client[]>([]);
   const [services, setServices] = React.useState<Service[]>([]);
@@ -82,7 +75,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (currentOpen) {
+      if (open) {
         try {
           const [fetchedClients, fetchedServices] = await Promise.all([
             getClients(),
@@ -106,10 +99,10 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
       }
     };
     fetchData();
-  }, [currentOpen, toast]);
+  }, [open, toast]);
 
   React.useEffect(() => {
-    if (currentOpen) {
+    if (open) {
       const initialDate = appointment?.date 
         ? (typeof appointment.date === 'string' ? parseISO(appointment.date) : appointment.date) 
         : new Date();
@@ -128,7 +121,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
       setSmsReminder(appointment?.smsReminder || false);
       if (!appointment?.clientId) setClientSearch("");
     }
-  }, [appointment, currentOpen, clients]);
+  }, [appointment, open, clients]);
 
   const filteredClients = clients.filter(client => 
     client.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
@@ -155,7 +148,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
       serviceColorClassName: serviceData?.colorClassName,
     };
     onSave(appointmentData);
-    if(setCurrentOpen) setCurrentOpen(false);
+    onOpenChange(false);
   }, [
       appointment?.id, 
       selectedClient, 
@@ -171,7 +164,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
       clients, 
       services, 
       onSave, 
-      setCurrentOpen
+      onOpenChange
   ]);
 
   const handleClientChange = useCallback((clientId: string) => {
@@ -186,239 +179,226 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
     }
   }, [clients]);
 
-  const dialogContent = (
-    <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="font-headline">{appointment?.id ? "Modifier le Rendez-vous" : "Nouveau Rendez-vous"}</DialogTitle>
-          <DialogDescription>
-            {appointment?.id ? "Mettez à jour les détails du rendez-vous." : "Planifiez un nouveau rendez-vous."}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-6 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="client" className="text-right col-span-1">
-              Client
-            </Label>
-            <div className="col-span-3">
-              <Select onValueChange={handleClientChange} value={selectedClient}>
-                <SelectTrigger id="client">
-                  <SelectValue placeholder="Sélectionner un client" />
-                </SelectTrigger>
-                <SelectContent>
-                  <div className="p-2">
-                    <Input 
-                      placeholder="Rechercher client..." 
-                      value={clientSearch}
-                      onChange={(e) => setClientSearch(e.target.value)}
-                      className="mb-2"
-                    />
-                  </div>
-                  {filteredClients.map(client => (
-                    <SelectItem key={client.id} value={client.id}>
-                      {client.name} ({client.address})
-                    </SelectItem>
-                  ))}
-                   <Button variant="ghost" className="w-full justify-start mt-1 text-primary">
-                    <PlusCircle className="mr-2 h-4 w-4" /> Nouveau Client
-                  </Button>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="service" className="text-right col-span-1">
-              Service
-            </Label>
-            <div className="col-span-3">
-              <Select onValueChange={setSelectedService} value={selectedService}>
-                <SelectTrigger id="service">
-                  <SelectValue placeholder="Sélectionner un service" />
-                </SelectTrigger>
-                <SelectContent>
-                  {services.map(service => (
-                    <SelectItem key={service.id} value={service.id}>
-                      <div className="flex items-center">
-                        <span className={cn("w-3 h-3 rounded-full mr-2", service.colorClassName || 'bg-gray-400')}></span>
-                        {service.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="date" className="text-right col-span-1">
-              Date
-            </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "col-span-3 justify-start text-left font-normal",
-                    !appointmentDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {appointmentDate ? format(appointmentDate, "PPP", { locale: fr }) : <span>Choisir une date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={appointmentDate}
-                  onSelect={setAppointmentDate}
-                  initialFocus
-                  locale={fr}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="startTime" className="text-right col-span-1">
-              Heure début
-            </Label>
-            <Input 
-              id="startTime" 
-              type="time" 
-              value={startTime} 
-              onChange={(e) => setStartTime(e.target.value)} 
-              className="col-span-3" 
-              step="1800" 
-            />
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="endTime" className="text-right col-span-1">
-              Heure fin
-            </Label>
-            <Input 
-              id="endTime" 
-              type="time" 
-              value={endTime} 
-              onChange={(e) => setEndTime(e.target.value)} 
-              className="col-span-3" 
-              step="1800" 
-            />
-          </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="address" className="text-right col-span-1">
-              Adresse
-            </Label>
-            <div className="col-span-3 relative">
-              <Input 
-                id="address" 
-                value={address} 
-                onChange={(e) => setAddress(e.target.value)} 
-                placeholder="Adresse du rendez-vous"
-              />
-              {address && (
-                <a 
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-primary/80"
-                  aria-label="Ouvrir dans Google Maps"
-                >
-                  <MapPin className="h-5 w-5"/>
-                </a>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="phone" className="text-right col-span-1">
-              Téléphone
-            </Label>
-             <div className="col-span-3 relative">
-              <Input 
-                id="phone" 
-                type="tel" 
-                value={phone} 
-                onChange={(e) => setPhone(e.target.value)} 
-                placeholder="Numéro de téléphone"
-              />
-              {phone && (
-                <a 
-                  href={`tel:${phone}`} 
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-primary/80"
-                  aria-label="Appeler le numéro"
-                >
-                  <Phone className="h-5 w-5"/>
-                </a>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-4 items-start gap-4">
-            <Label htmlFor="description" className="text-right pt-2 col-span-1">
-              Description
-            </Label>
-            <Textarea 
-              id="description" 
-              value={description} 
-              onChange={(e) => setDescription(e.target.value)} 
-              className="col-span-3 min-h-[80px]" 
-              placeholder="Détails du rendez-vous, travaux à effectuer..."
-            />
-          </div>
-
-          <div className="grid grid-cols-4 items-start gap-4">
-            <Label htmlFor="workDone" className="text-right pt-2 col-span-1">
-              Travail Effectué
-            </Label>
-            <Textarea 
-              id="workDone" 
-              value={workDone} 
-              onChange={(e) => setWorkDone(e.target.value)} 
-              className="col-span-3 min-h-[80px]" 
-              placeholder="Résumé des travaux réalisés (si applicable)"
-            />
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <div className="text-right col-span-1"> 
-              <Label htmlFor="smsReminder">SMS Rappel</Label>
-            </div>
-            <div className="col-span-3 flex items-center space-x-2">
-                <Checkbox
-                id="smsReminder"
-                checked={smsReminder}
-                onCheckedChange={(checked) => setSmsReminder(Boolean(checked))}
-                />
-                <Label htmlFor="smsReminder" className="text-sm font-normal cursor-pointer">
-                    Notifier le client par SMS avant le RDV (confirme en répondant).
-                </Label>
-            </div>
-          </div>
-
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => {if(setCurrentOpen) setCurrentOpen(false)}}>Annuler</Button>
-          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-            {appointment?.id ? "Sauvegarder" : "Créer Rendez-vous"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-  );
-
-  if (trigger) {
-    return (
-      <Dialog open={currentOpen} onOpenChange={setCurrentOpen}>
-        <DialogTrigger asChild>{trigger}</DialogTrigger>
-        {dialogContent}
-      </Dialog>
-    );
-  }
-
   return (
-    <Dialog open={currentOpen} onOpenChange={setCurrentOpen}>
-      {dialogContent}
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-headline">{appointment?.id ? "Modifier le Rendez-vous" : "Nouveau Rendez-vous"}</DialogTitle>
+            <DialogDescription>
+              {appointment?.id ? "Mettez à jour les détails du rendez-vous." : "Planifiez un nouveau rendez-vous."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-6 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="client" className="text-right col-span-1">
+                Client
+              </Label>
+              <div className="col-span-3">
+                <Select onValueChange={handleClientChange} value={selectedClient}>
+                  <SelectTrigger id="client">
+                    <SelectValue placeholder="Sélectionner un client" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <div className="p-2">
+                      <Input 
+                        placeholder="Rechercher client..." 
+                        value={clientSearch}
+                        onChange={(e) => setClientSearch(e.target.value)}
+                        className="mb-2"
+                      />
+                    </div>
+                    {filteredClients.map(client => (
+                      <SelectItem key={client.id} value={client.id}>
+                        {client.name} ({client.address})
+                      </SelectItem>
+                    ))}
+                    <Button variant="ghost" className="w-full justify-start mt-1 text-primary">
+                      <PlusCircle className="mr-2 h-4 w-4" /> Nouveau Client
+                    </Button>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="service" className="text-right col-span-1">
+                Service
+              </Label>
+              <div className="col-span-3">
+                <Select onValueChange={setSelectedService} value={selectedService}>
+                  <SelectTrigger id="service">
+                    <SelectValue placeholder="Sélectionner un service" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {services.map(service => (
+                      <SelectItem key={service.id} value={service.id}>
+                        <div className="flex items-center">
+                          <span className={cn("w-3 h-3 rounded-full mr-2", service.colorClassName || 'bg-gray-400')}></span>
+                          {service.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="date" className="text-right col-span-1">
+                Date
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "col-span-3 justify-start text-left font-normal",
+                      !appointmentDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {appointmentDate ? format(appointmentDate, "PPP", { locale: fr }) : <span>Choisir une date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={appointmentDate}
+                    onSelect={setAppointmentDate}
+                    initialFocus
+                    locale={fr}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="startTime" className="text-right col-span-1">
+                Heure début
+              </Label>
+              <Input 
+                id="startTime" 
+                type="time" 
+                value={startTime} 
+                onChange={(e) => setStartTime(e.target.value)} 
+                className="col-span-3" 
+                step="1800" 
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="endTime" className="text-right col-span-1">
+                Heure fin
+              </Label>
+              <Input 
+                id="endTime" 
+                type="time" 
+                value={endTime} 
+                onChange={(e) => setEndTime(e.target.value)} 
+                className="col-span-3" 
+                step="1800" 
+              />
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="address" className="text-right col-span-1">
+                Adresse
+              </Label>
+              <div className="col-span-3 relative">
+                <Input 
+                  id="address" 
+                  value={address} 
+                  onChange={(e) => setAddress(e.target.value)} 
+                  placeholder="Adresse du rendez-vous"
+                />
+                {address && (
+                  <a 
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-primary/80"
+                    aria-label="Ouvrir dans Google Maps"
+                  >
+                    <MapPin className="h-5 w-5"/>
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="phone" className="text-right col-span-1">
+                Téléphone
+              </Label>
+              <div className="col-span-3 relative">
+                <Input 
+                  id="phone" 
+                  type="tel" 
+                  value={phone} 
+                  onChange={(e) => setPhone(e.target.value)} 
+                  placeholder="Numéro de téléphone"
+                />
+                {phone && (
+                  <a 
+                    href={`tel:${phone}`} 
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-primary/80"
+                    aria-label="Appeler le numéro"
+                  >
+                    <Phone className="h-5 w-5"/>
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="description" className="text-right pt-2 col-span-1">
+                Description
+              </Label>
+              <Textarea 
+                id="description" 
+                value={description} 
+                onChange={(e) => setDescription(e.target.value)} 
+                className="col-span-3 min-h-[80px]" 
+                placeholder="Détails du rendez-vous, travaux à effectuer..."
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="workDone" className="text-right pt-2 col-span-1">
+                Travail Effectué
+              </Label>
+              <Textarea 
+                id="workDone" 
+                value={workDone} 
+                onChange={(e) => setWorkDone(e.target.value)} 
+                className="col-span-3 min-h-[80px]" 
+                placeholder="Résumé des travaux réalisés (si applicable)"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right col-span-1"> 
+                <Label htmlFor="smsReminder">SMS Rappel</Label>
+              </div>
+              <div className="col-span-3 flex items-center space-x-2">
+                  <Checkbox
+                  id="smsReminder"
+                  checked={smsReminder}
+                  onCheckedChange={(checked) => setSmsReminder(Boolean(checked))}
+                  />
+                  <Label htmlFor="smsReminder" className="text-sm font-normal cursor-pointer">
+                      Notifier le client par SMS avant le RDV (confirme en répondant).
+                  </Label>
+              </div>
+            </div>
+
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>Annuler</Button>
+            <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              {appointment?.id ? "Sauvegarder" : "Créer Rendez-vous"}
+            </Button>
+          </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 }

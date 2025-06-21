@@ -2,7 +2,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { AppointmentModal } from "./appointment-modal";
 import { PlusCircle, Calendar as CalendarIconLucide, Rows, Columns, Printer, CalendarDays } from "lucide-react";
 import {
   Select,
@@ -16,7 +15,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import React from "react";
+import React, { useState, lazy, Suspense } from "react";
+
+const AppointmentModal = lazy(() => import("./appointment-modal").then(module => ({ default: module.AppointmentModal })));
 
 export interface AgendaControlsProps {
   currentView: "day" | "week" | "month";
@@ -39,6 +40,13 @@ export const AgendaControls = React.memo(function AgendaControls({
   printEndDate,
   setPrintEndDate
 }: AgendaControlsProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleSave = (appointmentData: any) => {
+    onNewAppointmentSave(appointmentData);
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-4 bg-card text-card-foreground rounded-lg shadow">
       <div className="flex items-center gap-2">
@@ -112,14 +120,19 @@ export const AgendaControls = React.memo(function AgendaControls({
         <Button variant="outline" onClick={onPrintAppointments} className="border-input text-foreground hover:bg-accent hover:text-accent-foreground">
           <Printer className="mr-2 h-4 w-4" /> Imprimer
         </Button>
-        <AppointmentModal
-          trigger={
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              <PlusCircle className="mr-2 h-5 w-5" /> Nouveau Rendez-vous
-            </Button>
-          }
-          onSave={onNewAppointmentSave}
-        />
+        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={() => setIsModalOpen(true)}>
+            <PlusCircle className="mr-2 h-5 w-5" /> Nouveau Rendez-vous
+        </Button>
+
+        {isModalOpen && (
+            <Suspense fallback={null}>
+                <AppointmentModal
+                    open={isModalOpen}
+                    onOpenChange={setIsModalOpen}
+                    onSave={handleSave}
+                />
+            </Suspense>
+        )}
       </div>
     </div>
   );
