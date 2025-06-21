@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { CalendarDays, Users, FileText, DollarSign, PlusCircle, LineChart, MapPin, Phone, CalendarClock } from "lucide-react";
 import Link from "next/link";
 import { format, isToday, parseISO } from "date-fns"; 
-import { appointments } from "@/lib/data";
+import { getAppointments } from "@/lib/data";
 
-const mockTodaysAppointments = appointments.filter(appt => isToday(parseISO(appt.date)));
+const mockTodaysAppointments = getAppointments().filter(appt => isToday(parseISO(appt.date)));
 
 export default function DashboardPage() {
   const summaryCards = [

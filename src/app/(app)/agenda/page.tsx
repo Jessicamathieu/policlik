@@ -7,11 +7,11 @@ import { CalendarView } from '@/components/agenda/calendar-view';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { type Appointment, appointments as initialAppointments } from '@/lib/data';
+import { type Appointment, getAppointments } from '@/lib/data';
 
 export default function AgendaPage() {
   const [currentView, setCurrentView] = useState<"day" | "week" | "month">("day");
-  const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
+  const [appointments, setAppointments] = useState<Appointment[]>(() => getAppointments());
   const [currentDate, setCurrentDate] = useState<Date>(new Date()); 
   const [printStartDate, setPrintStartDate] = useState<Date | undefined>(undefined);
   const [printEndDate, setPrintEndDate] = useState<Date | undefined>(undefined);
