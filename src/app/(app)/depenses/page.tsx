@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal, PlusCircle, Search, FileDown, Filter, Camera, Edit3, Trash2 } from "lucide-react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
   Select,
@@ -94,7 +94,7 @@ export default function DepensesPage() {
             <TableBody>
               {expenses.map((expense) => (
                 <TableRow key={expense.id} className="border-b-border">
-                  <TableCell className="text-card-foreground">{format(expense.date, "dd MMM yyyy", { locale: fr })}</TableCell>
+                  <TableCell className="text-card-foreground">{format(parseISO(expense.date), "dd MMM yyyy", { locale: fr })}</TableCell>
                   <TableCell className="text-card-foreground">{expense.category}</TableCell>
                   <TableCell className="hidden md:table-cell text-card-foreground">{expense.description}</TableCell>
                   <TableCell className="text-right text-card-foreground">CAD${expense.amount.toFixed(2)}</TableCell>

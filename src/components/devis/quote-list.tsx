@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, FileText, CheckCircle, XCircle, Mail, CalendarPlus, Trash2, Edit3 } from "lucide-react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { getQuotes, type Quote, type QuoteStatus } from "@/lib/data";
@@ -58,7 +58,7 @@ export function QuoteList() {
           <TableRow key={quote.id} className="border-b-card-foreground/20">
             <TableCell className="font-medium text-card-foreground">{quote.id}</TableCell>
             <TableCell className="text-card-foreground">{quote.clientName}</TableCell>
-            <TableCell className="text-card-foreground">{format(quote.date, "dd MMM yyyy", { locale: fr })}</TableCell>
+            <TableCell className="text-card-foreground">{format(parseISO(quote.date), "dd MMM yyyy", { locale: fr })}</TableCell>
             <TableCell className="text-right text-card-foreground">CAD${quote.amount.toFixed(2)}</TableCell>
             <TableCell className="text-center">
               <Badge variant="outline" className={cn("text-xs", statusColors[quote.status as QuoteStatus])}>

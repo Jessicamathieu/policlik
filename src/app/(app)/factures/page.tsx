@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal, PlusCircle, Search, FileDown, Filter, Printer, CreditCard, Mail, FileText as FileTextIcon, MessageSquare } from "lucide-react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import Link from "next/link";
 import {
@@ -108,8 +108,8 @@ export default function FacturesPage() {
                     </Link>
                   </TableCell>
                   <TableCell className="text-card-foreground">{invoice.clientName}</TableCell>
-                  <TableCell className="hidden sm:table-cell text-card-foreground">{format(invoice.dateEmission, "dd MMM yyyy", { locale: fr })}</TableCell>
-                  <TableCell className="hidden md:table-cell text-card-foreground">{format(invoice.dateEcheance, "dd MMM yyyy", { locale: fr })}</TableCell>
+                  <TableCell className="hidden sm:table-cell text-card-foreground">{format(parseISO(invoice.dateEmission), "dd MMM yyyy", { locale: fr })}</TableCell>
+                  <TableCell className="hidden md:table-cell text-card-foreground">{format(parseISO(invoice.dateEcheance), "dd MMM yyyy", { locale: fr })}</TableCell>
                   <TableCell className="text-right text-card-foreground">CAD${invoice.amount.toFixed(2)}</TableCell>
                   <TableCell className="text-center">
                     <Badge variant="outline" className={cn("text-xs font-semibold border", statusColors[invoice.status])}>

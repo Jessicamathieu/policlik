@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal, Search, FileDown, Filter, Eye, Receipt } from "lucide-react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import Link from "next/link";
 import {
@@ -93,7 +93,7 @@ export default function PaiementsPage() {
             <TableBody>
               {payments.map((payment) => (
                 <TableRow key={payment.id} className="border-b-border">
-                  <TableCell className="text-card-foreground">{format(payment.date, "dd MMM yyyy", { locale: fr })}</TableCell>
+                  <TableCell className="text-card-foreground">{format(parseISO(payment.date), "dd MMM yyyy", { locale: fr })}</TableCell>
                   <TableCell className="font-medium text-card-foreground">{payment.clientName}</TableCell>
                   <TableCell className="hidden sm:table-cell">
                      <Link href={`/factures/${payment.invoiceId}`} className="hover:text-primary text-card-foreground">
