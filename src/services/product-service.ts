@@ -7,27 +7,6 @@ import type { Product } from '@/lib/data';
 export type NewProductData = Omit<Product, 'id'>;
 
 /**
- * Récupère tous les produits depuis la collection 'products' de Firestore.
- * @returns Une promesse qui résout en un tableau d'objets Product.
- */
-export const getProducts = async (): Promise<Product[]> => {
-    const productsCol = collection(db, 'products');
-    const productSnapshot = await getDocs(productsCol);
-    const productList = productSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        name: data.name || '',
-        code: data.code || '',
-        category: data.category || '',
-        subCategory: data.subCategory,
-        price: data.price,
-      };
-    });
-    return productList;
-};
-
-/**
  * Ajoute plusieurs produits à Firestore en une seule opération (batch).
  * @param products - Un tableau d'objets NewProductData à ajouter.
  */
@@ -41,4 +20,45 @@ export const addProductsBatch = async (products: NewProductData[]): Promise<void
     });
 
     await batch.commit();
+};
+
+// Données d'exemple pour peupler la base si elle est vide
+const seedProducts: NewProductData[] = [
+    { name: 'Produit de nettoyage tout usage (1L)', code: 'PNC-001', category: 'Produits', subCategory: 'Nettoyants', price: 15.99 },
+    { name: 'Lingettes microfibres (paquet de 10)', code: 'MAT-001', category: 'Matériel', subCategory: 'Accessoires', price: 25.00 },
+    { name: 'Désodorisant Professionnel (500ml)', code: 'PNC-002', category: 'Produits', subCategory: 'Finition', price: 12.50 },
+    { name: 'Raclette à vitres professionnelle', code: 'MAT-002', category: 'Matériel', subCategory: 'Vitrages', price: 35.00 },
+];
+
+
+/**
+ * Récupère tous les produits depuis la collection 'products' de Firestore.
+ * Si la collection est vide, la peuple avec des données d'exemple.
+ * @returns Une promesse qui résout en un tableau d'objets Product.
+ */
+export const getProducts = async (): Promise<Product[]> => {
+    const productsCol = collection(db, 'products');
+    let productSnapshot = await getDocs(productsCol);
+    
+    // Si la base de données est vide, on la peuple avec des données d'exemple
+    if (productSnapshot.empty) {
+        console.log("La collection 'products' est vide. Peuplement avec des données d'exemple...");
+        await addProductsBatch(seedProducts);
+        // On relit les données après les avoir ajoutées
+        productSnapshot = await getDocs(productsCol);
+        console.log("Peuplement terminé.");
+    }
+    
+    const productList = productSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        name: data.name || '',
+        code: data.code || '',
+        category: data.category || '',
+        subCategory: data.subCategory,
+        price: data.price,
+      };
+    });
+    return productList;
 };
