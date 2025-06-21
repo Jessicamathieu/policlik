@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, PlusCircle, Search, FileDown, Edit, CalendarPlus, FilePlus, Trash2, Phone, MapPin, Mail as MailIcon } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Search, FileDown, Edit, CalendarPlus, FilePlus, Trash2, Phone, MapPin, Mail as MailIcon, Upload } from "lucide-react";
 import Link from "next/link";
 import { clients } from "@/lib/data";
+import { ImportClientsModal } from "@/components/clients/import-clients-modal";
 
 export default function ClientsPage() {
   return (
@@ -13,9 +14,14 @@ export default function ClientsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Gestion des Clients</h1>
-          <p className="text-foreground">Consultez et gérez votre base de données clients.</p> 
+          <p className="text-primary-foreground">Consultez, gérez et importez votre base de données clients.</p> 
         </div>
         <div className="flex gap-2">
+          <ImportClientsModal>
+            <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
+              <Upload className="mr-2 h-4 w-4" /> Importer
+            </Button>
+          </ImportClientsModal>
           <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
             <FileDown className="mr-2 h-4 w-4" /> Exporter
           </Button>
