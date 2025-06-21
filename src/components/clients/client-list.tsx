@@ -10,20 +10,22 @@ import type { Client } from "@/lib/data";
 import { getClients } from "@/services/client-service";
 import { useToast } from "@/hooks/use-toast";
 import { ClientCard, ClientCardSkeleton } from "./client-card";
+import { useAuth } from "@/context/auth-context";
 
 const CLIENTS_PER_PAGE = 12;
 
 export function ClientList() {
+  const { user } = useAuth();
   const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
 
-  const fetchClients = useCallback(async () => {
+  const fetchClients = useCallback(async (userId: string) => {
     setIsLoading(true);
     try {
-      const fetchedClients = await getClients();
+      const fetchedClients = await getClients(userId);
       fetchedClients.sort((a, b) => a.name.localeCompare(b.name));
       setClients(fetchedClients);
     } catch (error) {
@@ -39,8 +41,10 @@ export function ClientList() {
   }, [toast]);
 
   useEffect(() => {
-    fetchClients();
-  }, [fetchClients]);
+    if (user) {
+      fetchClients(user.uid);
+    }
+  }, [user, fetchClients]);
 
   const filteredClients = useMemo(() => clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -1,5 +1,6 @@
+
 import { db } from '@/lib/firebase';
-import { collection, getDocs, writeBatch, doc } from 'firebase/firestore';
+import { collection, getDocs, writeBatch, doc, query, where } from 'firebase/firestore';
 import type { Client } from '@/lib/data';
 
 // Ce type est utilisé lors de la création de nouveaux clients.
@@ -7,46 +8,35 @@ import type { Client } from '@/lib/data';
 export type NewClientData = Omit<Client, 'id' | 'lastService' | 'totalSpent'>;
 
 /**
- * Ajoute plusieurs clients à Firestore en une seule opération (batch).
+ * Ajoute plusieurs clients à Firestore en une seule opération (batch) pour un utilisateur spécifique.
  * @param clients - Un tableau d'objets NewClientData à ajouter.
+ * @param userId - L'UID de l'utilisateur auquel les clients appartiennent.
  */
-export const addClientsBatch = async (clients: NewClientData[]): Promise<void> => {
+export const addClientsBatch = async (clients: NewClientData[], userId: string): Promise<void> => {
     const batch = writeBatch(db);
     const clientsCol = collection(db, 'clients');
 
     clients.forEach(client => {
         const docRef = doc(clientsCol); // Firestore génère un nouvel ID
-        batch.set(docRef, { ...client, createdAt: new Date() });
+        batch.set(docRef, { ...client, ownerId: userId, createdAt: new Date() });
     });
 
     await batch.commit();
 };
 
-// Données d'exemple pour peupler la base si elle est vide
-const seedClients: NewClientData[] = [
-    { name: 'Jean Dupont', email: 'jean.dupont@example.com', phone: '418-555-0101', address: '123 Rue de la Paix, Québec, QC G1V 0A1' },
-    { name: 'Marie Tremblay', email: 'marie.tremblay@email.com', phone: '581-555-0102', address: '456 Avenue Cartier, Québec, QC G1R 2V4' },
-    { name: 'Pierre Gagnon', email: 'pierre.gagnon@host.com', phone: '418-555-0103', address: '789 Boulevard Laurier, Québec, QC G1S 1T9' },
-    { name: 'Julie Roy', email: 'julie.roy@example.net', phone: '438-555-0104', address: '101 Grande Allée O, Québec, QC G1R 2G8' },
-];
-
 /**
- * Récupère tous les clients depuis la collection 'clients' de Firestore.
- * Si la collection est vide, la peuple avec des données d'exemple.
+ * Récupère tous les clients d'un utilisateur spécifique depuis la collection 'clients' de Firestore.
+ * @param userId - L'UID de l'utilisateur dont on veut récupérer les clients.
  * @returns Une promesse qui résout en un tableau d'objets Client.
  */
-export const getClients = async (): Promise<Client[]> => {
-    const clientsCol = collection(db, 'clients');
-    let clientSnapshot = await getDocs(clientsCol);
-
-    // Si la base de données est vide, on la peuple avec des données d'exemple
-    if (clientSnapshot.empty) {
-        console.log("La collection 'clients' est vide. Peuplement avec des données d'exemple...");
-        await addClientsBatch(seedClients);
-        // On relit les données après les avoir ajoutées
-        clientSnapshot = await getDocs(clientsCol);
-        console.log("Peuplement terminé.");
+export const getClients = async (userId: string): Promise<Client[]> => {
+    if (!userId) {
+        console.error("getClients a été appelé sans userId.");
+        return [];
     }
+    const clientsCol = collection(db, 'clients');
+    const q = query(clientsCol, where("ownerId", "==", userId));
+    const clientSnapshot = await getDocs(q);
 
     const clientList = clientSnapshot.docs.map(doc => {
       const data = doc.data();

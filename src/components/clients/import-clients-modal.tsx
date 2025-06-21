@@ -4,6 +4,8 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { GenericImportModal } from "@/components/shared/generic-import-modal";
 import { addClientsBatch, type NewClientData } from "@/services/client-service";
+import { useAuth } from "@/context/auth-context";
+import { useToast } from "@/hooks/use-toast";
 
 interface ImportClientsModalProps {
   open: boolean;
@@ -47,6 +49,21 @@ const renderClientPreviewRow = (client: NewClientData, index: number) => (
 );
 
 export function ImportClientsModal({ open, onOpenChange, onImportSuccess }: ImportClientsModalProps) {
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const handleImportWithUser = async (clients: NewClientData[]) => {
+    if (!user) {
+      toast({
+        title: "Utilisateur non connecté",
+        description: "Vous devez être connecté pour importer des clients.",
+        variant: "destructive"
+      });
+      throw new Error("Utilisateur non authentifié.");
+    }
+    await addClientsBatch(clients, user.uid);
+  }
+
   return (
     <GenericImportModal
       open={open}
@@ -58,7 +75,7 @@ export function ImportClientsModal({ open, onOpenChange, onImportSuccess }: Impo
       previewTableHeaders={previewTableHeaders}
       rowMapper={clientRowMapper}
       renderPreviewRow={renderClientPreviewRow}
-      batchImportFunction={addClientsBatch}
+      batchImportFunction={handleImportWithUser}
     />
   );
 }

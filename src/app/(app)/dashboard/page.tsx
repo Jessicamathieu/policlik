@@ -11,20 +11,24 @@ import { getAppointments, getInvoices, type Appointment, type Invoice } from "@/
 import { getClients } from "@/services/client-service";
 import { format, isFuture, isToday, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useAuth } from "@/context/auth-context";
 
 // Main component
 export default function DashboardPage() {
+  const { user } = useAuth();
   const [stats, setStats] = useState({ clientCount: 0, monthlyRevenue: 0, pendingInvoices: 0 });
   const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!user) return; // Ne rien faire si l'utilisateur n'est pas chargé
+
       setIsLoading(true);
       try {
         // Use Promise.all to fetch data in parallel
         const [clients, allAppointments, allInvoices] = await Promise.all([
-          getClients(),
+          getClients(user.uid),
           getAppointments(),
           getInvoices()
         ]);
@@ -67,7 +71,7 @@ export default function DashboardPage() {
     };
 
     fetchData();
-  }, []);
+  }, [user]);
 
   const renderStatCards = () => {
     if (isLoading) {
