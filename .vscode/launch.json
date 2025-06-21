@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js: Déboguer le serveur",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Next.js: Déboguer le client",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:9002",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Next.js: Déboguer Full Stack",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "serverReadyAction": {
+        "pattern": "- Local: .*(http://localhost:9002)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      }
+    }
+  ]
+}
