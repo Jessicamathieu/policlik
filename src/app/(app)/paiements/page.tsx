@@ -17,9 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-
-type PaymentStatus = "Réussi" | "En attente" | "Échoué" | "Remboursé";
-type PaymentMethod = "Carte de crédit" | "Virement bancaire" | "PayPal" | "Espèces";
+import { type PaymentStatus, type PaymentMethod, payments } from "@/lib/data";
 
 const paymentStatusColors: Record<PaymentStatus, string> = {
   "Réussi": "bg-emerald-100 text-emerald-800 border-emerald-300",
@@ -28,21 +26,13 @@ const paymentStatusColors: Record<PaymentStatus, string> = {
   "Remboursé": "bg-violet-100 text-violet-800 border-violet-300",
 };
 
-const payments = [
-  { id: "PAY001", invoiceId: "FAC001", clientName: "Entreprise Alpha", date: new Date(2023, 10, 20), amount: 1500.00, method: "Carte de crédit" as PaymentMethod, status: "Réussi" as PaymentStatus },
-  { id: "PAY002", invoiceId: "FAC002", clientName: "Société Beta", date: new Date(2023, 11, 5), amount: 950.50, method: "Virement bancaire" as PaymentMethod, status: "En attente" as PaymentStatus },
-  { id: "PAY003", invoiceId: "FAC00X", clientName: "Client Inconnu", date: new Date(2023, 9, 18), amount: 200.00, method: "PayPal" as PaymentMethod, status: "Échoué" as PaymentStatus },
-  { id: "PAY004", invoiceId: "FAC005", clientName: "Jean Dupont", date: new Date(2023, 10, 10), amount: 780.00, method: "Carte de crédit" as PaymentMethod, status: "Réussi" as PaymentStatus },
-  { id: "PAY005", invoiceId: "FAC001", clientName: "Entreprise Alpha", date: new Date(2023, 10, 25), amount: -100.00, method: "Carte de crédit" as PaymentMethod, status: "Remboursé" as PaymentStatus },
-];
-
 export default function PaiementsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Suivi des Paiements</h1>
-          <p className="text-muted-foreground">Consultez l'historique et le statut de tous les paiements.</p>
+          <p className="text-primary-foreground">Consultez l'historique et le statut de tous les paiements.</p>
         </div>
          <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
             <FileDown className="mr-2 h-4 w-4" /> Exporter

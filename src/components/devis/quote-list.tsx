@@ -17,16 +17,7 @@ import { MoreHorizontal, FileText, CheckCircle, XCircle, Mail, CalendarPlus, Tra
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-
-// Mock data
-const mockQuotes = [
-  { id: "DEV001", clientName: "Entreprise Alpha", date: new Date(2023, 10, 15), amount: 1250.00, status: "Envoyé" },
-  { id: "DEV002", clientName: "Société Beta", date: new Date(2023, 10, 20), amount: 875.50, status: "Accepté" },
-  { id: "DEV003", clientName: "Organisation Gamma", date: new Date(2023, 11, 1), amount: 2100.75, status: "Refusé" },
-  { id: "DEV004", clientName: "Particulier Delta", date: new Date(2023, 11, 5), amount: 350.00, status: "En attente" },
-];
-
-type QuoteStatus = "Envoyé" | "Accepté" | "Refusé" | "En attente" | "Converti";
+import { quotes as mockQuotes, type QuoteStatus } from "@/lib/data";
 
 // Badge colors updated for contrast on dynamic card background
 const statusColors: Record<QuoteStatus, string> = {

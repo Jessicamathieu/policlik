@@ -7,28 +7,11 @@ import { CalendarView } from '@/components/agenda/calendar-view';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-
-// Définition locale du type Appointment pour cette page
-interface Appointment {
-  id: string;
-  clientId?: string;
-  clientName?: string;
-  serviceId?: string;
-  serviceName?: string;
-  date: string; // yyyy-MM-dd
-  startTime: string; // "HH:mm"
-  endTime: string; // "HH:mm"
-  description: string;
-  workDone?: string;
-  address?: string;
-  phone?: string;
-  smsReminder?: boolean;
-  serviceColorClassName?: string;
-}
+import { type Appointment, appointments as initialAppointments } from '@/lib/data';
 
 export default function AgendaPage() {
   const [currentView, setCurrentView] = useState<"day" | "week" | "month">("day");
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
   const [currentDate, setCurrentDate] = useState<Date>(new Date()); 
   const [printStartDate, setPrintStartDate] = useState<Date | undefined>(undefined);
   const [printEndDate, setPrintEndDate] = useState<Date | undefined>(undefined);
@@ -36,19 +19,6 @@ export default function AgendaPage() {
 
   const handleViewChange = useCallback((view: "day" | "week" | "month") => {
     setCurrentView(view);
-  }, []);
-
-  useEffect(() => {
-    const today = new Date();
-    const todayStr = format(today, "yyyy-MM-dd");
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const tomorrowStr = format(tomorrow, "yyyy-MM-dd");
-    setAppointments([
-      { id: '1', clientId: '1', clientName: 'Jean Dupont', serviceId: 'SERV001', serviceName: 'Nettoyage Standard Résidentiel', date: todayStr, startTime: '09:00', endTime: '10:00', description: 'Nettoyage standard', workDone: '', address: '123 Rue Principale, Paris', phone: '0123456789', smsReminder: false, serviceColorClassName: 'bg-blue-500' },
-      { id: '2', clientId: '2', clientName: 'Marie Curie', serviceId: 'SERV002', serviceName: 'Grand Ménage de Printemps', date: todayStr, startTime: '11:00', endTime: '12:30', description: 'Grand ménage', workDone: 'Tout est propre', address: '456 Avenue des Sciences, Lyon', phone: '0987654321', smsReminder: true, serviceColorClassName: 'bg-green-500' },
-      { id: '3', clientId: '3', clientName: 'Pierre Martin', serviceId: 'SERV005', serviceName: 'Lavage de Vitres', date: tomorrowStr, startTime: '14:00', endTime: '15:00', description: 'Nettoyage vitres', workDone: '', address: '789 Boulevard Liberté, Marseille', phone: '0612345678', smsReminder: false, serviceColorClassName: 'bg-sky-500' },
-    ]);
   }, []);
 
   const handleNewAppointmentSave = useCallback((appointmentData: Appointment) => {

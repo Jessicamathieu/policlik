@@ -5,14 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, PlusCircle, Search, Edit3, Trash2 } from "lucide-react";
-
-const services = [
-  { id: "SERV001", name: "Nettoyage Standard Résidentiel", category: "Nettoyage Résidentiel", rate: "CAD$50/heure", unit: "heure", description: "Nettoyage de base pour appartements et maisons." },
-  { id: "SERV002", name: "Grand Ménage de Printemps", category: "Nettoyage Résidentiel", rate: "CAD$250", unit: "forfait", description: "Nettoyage en profondeur de toutes les pièces." },
-  { id: "SERV003", name: "Nettoyage de Bureaux", category: "Nettoyage Commercial", rate: "CAD$0.15/m²", unit: "m²", description: "Entretien régulier des locaux professionnels." },
-  { id: "SERV004", name: "Nettoyage Après Chantier", category: "Nettoyage Spécialisé", rate: "Devis", unit: "sur devis", description: "Remise en état après travaux de construction ou rénovation." },
-  { id: "SERV005", name: "Lavage de Vitres", category: "Nettoyage Spécialisé", rate: "CAD$5/fenêtre", unit: "fenêtre", description: "Nettoyage intérieur et extérieur des vitres." },
-];
+import { services } from "@/lib/data";
 
 export default function ServicesPage() {
   return (
@@ -20,7 +13,7 @@ export default function ServicesPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Liste des Services</h1>
-          <p className="text-muted-foreground">Gérez vos services prédéfinis et leurs tarifs associés.</p>
+          <p className="text-primary-foreground">Gérez vos services prédéfinis et leurs tarifs associés.</p>
         </div>
         <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
           <PlusCircle className="mr-2 h-4 w-4" /> Nouveau Service

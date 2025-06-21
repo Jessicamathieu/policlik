@@ -32,24 +32,7 @@ import { CalendarIcon, PlusCircle, Trash2, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, addDays } from "date-fns";
 import { fr } from "date-fns/locale";
-
-// Mock data (replace with actual data fetching)
-const mockClients = [
-  { id: "1", name: "Jean Dupont", email: "jean.dupont@example.com" },
-  { id: "2", name: "Marie Curie", email: "marie.curie@example.com" },
-  { id: "3", name: "Pierre Martin", email: "pierre.martin@example.com" },
-  { id: "4", name: "Entreprise Alpha", email: "contact@alpha.com" },
-  { id: "5", name: "Société Beta", email: "info@beta.org" },
-];
-
-const mockServices = [
-  { id: "SERV001", name: "Nettoyage Standard Résidentiel", price: 50, colorClassName: "bg-blue-500" },
-  { id: "SERV002", name: "Grand Ménage de Printemps", price: 250, colorClassName: "bg-green-500" },
-  { id: "SERV003", name: "Nettoyage de Bureaux", price: 0.15, colorClassName: "bg-indigo-500" }, // per m², example
-  { id: "SERV004", name: "Nettoyage Après Chantier", price: 300, colorClassName: "bg-purple-500" }, // Example price
-  { id: "SERV005", name: "Lavage de Vitres", price: 5, colorClassName: "bg-sky-500" }, // per window
-  { id: "PROD001", name: "Produit Nettoyant XYZ", price: 15, colorClassName: "bg-gray-500" },
-];
+import { clients as mockClients, services as mockServices } from "@/lib/data";
 
 const lineItemSchema = z.object({
   serviceId: z.string().min(1, "Veuillez sélectionner un service/produit."),
@@ -451,5 +434,3 @@ export function InvoiceForm() {
     </Form>
   );
 }
-
-    

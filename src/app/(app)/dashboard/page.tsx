@@ -3,25 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { CalendarDays, Users, FileText, DollarSign, PlusCircle, LineChart, MapPin, Phone, CalendarClock } from "lucide-react";
 import Link from "next/link";
-import { format } from "date-fns"; 
+import { format, isToday, parseISO } from "date-fns"; 
+import { appointments } from "@/lib/data";
 
-interface TodayAppointment {
-  id: string;
-  clientName: string;
-  serviceName: string;
-  startTime: string; 
-  endTime: string;   
-  address: string;
-  phone: string;
-  status?: "À venir" | "Terminé" | "En cours"; 
-}
-
-const today = new Date();
-const mockTodaysAppointments: TodayAppointment[] = [
-  { id: "rdv1", clientName: "Jean Dupont", serviceName: "Nettoyage Standard", startTime: "09:00", endTime: "10:30", address: "123 Rue Principale, 75001 Paris", phone: "0123456789", status: "À venir" },
-  { id: "rdv2", clientName: "Marie Curie", serviceName: "Grand Ménage", startTime: "11:00", endTime: "13:00", address: "456 Avenue des Sciences, 69007 Lyon", phone: "0987654321", status: "À venir" },
-  { id: "rdv3", clientName: "Pierre Martin", serviceName: "Lavage de Vitres", startTime: "14:30", endTime: "15:30", address: "789 Boulevard Liberté, 13001 Marseille", phone: "0612345678", status: "En cours" },
-];
+const mockTodaysAppointments = appointments.filter(appt => isToday(parseISO(appt.date)));
 
 export default function DashboardPage() {
   const summaryCards = [
@@ -36,7 +21,7 @@ export default function DashboardPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Tableau de Bord</h1>
-          <p className="text-muted-foreground">Bienvenue sur Polimik Gestion ! Voici un aperçu de votre activité.</p>
+          <p className="text-primary-foreground">Bienvenue sur Polimik Gestion ! Voici un aperçu de votre activité.</p>
         </div>
         <div className="flex gap-2">
           <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
@@ -87,7 +72,7 @@ export default function DashboardPage() {
                     <div className="flex items-start text-sm text-foreground">
                       <MapPin className="h-4 w-4 mr-2 mt-0.5 opacity-70 shrink-0" />
                       <Link 
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(appt.address)}`} 
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(appt.address || '')}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="hover:text-primary transition-colors"

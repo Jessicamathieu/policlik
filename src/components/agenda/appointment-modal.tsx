@@ -29,22 +29,7 @@ import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import React from "react";
-
-// This would come from your data layer
-const mockClients = [
-  { id: "1", name: "Jean Dupont", address: "123 Rue Principale, Paris", phone: "0123456789" },
-  { id: "2", name: "Marie Curie", address: "456 Avenue des Sciences, Lyon", phone: "0987654321" },
-  { id: "3", name: "Pierre Martin", address: "789 Boulevard Liberté, Marseille", phone: "0612345678" },
-];
-
-// Mock service data
-const mockServices = [
-  { id: "SERV001", name: "Nettoyage Standard Résidentiel", colorClassName: "bg-blue-500" },
-  { id: "SERV002", name: "Grand Ménage de Printemps", colorClassName: "bg-green-500" },
-  { id: "SERV003", name: "Nettoyage de Bureaux", colorClassName: "bg-indigo-500" },
-  { id: "SERV004", name: "Nettoyage Après Chantier", colorClassName: "bg-purple-500" },
-  { id: "SERV005", name: "Lavage de Vitres", colorClassName: "bg-sky-500" },
-];
+import { clients as mockClients, services as mockServices } from "@/lib/data";
 
 interface Appointment {
   id?: string;
@@ -388,5 +373,3 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
     </Dialog>
   );
 }
-
-    

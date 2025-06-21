@@ -16,13 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils";
-
-const expenses = [
-  { id: "EXP001", date: new Date(2023, 10, 15), category: "Fournitures de bureau", description: "Achat de papier et stylos", amount: 45.50, receiptUrl: "https://placehold.co/100x100.png", status: "Vérifié" },
-  { id: "EXP002", date: new Date(2023, 10, 18), category: "Carburant", description: "Plein d'essence véhicule utilitaire", amount: 72.30, receiptUrl: null, status: "En attente" },
-  { id: "EXP003", date: new Date(2023, 11, 2), category: "Matériel de nettoyage", description: "Produits désinfectants", amount: 120.00, receiptUrl: "https://placehold.co/100x100.png", status: "Vérifié" },
-  { id: "EXP004", date: new Date(2023, 11, 5), category: "Repas d'affaires", description: "Déjeuner client M. Dupont", amount: 35.80, receiptUrl: null, status: "Rejeté" },
-];
+import { expenses } from "@/lib/data";
 
 const statusBadgeColors = {
   "Vérifié": "bg-emerald-100 text-emerald-800 border-emerald-300",
@@ -36,7 +30,7 @@ export default function DepensesPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Suivi des Dépenses</h1>
-          <p className="text-muted-foreground">Enregistrez et gérez toutes vos dépenses professionnelles.</p>
+          <p className="text-primary-foreground">Enregistrez et gérez toutes vos dépenses professionnelles.</p>
         </div>
         <div className="flex gap-2">
            <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">

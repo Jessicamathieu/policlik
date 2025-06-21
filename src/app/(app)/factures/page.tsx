@@ -17,8 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils";
-
-type InvoiceStatus = "Brouillon" | "Envoyée" | "Payée" | "Non Payée" | "Partiellement Payée" | "En Retard";
+import { type InvoiceStatus, invoices } from "@/lib/data";
 
 const statusColors: Record<InvoiceStatus, string> = {
   "Brouillon": "bg-gray-100 text-gray-800 border-gray-300", 
@@ -29,22 +28,13 @@ const statusColors: Record<InvoiceStatus, string> = {
   "En Retard": "bg-rose-100 text-rose-800 border-rose-300",
 };
 
-const invoices = [
-  { id: "FAC001", clientName: "Entreprise Alpha", dateEmission: new Date(2023, 10, 20), dateEcheance: new Date(2023, 11, 20), amount: 1500.00, status: "Payée" as InvoiceStatus },
-  { id: "FAC002", clientName: "Société Beta", dateEmission: new Date(2023, 11, 1), dateEcheance: new Date(2023, 12, 1), amount: 950.50, status: "Envoyée" as InvoiceStatus },
-  { id: "FAC003", clientName: "Organisation Gamma", dateEmission: new Date(2023, 9, 15), dateEcheance: new Date(2023, 10, 15), amount: 2500.75, status: "En Retard" as InvoiceStatus },
-  { id: "FAC004", clientName: "Particulier Delta", dateEmission: new Date(2023, 11, 10), dateEcheance: new Date(2024, 0, 10), amount: 420.00, status: "Brouillon" as InvoiceStatus },
-  { id: "FAC005", clientName: "Jean Dupont", dateEmission: new Date(2023, 10, 5), dateEcheance: new Date(2023, 11, 5), amount: 780.00, status: "Non Payée" as InvoiceStatus },
-];
-
-
 export default function FacturesPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Gestion des Factures</h1>
-          <p className="text-muted-foreground">Créez, suivez et gérez vos factures clients.</p>
+          <p className="text-primary-foreground">Créez, suivez et gérez vos factures clients.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
