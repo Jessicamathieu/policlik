@@ -44,7 +44,8 @@ export default function ServicesPage() {
 
   const filteredServices = services.filter(service =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    service.category.toLowerCase().includes(searchTerm.toLowerCase())
+    service.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (service.subCategory && service.subCategory.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const renderTableContent = () => {
@@ -52,9 +53,9 @@ export default function ServicesPage() {
       return Array.from({ length: 5 }).map((_, index) => (
         <TableRow key={index}>
           <TableCell><Skeleton className="h-5 w-4/5 bg-muted" /></TableCell>
+          <TableCell><Skeleton className="h-5 w-3/5 bg-muted" /></TableCell>
           <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-3/5 bg-muted" /></TableCell>
-          <TableCell><Skeleton className="h-5 w-2/5 bg-muted" /></TableCell>
-          <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-3/5 bg-muted" /></TableCell>
+          <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-2/5 bg-muted" /></TableCell>
           <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto bg-muted rounded-md" /></TableCell>
         </TableRow>
       ));
@@ -72,10 +73,10 @@ export default function ServicesPage() {
 
     return filteredServices.map((service) => (
       <TableRow key={service.id} className="border-b-border">
-        <TableCell className="font-medium text-card-foreground">{service.name}</TableCell>
-        <TableCell className="hidden sm:table-cell text-card-foreground">{service.category}</TableCell>
-        <TableCell className="text-card-foreground">{service.rate}</TableCell>
-        <TableCell className="hidden md:table-cell text-card-foreground">{service.unit}</TableCell>
+        <TableCell className="font-medium text-foreground">{service.name}</TableCell>
+        <TableCell className="text-foreground">{service.category}</TableCell>
+        <TableCell className="hidden sm:table-cell text-foreground">{service.subCategory || '-'}</TableCell>
+        <TableCell className="hidden md:table-cell text-foreground">{service.price ? `CAD$${service.price.toFixed(2)}` : '-'}</TableCell>
         <TableCell className="text-right">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -105,7 +106,7 @@ export default function ServicesPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Liste des Services</h1>
-          <p className="text-primary-foreground">Gérez vos services prédéfinis et leurs tarifs associés.</p>
+          <p className="text-muted-foreground">Gérez vos services prédéfinis et leurs tarifs associés.</p>
         </div>
         <div className="flex gap-2">
             <ImportServicesModal onImportSuccess={fetchServices}>
@@ -141,9 +142,9 @@ export default function ServicesPage() {
             <TableHeader>
               <TableRow className="border-b-border">
                 <TableHead className="text-muted-foreground">Nom du Service</TableHead>
-                <TableHead className="hidden sm:table-cell text-muted-foreground">Catégorie</TableHead>
-                <TableHead className="text-muted-foreground">Tarif</TableHead>
-                <TableHead className="hidden md:table-cell text-muted-foreground">Unité</TableHead>
+                <TableHead className="text-muted-foreground">Catégorie</TableHead>
+                <TableHead className="hidden sm:table-cell text-muted-foreground">Sous-Catégorie</TableHead>
+                <TableHead className="hidden md:table-cell text-muted-foreground">Prix</TableHead>
                 <TableHead className="text-right text-muted-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>

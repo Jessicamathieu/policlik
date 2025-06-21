@@ -22,12 +22,11 @@ import { addServicesBatch } from "@/services/service-service";
 import type { NewServiceData } from "@/services/service-service";
 
 interface CsvRowData {
-  "Nom": string;
-  "Catégorie": string;
-  "Tarif": string;
-  "Unité": string;
-  "Description": string;
-  "Prix": string; // Price will be a string from CSV, needs parsing
+  "service nom": string;
+  "categorie": string;
+  "sous_categorie": string;
+  "couleur_code": string;
+  "prix": string; // Price is a string from CSV
   [key: string]: string; 
 }
 
@@ -36,8 +35,8 @@ interface ImportServicesModalProps {
   onImportSuccess: () => void;
 }
 
-const requiredHeaders = ["Nom", "Catégorie", "Tarif", "Unité", "Description", "Prix"];
-const previewTableHeaders = ["Nom", "Catégorie", "Tarif", "Description"];
+const requiredHeaders = ["service nom", "categorie", "sous_categorie", "couleur_code", "prix"];
+const previewTableHeaders = ["Nom du Service", "Catégorie", "Sous-Catégorie", "Prix"];
 
 export function ImportServicesModal({ children, onImportSuccess }: ImportServicesModalProps) {
   const [open, setOpen] = useState(false);
@@ -64,12 +63,11 @@ export function ImportServicesModal({ children, onImportSuccess }: ImportService
         
         const validData = results.data.map(row => {
             return {
-                name: row["Nom"] || "",
-                category: row["Catégorie"] || "",
-                rate: row["Tarif"] || "",
-                unit: row["Unité"] || "",
-                description: row["Description"] || "",
-                price: parseFloat(row["Prix"]) || 0,
+                name: row["service nom"] || "",
+                category: row["categorie"] || "",
+                subCategory: row["sous_categorie"] || "",
+                colorCode: row["couleur_code"] || "",
+                price: parseFloat(row["prix"]?.replace(',', '.')) || 0,
             };
         });
 
@@ -208,8 +206,8 @@ export function ImportServicesModal({ children, onImportSuccess }: ImportService
                     <TableRow key={index}>
                       <TableCell>{row.name}</TableCell>
                       <TableCell>{row.category}</TableCell>
-                      <TableCell>{row.rate}</TableCell>
-                      <TableCell>{row.description}</TableCell>
+                      <TableCell>{row.subCategory}</TableCell>
+                      <TableCell>{row.price ? `CAD$${row.price.toFixed(2)}` : '-'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

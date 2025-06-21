@@ -16,11 +16,13 @@ export interface Service {
   id: string;
   name: string;
   category: string;
-  rate: string;
-  unit: string;
-  description: string;
-  price?: number; // for invoice form
-  colorClassName?: string; // for agenda
+  subCategory?: string;
+  description?: string;
+  rate?: string;
+  unit?: string;
+  price?: number;
+  colorCode?: string;
+  colorClassName?: string;
 }
 
 export interface Appointment {

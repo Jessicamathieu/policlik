@@ -1,4 +1,3 @@
-
 import { db } from '@/lib/firebase';
 import { collection, getDocs, writeBatch, doc } from 'firebase/firestore';
 import type { Service } from '@/lib/data';
@@ -20,11 +19,12 @@ export const getServices = async (): Promise<Service[]> => {
         id: doc.id,
         name: data.name || '',
         category: data.category || '',
-        rate: data.rate || '',
-        unit: data.unit || '',
-        description: data.description || '',
-        // Les champs optionnels peuvent ne pas exister sur le document
+        subCategory: data.subCategory,
+        rate: data.rate,
+        unit: data.unit,
+        description: data.description,
         price: data.price,
+        colorCode: data.colorCode,
         colorClassName: data.colorClassName,
       };
     });
