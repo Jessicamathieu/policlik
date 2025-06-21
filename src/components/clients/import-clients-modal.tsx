@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
@@ -21,13 +22,6 @@ import { addClientsBatch } from "@/services/client-service";
 import type { NewClientData } from "@/services/client-service";
 
 interface CsvRowData {
-  "Nom": string;
-  "Adresse municipale": string;
-  "Ville": string;
-  "Province": string;
-  "Code postal": string;
-  "Telephone": string;
-  "Courriel": string;
   [key: string]: string; 
 }
 
@@ -63,21 +57,28 @@ export function ImportClientsModal({ children, onImportSuccess }: ImportClientsM
         const fileHeaders = results.meta.fields || [];
         setHeaders(fileHeaders);
         
+        // Helper to find the actual header in the file, ignoring case and whitespace
+        const getRowValue = (row: CsvRowData, headerName: string): string => {
+            const actualHeader = fileHeaders.find(fh => fh.trim().toLowerCase() === headerName.toLowerCase());
+            return actualHeader ? row[actualHeader] || "" : "";
+        };
+
         const validData = results.data.map(row => {
             const addressParts = [
-                row["Adresse municipale"],
-                row["Ville"],
-                row["Province"],
-                row["Code postal"]
+                getRowValue(row, "Adresse municipale"),
+                getRowValue(row, "Ville"),
+                getRowValue(row, "Province"),
+                getRowValue(row, "Code postal")
             ].filter(Boolean).join(', ');
 
-            return {
-                name: row["Nom"] || "",
-                email: row["Courriel"] || "",
-                phone: row["Telephone"] || "",
+            const clientData: NewClientData = {
+                name: getRowValue(row, "Nom"),
+                email: getRowValue(row, "Courriel"),
+                phone: getRowValue(row, "Telephone"),
                 address: addressParts,
             };
-        });
+            return clientData.name ? clientData : null;
+        }).filter((item): item is NewClientData => item !== null);
 
         setParsedData(validData);
         setIsLoading(false);
@@ -111,7 +112,8 @@ export function ImportClientsModal({ children, onImportSuccess }: ImportClientsM
 
   const hasMissingHeaders = useMemo(() => {
     if (!file) return false;
-    return !requiredHeaders.every(header => headers.includes(header));
+    const presentHeaders = headers.map(h => h.trim().toLowerCase());
+    return !requiredHeaders.every(rh => presentHeaders.includes(rh.toLowerCase()));
   }, [headers, file]);
 
   const handleImport = async () => {

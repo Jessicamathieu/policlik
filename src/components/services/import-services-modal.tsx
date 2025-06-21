@@ -22,11 +22,6 @@ import { addServicesBatch } from "@/services/service-service";
 import type { NewServiceData } from "@/services/service-service";
 
 interface CsvRowData {
-  "service nom": string;
-  "categorie": string;
-  "sous_categorie": string;
-  "couleur_code": string;
-  "prix": string; // Price is a string from CSV
   [key: string]: string; 
 }
 
@@ -61,15 +56,23 @@ export function ImportServicesModal({ children, onImportSuccess }: ImportService
         const fileHeaders = results.meta.fields || [];
         setHeaders(fileHeaders);
         
+        // Helper to find the actual header in the file, ignoring case and whitespace
+        const getRowValue = (row: CsvRowData, headerName: string): string => {
+            const actualHeader = fileHeaders.find(fh => fh.trim().toLowerCase() === headerName.toLowerCase());
+            return actualHeader ? row[actualHeader] || "" : "";
+        };
+
         const validData = results.data.map(row => {
-            return {
-                name: row["service nom"] || "",
-                category: row["categorie"] || "",
-                subCategory: row["sous_categorie"] || "",
-                colorCode: row["couleur_code"] || "",
-                price: parseFloat(row["prix"]?.replace(',', '.')) || 0,
+            const priceValue = getRowValue(row, "prix").replace(',', '.');
+            const serviceData: NewServiceData = {
+                name: getRowValue(row, "service nom"),
+                category: getRowValue(row, "categorie"),
+                subCategory: getRowValue(row, "sous_categorie"),
+                colorCode: getRowValue(row, "couleur_code"),
+                price: parseFloat(priceValue) || 0,
             };
-        });
+            return serviceData.name ? serviceData : null;
+        }).filter((item): item is NewServiceData => item !== null);
 
         setParsedData(validData);
         setIsLoading(false);
@@ -103,7 +106,8 @@ export function ImportServicesModal({ children, onImportSuccess }: ImportService
 
   const hasMissingHeaders = useMemo(() => {
     if (!file) return false;
-    return !requiredHeaders.every(header => headers.includes(header));
+    const presentHeaders = headers.map(h => h.trim().toLowerCase());
+    return !requiredHeaders.every(rh => presentHeaders.includes(rh.toLowerCase()));
   }, [headers, file]);
 
   const handleImport = async () => {
