@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useCallback, Suspense, lazy } from "react";
@@ -10,13 +9,20 @@ const ImportClientsModal = lazy(() =>
   import("@/components/clients/import-clients-modal").then(module => ({ default: module.ImportClientsModal }))
 );
 
+const AddClientModal = lazy(() => 
+  import("@/components/clients/add-client-modal").then(module => ({ default: module.AddClientModal }))
+);
+
+
 export default function ClientsPage() {
     const [refreshKey, setRefreshKey] = useState(0);
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-    const handleImportSuccess = useCallback(() => {
+    const handleSuccess = useCallback(() => {
         setRefreshKey(oldKey => oldKey + 1);
         setIsImportModalOpen(false);
+        setIsAddModalOpen(false);
     }, []);
 
   return (
@@ -26,7 +32,7 @@ export default function ClientsPage() {
           <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Gestion des Clients</h1>
           <p className="text-muted-foreground">Consultez, gérez et importez votre base de données clients.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground" onClick={() => setIsImportModalOpen(true)}>
             <Upload className="mr-2 h-4 w-4" /> Importer
           </Button>
@@ -36,7 +42,7 @@ export default function ClientsPage() {
               <ImportClientsModal 
                 open={isImportModalOpen} 
                 onOpenChange={setIsImportModalOpen} 
-                onImportSuccess={handleImportSuccess} 
+                onImportSuccess={handleSuccess} 
               />
             </Suspense>
           )}
@@ -44,9 +50,19 @@ export default function ClientsPage() {
           <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
             <FileDown className="mr-2 h-4 w-4" /> Exporter
           </Button>
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={() => setIsAddModalOpen(true)}>
             <PlusCircle className="mr-2 h-4 w-4" /> Nouveau Client
           </Button>
+          
+          {isAddModalOpen && (
+            <Suspense fallback={null}>
+              <AddClientModal
+                open={isAddModalOpen}
+                onOpenChange={setIsAddModalOpen}
+                onClientAdded={handleSuccess}
+              />
+            </Suspense>
+          )}
         </div>
       </div>
       

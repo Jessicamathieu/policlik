@@ -1,11 +1,30 @@
 
 import { db } from '@/lib/firebase';
-import { collection, getDocs, writeBatch, doc, query, where } from 'firebase/firestore';
+import { collection, getDocs, writeBatch, doc, query, where, serverTimestamp, addDoc } from 'firebase/firestore';
 import type { Client } from '@/lib/data';
 
 // Ce type est utilisé lors de la création de nouveaux clients.
 // Il omet les champs qui sont générés par la base de données ou ajoutés plus tard.
 export type NewClientData = Omit<Client, 'id' | 'lastService' | 'totalSpent'>;
+
+
+/**
+ * Ajoute un seul client à Firestore.
+ * @param clientData - L'objet NewClientData du client à ajouter.
+ * @param userId - L'UID de l'utilisateur propriétaire.
+ */
+export const addClient = async (clientData: NewClientData, userId: string): Promise<void> => {
+  if (!userId) {
+    throw new Error("L'ID utilisateur est requis pour ajouter un client.");
+  }
+  const clientsCol = collection(db, 'clients');
+  await addDoc(clientsCol, {
+    ...clientData,
+    ownerId: userId,
+    createdAt: serverTimestamp()
+  });
+};
+
 
 /**
  * Ajoute plusieurs clients à Firestore en une seule opération (batch) pour un utilisateur spécifique.
@@ -18,7 +37,7 @@ export const addClientsBatch = async (clients: NewClientData[], userId: string):
 
     clients.forEach(client => {
         const docRef = doc(clientsCol); // Firestore génère un nouvel ID
-        batch.set(docRef, { ...client, ownerId: userId, createdAt: new Date() });
+        batch.set(docRef, { ...client, ownerId: userId, createdAt: serverTimestamp() });
     });
 
     await batch.commit();
