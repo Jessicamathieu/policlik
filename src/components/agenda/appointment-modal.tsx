@@ -70,9 +70,7 @@ export function AppointmentModal({ trigger, appointment, onSave, open, onOpenCha
   const [services, setServices] = React.useState<Service[]>([]);
   const [selectedClient, setSelectedClient] = React.useState(appointment?.clientId || "");
   const [selectedService, setSelectedService] = React.useState(appointment?.serviceId || "");
-  const [appointmentDate, setAppointmentDate] = React.useState<Date | undefined>(
-    appointment?.date ? (typeof appointment.date === 'string' ? parseISO(appointment.date) : appointment.date) : new Date()
-  );
+  const [appointmentDate, setAppointmentDate] = React.useState<Date | undefined>();
   const [startTime, setStartTime] = React.useState(appointment?.startTime || "09:00");
   const [endTime, setEndTime] = React.useState(appointment?.endTime || "10:00");
   const [description, setDescription] = React.useState(appointment?.description || "");

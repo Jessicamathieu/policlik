@@ -8,18 +8,20 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { type Appointment, getAppointments } from '@/lib/data';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AgendaPage() {
   const [currentView, setCurrentView] = useState<"day" | "week" | "month">("day");
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [currentDate, setCurrentDate] = useState<Date>(new Date()); 
+  const [currentDate, setCurrentDate] = useState<Date | null>(null); 
   const [printStartDate, setPrintStartDate] = useState<Date | undefined>(undefined);
   const [printEndDate, setPrintEndDate] = useState<Date | undefined>(undefined);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Fetches initial appointments on component mount
+    // Récupère les rendez-vous initiaux et définit la date actuelle uniquement sur le client pour éviter les erreurs d'hydratation.
     setAppointments(getAppointments());
+    setCurrentDate(new Date());
   }, []);
 
   const handleViewChange = useCallback((view: "day" | "week" | "month") => {
@@ -44,7 +46,8 @@ export default function AgendaPage() {
   }, [toast]);
 
   const displayedAppointments = appointments.filter(app => {
-    // Ensure app.date is treated as local date, not UTC, by appending T00:00:00
+    if (!currentDate) return false;
+    // Assurez-vous que la date de l'application est traitée comme une date locale, et non UTC, en ajoutant T00:00:00
     const appDate = new Date(app.date + "T00:00:00"); 
     
     if (currentView === "day") {
@@ -54,7 +57,7 @@ export default function AgendaPage() {
     }
     if (currentView === "week") {
       const startOfWeek = new Date(currentDate);
-      startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + (currentDate.getDay() === 0 ? -6 : 1)); // Monday as start of week
+      startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + (currentDate.getDay() === 0 ? -6 : 1)); // Lundi comme début de semaine
       startOfWeek.setHours(0,0,0,0);
       const endOfWeek = new Date(startOfWeek);
       endOfWeek.setDate(startOfWeek.getDate() + 6);
@@ -68,13 +71,14 @@ export default function AgendaPage() {
   });
 
   const handlePrintAppointments = useCallback(() => {
+    if (!currentDate) return;
     let appointmentsToPrint = displayedAppointments;
     let printMessage = `Impression de la vue ${currentView} demandée.`;
 
     if (currentView === "month" && printStartDate && printEndDate) {
       appointmentsToPrint = appointments.filter(app => {
         const appDate = new Date(app.date + "T00:00:00");
-        // Ensure printStartDate and printEndDate are at the beginning/end of their respective days for comparison
+        // S'assurer que printStartDate et printEndDate sont au début/fin de leurs jours respectifs pour la comparaison
         const start = new Date(printStartDate);
         start.setHours(0,0,0,0);
         const end = new Date(printEndDate);
@@ -89,8 +93,26 @@ export default function AgendaPage() {
     console.log(printMessage, "Rendez-vous à imprimer :", appointmentsToPrint);
     alert(`${printMessage} Les données des rendez-vous sont dans la console. L'impression réelle et la sélection des champs seront implémentées.`);
     
-  }, [currentView, appointments, displayedAppointments, printStartDate, printEndDate]);
+  }, [currentView, appointments, displayedAppointments, printStartDate, printEndDate, currentDate]);
 
+  // Affiche un squelette de chargement jusqu'à ce que la date actuelle soit définie côté client
+  if (!currentDate) {
+    return (
+      <div className="flex flex-col h-full">
+        <h1 className="text-3xl font-bold tracking-tight mb-6 font-headline text-foreground">Agenda des Rendez-vous</h1>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-4 bg-card text-card-foreground rounded-lg shadow">
+          <Skeleton className="h-10 w-36 bg-muted"/>
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-24 bg-muted"/>
+            <Skeleton className="h-10 w-48 bg-muted"/>
+          </div>
+        </div>
+        <div className="flex-grow border rounded-lg shadow-sm">
+          <Skeleton className="h-full w-full bg-muted/50"/>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">

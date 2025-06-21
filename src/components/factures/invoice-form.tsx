@@ -125,16 +125,32 @@ export function InvoiceForm() {
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
+    // Initialise les valeurs par défaut avec des données statiques pour éviter les erreurs d'hydratation.
+    // Elles seront réinitialisées dans useEffect côté client.
     defaultValues: {
+      invoiceId: "",
+      clientId: "",
+      issueDate: new Date(),
+      dueDate: new Date(),
+      lineItems: [{ serviceId: "", description: "", quantity: 1, unitPrice: 0 }],
+      notes: "",
+      taxRate: 0,
+    },
+  });
+
+  // Réinitialise le formulaire avec des valeurs dynamiques (comme la date actuelle) côté client.
+  React.useEffect(() => {
+    form.reset({
       invoiceId: `FAC-${Date.now().toString().slice(-6)}`,
       clientId: searchParams.get("clientId") || "",
       issueDate: new Date(),
       dueDate: addDays(new Date(), 30),
       lineItems: [{ serviceId: "", description: "", quantity: 1, unitPrice: 0 }],
       notes: "",
-      taxRate: 0, // Default no tax
-    },
-  });
+      taxRate: 0,
+    });
+  }, [form, searchParams]);
+
 
   const { fields, append, remove, update } = useFieldArray({
     control: form.control,
