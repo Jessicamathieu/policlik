@@ -26,11 +26,24 @@ interface ClientData {
   address: string;
 }
 
+interface CsvRowData {
+  "Nom": string;
+  "Adresse municipale": string;
+  "Ville": string;
+  "Province": string;
+  "Code postal": string;
+  "Telephone": string;
+  "Courriel": string;
+  [key: string]: string; 
+}
+
+
 interface ImportClientsModalProps {
   children: React.ReactNode;
 }
 
-const requiredHeaders = ["name", "email", "phone", "address"];
+const requiredHeaders = ["Nom", "Adresse municipale", "Ville", "Province", "Code postal", "Telephone", "Courriel"];
+const previewTableHeaders = ["Nom", "Email", "Téléphone", "Adresse Complète"];
 
 export function ImportClientsModal({ children }: ImportClientsModalProps) {
   const [open, setOpen] = useState(false);
@@ -48,19 +61,28 @@ export function ImportClientsModal({ children }: ImportClientsModalProps) {
     setParsedData([]);
     setHeaders([]);
 
-    Papa.parse<ClientData>(selectedFile, {
+    Papa.parse<CsvRowData>(selectedFile, {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
         const fileHeaders = results.meta.fields || [];
         setHeaders(fileHeaders);
         
-        const validData = results.data.map(row => ({
-          name: row.name || "",
-          email: row.email || "",
-          phone: row.phone || "",
-          address: row.address || "",
-        }));
+        const validData = results.data.map(row => {
+            const addressParts = [
+                row["Adresse municipale"],
+                row["Ville"],
+                row["Province"],
+                row["Code postal"]
+            ].filter(Boolean).join(', ');
+
+            return {
+                name: row["Nom"] || "",
+                email: row["Courriel"] || "",
+                phone: row["Telephone"] || "",
+                address: addressParts,
+            };
+        });
 
         setParsedData(validData);
         setIsLoading(false);
@@ -78,21 +100,24 @@ export function ImportClientsModal({ children }: ImportClientsModalProps) {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    processFile(selectedFile!);
+    if (selectedFile) {
+        processFile(selectedFile);
+    }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const droppedFile = e.dataTransfer.files?.[0];
-    processFile(droppedFile!);
+     if (droppedFile) {
+        processFile(droppedFile);
+    }
   };
 
   const hasMissingHeaders = useMemo(() => {
-    if (parsedData.length === 0 && !file) return false;
-    if (headers.length === 0) return false;
+    if (!file) return false;
     return !requiredHeaders.every(header => headers.includes(header));
-  }, [headers, parsedData, file]);
+  }, [headers, file]);
 
   const handleImport = async () => {
     if (hasMissingHeaders) {
@@ -131,7 +156,7 @@ export function ImportClientsModal({ children }: ImportClientsModalProps) {
         <DialogHeader>
           <DialogTitle>Importer des Clients depuis un fichier CSV</DialogTitle>
           <DialogDescription>
-            Sélectionnez un fichier CSV avec les colonnes: {requiredHeaders.join(', ')}.
+            Sélectionnez un fichier CSV avec les colonnes requises: {requiredHeaders.join(', ')}.
           </DialogDescription>
         </DialogHeader>
 
@@ -173,7 +198,7 @@ export function ImportClientsModal({ children }: ImportClientsModalProps) {
               <Table>
                 <TableHeader className="sticky top-0 bg-muted">
                   <TableRow>
-                    {requiredHeaders.map(header => <TableHead key={header}>{header}</TableHead>)}
+                    {previewTableHeaders.map(header => <TableHead key={header}>{header}</TableHead>)}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
