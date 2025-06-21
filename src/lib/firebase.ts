@@ -24,12 +24,7 @@ const firebaseConfig = {
 };
 
 // Initialise Firebase
-// Ne modifiez pas le code ci-dessous
-let app;
-try {
-  app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-} catch (e) {
-  console.error("Erreur d'initialisation de Firebase. Vérifiez que firebaseConfig est correct.", e);
-  // Si l'initialisation échoue, on crée un objet 'app' factice pour éviter d'autres erreurs,
-  // mais l'application ne fonctionnera pas avec la base de données.
-  app = {};
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+export { app, db };
