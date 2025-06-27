@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowUpRight, Users, Calendar, DollarSign, PlusCircle, FileText } from "lucide-react";
+import { ArrowUpRight, Users, Calendar, DollarSign, FileText, CalendarPlus, UserPlus, FilePlus } from "lucide-react";
 import Link from "next/link";
 import { type Appointment } from "@/lib/data";
 import { getAppointmentsForUser } from "@/services/appointment-service";
@@ -22,15 +22,6 @@ export default function DashboardPage() {
   const [stats, setStats] = useState({ clientCount: 0, monthlyRevenue: 0, pendingInvoices: 0 });
   const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const handleAIPrompt = () => {
-    const promptText = window.prompt("Qu’est-ce que tu veux créer ? (ex. : Facture, RDV, Client)");
-    if (promptText) {
-      console.log("Demande à l'IA :", promptText);
-      // Future AI call can be placed here
-    }
-  };
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -195,31 +186,42 @@ export default function DashboardPage() {
   // Final component structure
   return (
     <div className="flex flex-col gap-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight font-headline">Tableau de Bord</h1>
-                <p className="text-muted-foreground">Aperçu rapide de votre activité.</p>
-            </div>
-            <div className="mt-2 sm:mt-0">
-              <h3 className="text-lg font-semibold text-foreground mb-2">Actions rapides</h3>
-              <Button
-                onClick={handleAIPrompt}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground"
-              >
-                <PlusCircle className="mr-2 h-4 w-4" /> Demander à l’IA
-              </Button>
-            </div>
+        <div>
+            <h1 className="text-3xl font-bold tracking-tight font-headline">Tableau de Bord</h1>
+            <p className="text-muted-foreground">Aperçu rapide de votre activité.</p>
         </div>
         
         <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
-                    Rendez-vous à venir
-                </CardTitle>
-                <CardDescription>
-                    Vos 5 prochains rendez-vous planifiés.
-                </CardDescription>
+            <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <CardTitle className="flex items-center gap-2">
+                        <Calendar className="h-5 w-5" />
+                        Rendez-vous à venir
+                    </CardTitle>
+                    <CardDescription>
+                        Vos 5 prochains rendez-vous planifiés.
+                    </CardDescription>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                    <Button asChild variant="outline">
+                        <Link href="/agenda" className="flex items-center">
+                            <CalendarPlus className="mr-2 h-4 w-4" />
+                            Nouveau RDV
+                        </Link>
+                    </Button>
+                    <Button asChild variant="outline">
+                        <Link href="/clients" className="flex items-center">
+                            <UserPlus className="mr-2 h-4 w-4" />
+                            Nouveau Client
+                        </Link>
+                    </Button>
+                    <Button asChild>
+                        <Link href="/factures/nouveau?type=facture">
+                            <FilePlus className="mr-2 h-4 w-4" />
+                            Nouvelle Facture
+                        </Link>
+                    </Button>
+                </div>
             </CardHeader>
             {renderUpcomingAppointments()}
         </Card>
