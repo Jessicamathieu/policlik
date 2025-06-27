@@ -14,12 +14,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Icons } from "@/components/icons";
 import { LogOut, UserCircle, Settings } from "lucide-react";
-import { appNavItems, pageColors as navPageColors } from "@/config/nav";
+import { appNavItems } from "@/config/nav";
 import type { NavItem } from "@/types";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
+import Image from "next/image";
 
 
 // Helper function to determine the active tab base href for Tabs value
@@ -48,18 +48,19 @@ export function AppHeader() {
   const { user, signOut } = useAuth();
   const activeTabValue = getCurrentBasePathForTabs(pathname, appNavItems);
 
-  const gradientStops = navPageColors.map((pc, index, arr) => ({
-    offset: arr.length === 1 ? "100%" : `${(index / (arr.length - 1)) * 100}%`,
-    color: pc.color,
-  }));
-
   return (
-    <header className="sticky top-0 z-30 flex w-full flex-col bg-background shadow-sm">
+    <header className="sticky top-0 z-30 flex w-full flex-col bg-background">
       {/* Top Part: Logo and User Actions */}
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
+      <div className="flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
         <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-          <Icons.Logo className="h-6 w-6 text-primary" />
-          <span className="font-headline text-lg">PolicliK</span>
+           <Image
+            src="/logo-PoliCliK.png"
+            alt="PolicliK Logo"
+            width={120}
+            height={40}
+            className="h-10 w-auto"
+            priority
+          />
         </Link>
         
         <DropdownMenu>
@@ -112,7 +113,7 @@ export function AppHeader() {
       {/* Bottom Part: Navigation Tabs */}
       <nav className="w-full bg-background">
         <Tabs value={activeTabValue} className="w-full">
-          <TabsList className="container mx-auto h-12 justify-start rounded-none bg-transparent p-0 -mb-px overflow-x-auto px-4 sm:px-6 md:px-8">
+          <TabsList className="h-12 w-full justify-start rounded-none bg-transparent p-0 overflow-x-auto px-4 sm:px-6 md:px-8">
             {appNavItems.map((item) => {
               if (!item.href) return null; 
               const Icon = item.icon;
@@ -146,20 +147,6 @@ export function AppHeader() {
             })}
           </TabsList>
         </Tabs>
-        {/* Spilled Paint SVG Separator */}
-        <div className="relative w-full h-3 md:h-4 -mt-px"> 
-          <svg width="100%" height="100%" viewBox="0 0 1200 15" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="pageColorGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                {gradientStops.map(stop => (
-                  <stop key={stop.offset} offset={stop.offset} style={{stopColor: stop.color, stopOpacity:1}} />
-                ))}
-              </linearGradient>
-            </defs>
-            <path d="M0 8 C 50 2, 100 10, 150 7 S 250 2, 300 8 S 400 13, 450 8 S 550 3, 600 8 S 700 13, 750 8 S 850 3, 900 8 S 1000 13, 1050 8 S 1150 2, 1200 8" 
-                  stroke="url(#pageColorGradient)" strokeWidth="3" fill="none" strokeLinecap="round" />
-          </svg>
-        </div>
       </nav>
     </header>
   );
