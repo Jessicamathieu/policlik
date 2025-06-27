@@ -113,7 +113,7 @@ export function AppHeader() {
       {/* Bottom Part: Navigation Tabs */}
       <nav className="w-full bg-background">
         <Tabs value={activeTabValue} className="w-full">
-          <TabsList className="h-12 w-full justify-start rounded-none bg-transparent p-0 overflow-x-auto px-4 sm:px-6 md:px-8">
+          <TabsList className="grid h-12 w-full grid-cols-8 rounded-none bg-transparent p-0">
             {appNavItems.map((item) => {
               if (!item.href) return null; 
               const Icon = item.icon;
@@ -125,7 +125,7 @@ export function AppHeader() {
                   value={item.href}
                   asChild
                   className={cn(
-                    "h-full rounded-none px-3 lg:px-4 text-sm transition-all duration-150 ease-in-out",
+                    "h-full rounded-none p-0 text-sm transition-all duration-150 ease-in-out",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
                     isActive ? "font-medium" : "hover:opacity-100"
                   )}
@@ -138,8 +138,8 @@ export function AppHeader() {
                     } as React.CSSProperties
                   }
                 >
-                  <Link href={item.href} style={{color: item.contrastColor }}>
-                    {Icon && <Icon className="h-4 w-4 shrink-0 lg:mr-2" />}
+                  <Link href={item.href} style={{color: item.contrastColor }} className="flex h-full w-full items-center justify-center gap-2 px-3 lg:px-4">
+                    {Icon && <Icon className="h-4 w-4 shrink-0" />}
                     <span className="hidden lg:inline">{item.title}</span>
                   </Link>
                 </TabsTrigger>
