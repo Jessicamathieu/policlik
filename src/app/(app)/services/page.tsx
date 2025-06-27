@@ -16,6 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSortableData } from "@/hooks/use-sortable-data";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { CatalogueCard, CatalogueCardSkeleton } from "@/components/services/catalogue-card";
 
 const ImportServicesModal = lazy(() => 
   import("@/components/services/import-services-modal").then(module => ({ default: module.ImportServicesModal }))
@@ -24,7 +26,7 @@ const ImportProduitsModal = lazy(() =>
   import("@/components/produits/import-produits-modal").then(module => ({ default: module.ImportProduitsModal }))
 );
 
-type CatalogueItem = (Service | Product) & { itemType: 'Service' | 'Produit' };
+export type CatalogueItem = (Service | Product) & { itemType: 'Service' | 'Produit' };
 
 export default function CataloguePage() {
   const [items, setItems] = useState<CatalogueItem[]>([]);
@@ -33,6 +35,7 @@ export default function CataloguePage() {
   const [isImportServiceModalOpen, setIsImportServiceModalOpen] = useState(false);
   const [isImportProduitModalOpen, setIsImportProduitModalOpen] = useState(false);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const fetchItems = useCallback(async () => {
     setIsLoading(true);
@@ -85,67 +88,115 @@ export default function CataloguePage() {
     return sortConfig.direction === 'ascending' ? '▲' : '▼';
   };
 
-  const renderTableContent = () => {
-    if (isLoading) {
-      return Array.from({ length: 8 }).map((_, index) => (
-        <TableRow key={index}>
-          <TableCell><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
-          <TableCell><Skeleton className="h-5 w-4/5 bg-muted" /></TableCell>
-          <TableCell><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
-          <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-3/5 bg-muted" /></TableCell>
-          <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-3/5 bg-muted" /></TableCell>
-          <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
-          <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto bg-muted rounded-md" /></TableCell>
-        </TableRow>
-      ));
-    }
-
-    if (sortedItems.length === 0) {
-        return (
+  const renderDesktopView = () => (
+      <Table>
+        <TableHeader>
+          <TableRow className="border-b-border">
+            <TableHead className="w-[120px] text-muted-foreground">
+                <Button variant="ghost" onClick={() => requestSort('itemType')}>
+                    Type {getSortIndicator('itemType')}
+                </Button>
+            </TableHead>
+            <TableHead className="text-muted-foreground">
+              <Button variant="ghost" onClick={() => requestSort('name')}>
+                Nom {getSortIndicator('name')}
+              </Button>
+            </TableHead>
+            <TableHead className="text-muted-foreground">
+                <Button variant="ghost" onClick={() => requestSort('code' as any)}>
+                Code {getSortIndicator('code' as any)}
+              </Button>
+            </TableHead>
+            <TableHead className="hidden sm:table-cell text-muted-foreground">
+              <Button variant="ghost" onClick={() => requestSort('category')}>
+                Catégorie {getSortIndicator('category')}
+              </Button>
+            </TableHead>
+            <TableHead className="hidden md:table-cell text-muted-foreground">
+              <Button variant="ghost" onClick={() => requestSort('subCategory')}>
+                Sous-Catégorie {getSortIndicator('subCategory')}
+              </Button>
+            </TableHead>
+            <TableHead className="hidden lg:table-cell text-muted-foreground">
+              <Button variant="ghost" onClick={() => requestSort('price')}>
+                Prix {getSortIndicator('price')}
+              </Button>
+            </TableHead>
+            <TableHead className="text-right text-muted-foreground">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isLoading ? (
+            Array.from({ length: 8 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
+                <TableCell><Skeleton className="h-5 w-4/5 bg-muted" /></TableCell>
+                <TableCell><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
+                <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-3/5 bg-muted" /></TableCell>
+                <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-3/5 bg-muted" /></TableCell>
+                <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
+                <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto bg-muted rounded-md" /></TableCell>
+              </TableRow>
+            ))
+          ) : sortedItems.length > 0 ? (
+            sortedItems.map((item) => (
+              <TableRow key={`${item.itemType}-${item.id}`} className="border-b-border">
+                <TableCell>
+                  <Badge variant="outline" className={cn('font-medium', item.itemType === 'Service' ? 'border-sky-300 text-sky-800 bg-sky-50' : 'border-lime-300 text-lime-800 bg-lime-50')}>
+                    {item.itemType === 'Service' ? <Briefcase className="mr-1 h-3 w-3" /> : <Package className="mr-1 h-3 w-3" />}
+                    {item.itemType}
+                  </Badge>
+                </TableCell>
+                <TableCell className="font-medium text-foreground">{item.name}</TableCell>
+                <TableCell className="text-muted-foreground">{'code' in item && item.code ? item.code : 'N/A'}</TableCell>
+                <TableCell className="hidden sm:table-cell text-foreground">{item.category}</TableCell>
+                <TableCell className="hidden md:table-cell text-foreground">{item.subCategory || '-'}</TableCell>
+                <TableCell className="hidden lg:table-cell text-foreground font-semibold">{item.price ? `CAD$${item.price.toFixed(2)}` : '-'}</TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button aria-haspopup="true" size="icon" variant="ghost" className="text-muted-foreground hover:bg-muted/50">
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Actions pour {item.name}</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end"> 
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem>
+                        <Edit3 className="mr-2 h-4 w-4 text-primary" /> Modifier
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive">
+                        <Trash2 className="mr-2 h-4 w-4" /> Supprimer
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
             <TableRow>
                 <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                     Aucun service ou produit trouvé. Commencez par en ajouter ou en importer.
                 </TableCell>
             </TableRow>
-        );
-    }
+          )}
+        </TableBody>
+      </Table>
+  );
 
-    return sortedItems.map((item) => (
-      <TableRow key={`${item.itemType}-${item.id}`} className="border-b-border">
-        <TableCell>
-          <Badge variant="outline" className={cn('font-medium', item.itemType === 'Service' ? 'border-sky-300 text-sky-800 bg-sky-50' : 'border-lime-300 text-lime-800 bg-lime-50')}>
-            {item.itemType === 'Service' ? <Briefcase className="mr-1 h-3 w-3" /> : <Package className="mr-1 h-3 w-3" />}
-            {item.itemType}
-          </Badge>
-        </TableCell>
-        <TableCell className="font-medium text-foreground">{item.name}</TableCell>
-        <TableCell className="text-muted-foreground">{'code' in item && item.code ? item.code : 'N/A'}</TableCell>
-        <TableCell className="hidden sm:table-cell text-foreground">{item.category}</TableCell>
-        <TableCell className="hidden md:table-cell text-foreground">{item.subCategory || '-'}</TableCell>
-        <TableCell className="hidden lg:table-cell text-foreground font-semibold">{item.price ? `CAD$${item.price.toFixed(2)}` : '-'}</TableCell>
-        <TableCell className="text-right">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button aria-haspopup="true" size="icon" variant="ghost" className="text-muted-foreground hover:bg-muted/50">
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Actions pour {item.name}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end"> 
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem>
-                <Edit3 className="mr-2 h-4 w-4 text-primary" /> Modifier
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive">
-                <Trash2 className="mr-2 h-4 w-4" /> Supprimer
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </TableCell>
-      </TableRow>
-    ));
-  };
-
+  const renderMobileView = () => (
+    <div className="space-y-4">
+      {isLoading ? (
+        Array.from({ length: 5 }).map((_, index) => <CatalogueCardSkeleton key={index} />)
+      ) : sortedItems.length > 0 ? (
+        sortedItems.map((item) => <CatalogueCard key={`${item.itemType}-${item.id}`} item={item} />)
+      ) : (
+        <div className="text-center py-10 text-muted-foreground">
+          Aucun article trouvé pour votre recherche.
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -203,46 +254,7 @@ export default function CataloguePage() {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow className="border-b-border">
-                <TableHead className="w-[120px] text-muted-foreground">
-                    <Button variant="ghost" onClick={() => requestSort('itemType')}>
-                        Type {getSortIndicator('itemType')}
-                    </Button>
-                </TableHead>
-                <TableHead className="text-muted-foreground">
-                  <Button variant="ghost" onClick={() => requestSort('name')}>
-                    Nom {getSortIndicator('name')}
-                  </Button>
-                </TableHead>
-                <TableHead className="text-muted-foreground">
-                   <Button variant="ghost" onClick={() => requestSort('code' as any)}>
-                    Code {getSortIndicator('code' as any)}
-                  </Button>
-                </TableHead>
-                <TableHead className="hidden sm:table-cell text-muted-foreground">
-                  <Button variant="ghost" onClick={() => requestSort('category')}>
-                    Catégorie {getSortIndicator('category')}
-                  </Button>
-                </TableHead>
-                <TableHead className="hidden md:table-cell text-muted-foreground">
-                  <Button variant="ghost" onClick={() => requestSort('subCategory')}>
-                    Sous-Catégorie {getSortIndicator('subCategory')}
-                  </Button>
-                </TableHead>
-                <TableHead className="hidden lg:table-cell text-muted-foreground">
-                  <Button variant="ghost" onClick={() => requestSort('price')}>
-                    Prix {getSortIndicator('price')}
-                  </Button>
-                </TableHead>
-                <TableHead className="text-right text-muted-foreground">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {renderTableContent()}
-            </TableBody>
-          </Table>
+          {isMobile ? renderMobileView() : renderDesktopView()}
         </CardContent>
       </Card>
     </div>
