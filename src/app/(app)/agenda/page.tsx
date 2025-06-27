@@ -112,7 +112,10 @@ export default function AgendaPage() {
   if (!currentDate || isLoading) {
     return (
       <div className="flex flex-col h-full">
-        <h1 className="text-3xl font-bold tracking-tight mb-6 font-headline text-foreground">Agenda des Rendez-vous</h1>
+        <div className="mb-6">
+            <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Agenda des Rendez-vous</h1>
+            <div className="mt-2 h-1 w-24 bg-primary rounded-full" />
+        </div>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-4 bg-card text-card-foreground rounded-lg shadow">
           <Skeleton className="h-10 w-36 bg-muted"/>
           <div className="flex gap-2">
@@ -129,7 +132,10 @@ export default function AgendaPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <h1 className="text-3xl font-bold tracking-tight mb-6 font-headline text-foreground">Agenda des Rendez-vous</h1>
+        <div className="mb-6">
+            <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Agenda des Rendez-vous</h1>
+            <div className="mt-2 h-1 w-24 bg-primary rounded-full" />
+        </div>
       <AgendaControls 
         currentView={currentView} 
         onViewChange={handleViewChange}

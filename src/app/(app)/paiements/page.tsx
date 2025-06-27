@@ -188,6 +188,7 @@ export default function PaiementsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Suivi des Paiements</h1>
           <p className="text-muted-foreground">Consultez l'historique et le statut de tous les paiements.</p>
+          <div className="mt-2 h-1 w-24 bg-primary rounded-full" />
         </div>
           <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground">
             <FileDown className="mr-2 h-4 w-4" /> Exporter

@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowUpRight, Users, Calendar, DollarSign, FileText, CalendarPlus, UserPlus, FilePlus } from "lucide-react";
@@ -126,36 +125,34 @@ export default function DashboardPage() {
   const renderUpcomingAppointments = () => {
     if (isLoading) {
         return (
-             <CardContent>
-                <div className="space-y-4">
-                    {Array.from({ length: 3 }).map((_, index) => (
-                        <div key={index} className="flex items-center gap-4">
-                            <Skeleton className="h-14 w-14 rounded-md bg-muted" />
-                            <div className="ml-4 space-y-2">
-                                <Skeleton className="h-4 w-[250px] bg-muted" />
-                                <Skeleton className="h-4 w-[200px] bg-muted" />
-                            </div>
-                            <Skeleton className="ml-auto h-8 w-20 rounded-md bg-muted" />
+             <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="flex items-center gap-4">
+                        <Skeleton className="h-14 w-14 rounded-md bg-muted" />
+                        <div className="ml-4 space-y-2">
+                            <Skeleton className="h-4 w-[250px] bg-muted" />
+                            <Skeleton className="h-4 w-[200px] bg-muted" />
                         </div>
-                    ))}
-                </div>
-            </CardContent>
+                        <Skeleton className="ml-auto h-8 w-20 rounded-md bg-muted" />
+                    </div>
+                ))}
+            </div>
         );
     }
     if (upcomingAppointments.length === 0) {
         return (
-            <CardContent className="flex flex-col items-center justify-center text-center text-muted-foreground h-64">
+            <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-64">
                 <Calendar className="h-12 w-12 mb-4 text-primary" />
                 <p className="font-semibold">Aucun rendez-vous à venir.</p>
                 <p className="text-sm">Planifiez votre prochain service dès maintenant.</p>
                 <Button asChild variant="secondary" className="mt-4">
                     <Link href="/agenda">Planifier un RDV</Link>
                 </Button>
-            </CardContent>
+            </div>
         );
     }
     return (
-        <CardContent className="space-y-6">
+        <div className="space-y-6">
             {upcomingAppointments.map(app => (
                 <div key={app.id} className="flex items-center gap-4">
                     <div className="flex flex-col items-center justify-center p-2 rounded-md bg-muted aspect-square h-14 text-center">
@@ -179,7 +176,7 @@ export default function DashboardPage() {
                     </Button>
                 </div>
             ))}
-        </CardContent>
+        </div>
     );
   }
 
@@ -189,47 +186,44 @@ export default function DashboardPage() {
         <div>
             <h1 className="text-3xl font-bold tracking-tight font-headline">Tableau de Bord</h1>
             <p className="text-muted-foreground">Aperçu rapide de votre activité.</p>
+            <div className="mt-2 h-1 w-24 bg-primary rounded-full" />
         </div>
 
+        <div className="relative rounded-2xl border-4 border-violet-500 bg-card p-6 shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl">
+            <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full bg-violet-500 px-3 py-1.5 text-sm font-bold text-white">
+                <Calendar className="h-4 w-4" />
+                <span>Rendez-vous à venir</span>
+            </div>
+            
+            <div className="absolute -top-4 right-4 flex flex-wrap items-center gap-2">
+                 <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
+                    <Link href="/agenda" className="flex items-center">
+                        <CalendarPlus className="mr-2 h-4 w-4" />
+                        Nouveau RDV
+                    </Link>
+                </Button>
+                <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
+                    <Link href="/clients" className="flex items-center">
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Nouveau Client
+                    </Link>
+                </Button>
+                <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
+                    <Link href="/factures/nouveau?type=facture">
+                        <FilePlus className="mr-2 h-4 w-4" />
+                        Nouvelle Facture
+                    </Link>
+                </Button>
+            </div>
+            
+            <div className="pt-8">
+                 {renderUpcomingAppointments()}
+            </div>
+        </div>
+        
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {renderStatCards()}
         </div>
-        
-        <Card>
-            <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <CardTitle className="flex items-center gap-2">
-                        <Calendar className="h-5 w-5 text-primary" />
-                        Rendez-vous à venir
-                    </CardTitle>
-                    <CardDescription>
-                        Vos 5 prochains rendez-vous planifiés.
-                    </CardDescription>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                    <Button asChild variant="outline">
-                        <Link href="/agenda" className="flex items-center">
-                            <CalendarPlus className="mr-2 h-4 w-4" />
-                            Nouveau RDV
-                        </Link>
-                    </Button>
-                    <Button asChild variant="outline">
-                        <Link href="/clients" className="flex items-center">
-                            <UserPlus className="mr-2 h-4 w-4" />
-                            Nouveau Client
-                        </Link>
-                    </Button>
-                    <Button asChild variant="outline">
-                        <Link href="/factures/nouveau?type=facture">
-                            <FilePlus className="mr-2 h-4 w-4" />
-                            Nouvelle Facture
-                        </Link>
-                    </Button>
-                </div>
-            </CardHeader>
-            {renderUpcomingAppointments()}
-        </Card>
-
     </div>
   );
 }

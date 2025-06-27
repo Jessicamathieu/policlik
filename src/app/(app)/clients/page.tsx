@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useCallback, Suspense, lazy } from "react";
@@ -31,6 +32,7 @@ export default function ClientsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Gestion des Clients</h1>
           <p className="text-muted-foreground">Consultez, gérez et importez votre base de données clients.</p>
+          <div className="mt-2 h-1 w-24 bg-primary rounded-full" />
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground" onClick={() => setIsImportModalOpen(true)}>

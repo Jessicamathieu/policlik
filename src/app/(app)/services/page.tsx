@@ -204,6 +204,7 @@ export default function CataloguePage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">Catalogue</h1>
           <p className="text-muted-foreground">Gérez votre catalogue de services et produits.</p>
+          <div className="mt-2 h-1 w-24 bg-primary rounded-full" />
         </div>
         <div className="flex flex-wrap gap-2">
             <Button variant="outline" className="text-foreground border-input hover:bg-accent hover:text-accent-foreground" onClick={() => setIsImportServiceModalOpen(true)}>
