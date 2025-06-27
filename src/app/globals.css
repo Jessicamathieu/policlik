@@ -66,7 +66,7 @@
     --destructive-s: 0%;
     --destructive-foreground-l: 100%;
     --destructive: hsl(var(--destructive-h), var(--destructive-s), var(--destructive-l));
-    --destructive-foreground: hsl(var(--destructive-foreground-h), var(--destructive-foreground-s), var(--destructive-foreground-l));
+    --destructive-foreground: hsl(var(--destructive-foreground-h), var(--destructive-s), var(--destructive-foreground-l));
 
     /* Secondary color (Lighter, softer Blue) - For less emphasis elements */
     --secondary-h: 210;
@@ -158,7 +158,7 @@
     --secondary-s: 30%;
     --secondary-l: 25%; /* Darker secondary background */
     --secondary-foreground-h: 210;
-    --secondary-foreground-s: 40%;
+    --secondary-s: 40%;
     --secondary-foreground-l: 90%; /* Lighter secondary text */
     
     --chart-1: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
@@ -192,32 +192,19 @@
             hsl(var(--primary-h), var(--primary-s), var(--primary-l)), 
             hsl(var(--chart-3)), 
             hsl(var(--accent-h), var(--accent-s), var(--accent-l))) 1;
-        transition: transform 0.4s ease, box-shadow 0.4s ease, background-color 0.4s ease;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
     }
 
     .card-dynamic-border:hover {
-        background-color: #ffff00; /* Bright yellow */
-        @apply -translate-y-2 scale-[1.03] shadow-2xl text-gray-800;
-    }
-    
-    /* On hover, force all text inside the card to be the dark color for readability */
-    .card-dynamic-border:hover *:not(svg) {
-      @apply text-gray-800;
-      transition: color 0.3s ease;
-    }
-
-    .card-dynamic-border:hover .text-muted-foreground {
-        @apply text-gray-800/80;
+        @apply -translate-y-2 scale-[1.03] shadow-2xl;
     }
     
     .card-dynamic-border:hover svg {
       transform: scale(1.15) rotate(5deg);
-      @apply text-gray-800;
-      transition: transform 0.3s ease, color 0.3s ease;
     }
 
     .card-dynamic-border svg {
-       transition: transform 0.3s ease, color 0.3s ease;
+       transition: transform 0.3s ease;
     }
 }
 
