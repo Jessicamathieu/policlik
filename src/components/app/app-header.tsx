@@ -19,7 +19,7 @@ import { appNavItems } from "@/config/nav";
 import type { NavItem } from "@/types";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
-import Image from "next/image";
+import { Icons } from "@/components/icons";
 
 
 // Helper function to determine the active tab base href for Tabs value
@@ -53,14 +53,8 @@ export function AppHeader() {
       {/* Top Part: Logo and User Actions */}
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
         <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-           <Image
-            src="/logo-PoliCliK.png"
-            alt="PolicliK Logo"
-            width={120}
-            height={40}
-            className="h-10 w-auto"
-            priority
-          />
+           <Icons.Logo className="h-7 w-7 text-primary" />
+           <span className="font-bold text-lg font-headline">PolicliK</span>
         </Link>
         
         <DropdownMenu>
@@ -113,7 +107,7 @@ export function AppHeader() {
       {/* Bottom Part: Navigation Tabs */}
       <nav className="w-full bg-background">
         <Tabs value={activeTabValue} className="w-full">
-          <TabsList className="grid h-12 w-full grid-cols-8 rounded-none bg-transparent p-0">
+          <TabsList className="flex h-12 items-center justify-start rounded-none bg-transparent p-0 overflow-x-auto no-scrollbar">
             {appNavItems.map((item) => {
               if (!item.href) return null; 
               const Icon = item.icon;
