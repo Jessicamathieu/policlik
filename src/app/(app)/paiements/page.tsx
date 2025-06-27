@@ -40,7 +40,7 @@ export default function PaiementsPage() {
 
   const getSortIndicator = (key: keyof Payment) => {
     if (!sortConfig || sortConfig.key !== key) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground/50" />;
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-primary/50" />;
     }
     return sortConfig.direction === 'ascending' ? '▲' : '▼';
   };
@@ -66,7 +66,7 @@ export default function PaiementsPage() {
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-grow sm:flex-grow-0">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-primary" />
                     <Input 
                       placeholder="Rechercher paiement..." 
                       className="pl-8 w-full sm:w-auto bg-background border-input text-foreground placeholder:text-muted-foreground" 
@@ -153,11 +153,11 @@ export default function PaiementsPage() {
                       <DropdownMenuContent align="end"> 
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem>
-                          <Eye className="mr-2 h-4 w-4" /> Voir Détails
+                          <Eye className="mr-2 h-4 w-4 text-primary" /> Voir Détails
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                            <Link href={`/factures/${payment.invoiceId}`} className="flex items-center w-full">
-                            <Receipt className="mr-2 h-4 w-4" /> Voir Facture Associée
+                            <Receipt className="mr-2 h-4 w-4 text-primary" /> Voir Facture Associée
                            </Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>

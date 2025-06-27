@@ -16,7 +16,7 @@ export default function DevisPage() {
         <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 bg-card text-card-foreground">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-headline text-card-foreground">
-              <PlusCircle className="h-6 w-6 text-card-foreground opacity-90" />
+              <PlusCircle className="h-6 w-6 text-primary" />
               Nouvelle Demande de Devis
             </CardTitle>
             <CardDescription className="opacity-75">Permettez à vos clients de soumettre des demandes en ligne ou créez-en une manuellement.</CardDescription>
@@ -31,7 +31,7 @@ export default function DevisPage() {
         <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 bg-card text-card-foreground">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-headline text-card-foreground">
-              <ListChecks className="h-6 w-6 text-card-foreground opacity-90" />
+              <ListChecks className="h-6 w-6 text-primary" />
               Liste des Devis
             </CardTitle>
             <CardDescription className="opacity-75">Consultez tous les devis soumis, suivez leur statut et convertissez-les en rendez-vous.</CardDescription>
@@ -46,7 +46,7 @@ export default function DevisPage() {
         <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 lg:col-span-1 bg-card text-card-foreground">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-headline text-card-foreground">
-              <FileText className="h-6 w-6 text-card-foreground opacity-90" />
+              <FileText className="h-6 w-6 text-primary" />
               Statistiques Devis
             </CardTitle>
             <CardDescription className="opacity-75">Aperçu rapide: X devis en attente, Y acceptés, Z refusés.</CardDescription>

@@ -42,7 +42,7 @@ export function ClientCard({ client, onDelete }: ClientCardProps) {
             </CardTitle>
             {client.email && (
                <Link href={`mailto:${client.email}`} className="text-xs flex items-center gap-1 text-muted-foreground hover:text-primary">
-                 <MailIcon className="h-3 w-3"/> {client.email}
+                 <MailIcon className="h-3 w-3 text-primary"/> {client.email}
                </Link>
             )}
           </div>
@@ -57,17 +57,17 @@ export function ClientCard({ client, onDelete }: ClientCardProps) {
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem asChild>
                 <Link href={`/clients/${client.id}/modifier`} className="flex items-center cursor-pointer">
-                  <Edit className="mr-2 h-4 w-4" /> Modifier
+                  <Edit className="mr-2 h-4 w-4 text-primary" /> Modifier
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                  <Link href={`/agenda?clientId=${client.id}&action=nouveau`} className="flex items-center cursor-pointer">
-                  <CalendarPlus className="mr-2 h-4 w-4" /> Nouveau RDV
+                  <CalendarPlus className="mr-2 h-4 w-4 text-primary" /> Nouveau RDV
                  </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                  <Link href={`/factures/nouveau?clientId=${client.id}`} className="flex items-center cursor-pointer">
-                   <FilePlus className="mr-2 h-4 w-4" /> Nouvelle Facture
+                   <FilePlus className="mr-2 h-4 w-4 text-primary" /> Nouvelle Facture
                  </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -83,13 +83,13 @@ export function ClientCard({ client, onDelete }: ClientCardProps) {
         <CardContent className="p-4 text-sm space-y-2.5 flex-grow">
           {client.phone && (
             <div className="flex items-center">
-              <Phone className="h-4 w-4 mr-2.5 text-muted-foreground" />
+              <Phone className="h-4 w-4 mr-2.5 text-primary" />
               <Link href={`tel:${client.phone}`} className="hover:text-primary">{client.phone}</Link>
             </div>
           )}
           {client.address && (
             <div className="flex items-start">
-              <MapPin className="h-4 w-4 mr-2.5 mt-0.5 text-muted-foreground shrink-0" />
+              <MapPin className="h-4 w-4 mr-2.5 mt-0.5 text-primary shrink-0" />
               <Link 
                 href={`https://maps.google.com/?q=${encodeURIComponent(client.address)}`} 
                 target="_blank" 

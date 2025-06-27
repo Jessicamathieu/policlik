@@ -38,7 +38,7 @@ export default function DepensesPage() {
 
   const getSortIndicator = (key: keyof Expense) => {
     if (!sortConfig || sortConfig.key !== key) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground/50" />;
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-primary/50" />;
     }
     return sortConfig.direction === 'ascending' ? '▲' : '▼';
   };
@@ -69,7 +69,7 @@ export default function DepensesPage() {
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-grow sm:flex-grow-0">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-primary" />
                     <Input placeholder="Rechercher dépense..." className="pl-8 w-full sm:w-auto bg-background text-foreground placeholder:text-muted-foreground border-input" /> 
                 </div>
                  <Select defaultValue="all">
@@ -149,12 +149,12 @@ export default function DepensesPage() {
                       <DropdownMenuContent align="end"> 
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem>
-                          <Edit3 className="mr-2 h-4 w-4" /> Modifier
+                          <Edit3 className="mr-2 h-4 w-4 text-primary" /> Modifier
                         </DropdownMenuItem>
                          <DropdownMenuItem>
                            {expense.receiptUrl ? 
                            <a href={expense.receiptUrl} target="_blank" rel="noopener noreferrer" className="flex items-center w-full">
-                               <Camera className="mr-2 h-4 w-4" /> Voir Reçu
+                               <Camera className="mr-2 h-4 w-4 text-primary" /> Voir Reçu
                            </a> : 
                            <span className="flex items-center w-full opacity-50 cursor-not-allowed">
                                <Camera className="mr-2 h-4 w-4" /> Pas de Reçu

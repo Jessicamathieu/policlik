@@ -80,7 +80,7 @@ export default function CataloguePage() {
   
   const getSortIndicator = (key: keyof CatalogueItem | 'price' | 'code') => {
     if (!sortConfig || sortConfig.key !== key) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground/50" />;
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-primary/50" />;
     }
     return sortConfig.direction === 'ascending' ? '▲' : '▼';
   };
@@ -134,7 +134,7 @@ export default function CataloguePage() {
             <DropdownMenuContent align="end"> 
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem>
-                <Edit3 className="mr-2 h-4 w-4" /> Modifier
+                <Edit3 className="mr-2 h-4 w-4 text-primary" /> Modifier
               </DropdownMenuItem>
               <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive">
                 <Trash2 className="mr-2 h-4 w-4" /> Supprimer
@@ -193,7 +193,7 @@ export default function CataloguePage() {
           <CardTitle className="text-card-foreground">Services & Produits</CardTitle>
           <CardDescription className="opacity-75">Consultez, modifiez ou supprimez des articles de votre catalogue.</CardDescription>
           <div className="relative mt-4">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-primary" />
             <Input 
                 placeholder="Rechercher par nom, code ou catégorie..." 
                 className="pl-8 w-full sm:w-1/2 lg:w-1/3 bg-background text-foreground placeholder:text-muted-foreground border-input" 

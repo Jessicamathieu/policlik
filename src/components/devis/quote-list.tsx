@@ -45,7 +45,7 @@ export function QuoteList() {
   
   const getSortIndicator = (key: keyof Quote) => {
     if (!sortConfig || sortConfig.key !== key) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground/50" />;
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-primary/50" />;
     }
     return sortConfig.direction === 'ascending' ? '▲' : '▼';
   };
@@ -105,17 +105,17 @@ export function QuoteList() {
                 <DropdownMenuContent align="end"> {/* Popover content, should remain light/dark */}
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                   <DropdownMenuItem onClick={() => handleEditQuote(quote.id)}>
-                    <Edit3 className="mr-2 h-4 w-4" /> Modifier
+                    <Edit3 className="mr-2 h-4 w-4 text-primary" /> Modifier
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => alert(`Voir détails pour ${quote.id}`)}>
-                    <FileText className="mr-2 h-4 w-4" /> Voir Détails
+                    <FileText className="mr-2 h-4 w-4 text-primary" /> Voir Détails
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleSendEmail(quote.id)}>
-                    <Mail className="mr-2 h-4 w-4" /> Envoyer par Email
+                    <Mail className="mr-2 h-4 w-4 text-primary" /> Envoyer par Email
                   </DropdownMenuItem>
                   {quote.status === "Accepté" && (
                     <DropdownMenuItem onClick={() => handleConvertToAppointment(quote.id)}>
-                      <CalendarPlus className="mr-2 h-4 w-4" /> Convertir en RDV
+                      <CalendarPlus className="mr-2 h-4 w-4 text-primary" /> Convertir en RDV
                     </DropdownMenuItem>
                   )}
                   {quote.status !== "Accepté" && (

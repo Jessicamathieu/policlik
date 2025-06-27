@@ -67,7 +67,7 @@ export default function FacturesPage() {
 
   const getSortIndicator = (key: keyof Invoice) => {
     if (!sortConfig || sortConfig.key !== key) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground/50" />;
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-primary/50" />;
     }
     return sortConfig.direction === 'ascending' ? '▲' : '▼';
   };
@@ -101,7 +101,7 @@ export default function FacturesPage() {
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-grow sm:flex-grow-0">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-primary" />
                     <Input 
                       placeholder="Rechercher facture..." 
                       className="pl-8 w-full sm:w-auto bg-background border-input text-foreground placeholder:text-muted-foreground" 
@@ -200,22 +200,22 @@ export default function FacturesPage() {
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                            <DropdownMenuItem>
                              <Link href={`/factures/${invoice.id}`} className="flex items-center w-full">
-                              <Printer className="mr-2 h-4 w-4" /> Voir / Imprimer
+                              <Printer className="mr-2 h-4 w-4 text-primary" /> Voir / Imprimer
                              </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                              <Link href={`/factures/nouveau?invoiceId=${invoice.id}`} className="flex items-center w-full">
-                              <FileTextIcon className="mr-2 h-4 w-4" /> Modifier
+                              <FileTextIcon className="mr-2 h-4 w-4 text-primary" /> Modifier
                              </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => alert(`Envoyer la facture ${invoice.id} par email.`)}>
-                              <Mail className="mr-2 h-4 w-4" /> Envoyer par Email
+                              <Mail className="mr-2 h-4 w-4 text-primary" /> Envoyer par Email
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => alert(`Envoyer la facture ${invoice.id} par SMS.`)}>
-                              <MessageSquare className="mr-2 h-4 w-4" /> Envoyer par SMS
+                              <MessageSquare className="mr-2 h-4 w-4 text-primary" /> Envoyer par SMS
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                              <CreditCard className="mr-2 h-4 w-4" /> Enregistrer Paiement
+                              <CreditCard className="mr-2 h-4 w-4 text-primary" /> Enregistrer Paiement
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive">

@@ -92,7 +92,7 @@ export default function DashboardPage() {
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Revenu (Mois en cours)</CardTitle>
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <DollarSign className="h-4 w-4 text-primary" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">CAD${stats.monthlyRevenue.toFixed(2)}</div>
@@ -102,7 +102,7 @@ export default function DashboardPage() {
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Clients</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <Users className="h-4 w-4 text-primary" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">+{stats.clientCount}</div>
@@ -112,7 +112,7 @@ export default function DashboardPage() {
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Factures en Attente</CardTitle>
-                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    <FileText className="h-4 w-4 text-primary" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{stats.pendingInvoices}</div>
@@ -145,7 +145,7 @@ export default function DashboardPage() {
     if (upcomingAppointments.length === 0) {
         return (
             <CardContent className="flex flex-col items-center justify-center text-center text-muted-foreground h-64">
-                <Calendar className="h-12 w-12 mb-4" />
+                <Calendar className="h-12 w-12 mb-4 text-primary" />
                 <p className="font-semibold">Aucun rendez-vous à venir.</p>
                 <p className="text-sm">Planifiez votre prochain service dès maintenant.</p>
                 <Button asChild variant="secondary" className="mt-4">
@@ -195,7 +195,7 @@ export default function DashboardPage() {
             <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <CardTitle className="flex items-center gap-2">
-                        <Calendar className="h-5 w-5" />
+                        <Calendar className="h-5 w-5 text-primary" />
                         Rendez-vous à venir
                     </CardTitle>
                     <CardDescription>
