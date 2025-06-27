@@ -125,7 +125,7 @@ export function AppHeader() {
                   value={item.href}
                   asChild
                   className={cn(
-                    "h-full rounded-none px-4 text-sm transition-all duration-150 ease-in-out",
+                    "h-full rounded-none px-3 lg:px-4 text-sm transition-all duration-150 ease-in-out",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
                     isActive ? "font-medium" : "hover:opacity-100"
                   )}
@@ -139,8 +139,8 @@ export function AppHeader() {
                   }
                 >
                   <Link href={item.href} style={{color: item.contrastColor }}>
-                    {Icon && <Icon className="mr-2 h-4 w-4 shrink-0" />}
-                    {item.title}
+                    {Icon && <Icon className="h-4 w-4 shrink-0 lg:mr-2" />}
+                    <span className="hidden lg:inline">{item.title}</span>
                   </Link>
                 </TabsTrigger>
               );
