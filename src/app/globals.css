@@ -63,7 +63,7 @@
     --destructive-s: 80%;
     --destructive-l: 60%;
     --destructive-foreground-h: 0;
-    --destructive-foreground-s: 0%;
+    --destructive-s: 0%;
     --destructive-foreground-l: 100%;
     --destructive: hsl(var(--destructive-h), var(--destructive-s), var(--destructive-l));
     --destructive-foreground: hsl(var(--destructive-foreground-h), var(--destructive-foreground-s), var(--destructive-foreground-l));
@@ -150,7 +150,7 @@
     --destructive-s: 75%;
     --destructive-l: 60%;
     --destructive-foreground-h: 0;
-    --destructive-foreground-s: 0%;
+    --destructive-s: 0%;
     --destructive-foreground-l: 100%;
 
     /* Secondary for dark theme */
@@ -181,8 +181,54 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
   }
 }
+
+@layer components {
+    .card-dynamic-border {
+        @apply relative bg-card border-[5px] border-transparent rounded-2xl shadow-md;
+        background-clip: padding-box;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-dynamic-border::after {
+        content: '';
+        @apply absolute -top-1.5 -left-1.5 -bottom-1.5 -right-1.5 rounded-2xl -z-10;
+        background: conic-gradient(
+            from 180deg at 50% 50%,
+            transparent 0deg 90deg, /* Left side transparent */
+            #FF9800 90deg 180deg,  /* Bottom side orange */
+            #0ccc34 180deg 270deg, /* Right side green */
+            #3F51B5 270deg 360deg  /* Top side blue */
+        );
+    }
+
+    .card-dynamic-border:hover {
+        @apply -translate-y-1 scale-[1.02];
+        box-shadow: 0 10px 25px -5px hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.25),
+                    0 8px 10px -6px hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.2);
+    }
+    
+    .card-dynamic-border:hover h1,
+    .card-dynamic-border:hover h2,
+    .card-dynamic-border:hover h3,
+    .card-dynamic-border:hover h4,
+    .card-dynamic-border:hover a {
+      color: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
+      transition: color 0.3s ease;
+    }
+    
+    .card-dynamic-border:hover svg {
+      transform: scale(1.15) rotate(3deg);
+      color: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .card-dynamic-border svg {
+       transition: transform 0.3s ease, color 0.3s ease;
+    }
+}
+
 
 /* Custom scrollbar for webkit browsers */
 ::-webkit-scrollbar {
