@@ -215,7 +215,7 @@ export default function DashboardPage() {
                             Nouveau Client
                         </Link>
                     </Button>
-                    <Button asChild>
+                    <Button asChild variant="outline">
                         <Link href="/factures/nouveau?type=facture">
                             <FilePlus className="mr-2 h-4 w-4" />
                             Nouvelle Facture
