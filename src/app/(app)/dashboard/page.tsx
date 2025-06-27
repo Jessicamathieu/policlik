@@ -77,7 +77,7 @@ export default function DashboardPage() {
          <div key={index} className="flex overflow-hidden rounded-xl bg-card shadow-lg">
             <div className="w-2 bg-muted"></div>
             <div className="flex-1 p-6">
-                <Skeleton className="mb-4 h-8 w-32 rounded-full bg-muted" />
+                <div className="mb-4 h-8 w-32 rounded-full bg-muted" />
                 <div className="mt-2 space-y-2">
                     <Skeleton className="h-10 w-3/5 bg-muted" />
                     <Skeleton className="h-4 w-4/5 bg-muted" />
@@ -89,9 +89,9 @@ export default function DashboardPage() {
     return (
         <>
             <div className="flex overflow-hidden rounded-xl shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
-                <div className="w-2 bg-[#3F51B5]"></div>
+                <div className="w-2 bg-[#2743e3]"></div>
                 <div className="flex-1 bg-card p-6">
-                    <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#3F51B5] px-3 py-1 text-sm font-bold text-white">
+                    <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#2743e3] px-3 py-1 text-sm font-bold text-white">
                         <DollarSign className="h-4 w-4" />
                         <span>Revenu</span>
                     </div>
@@ -115,9 +115,9 @@ export default function DashboardPage() {
                 </div>
             </div>
             <div className="flex overflow-hidden rounded-xl shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
-                <div className="w-2 bg-[#FF9800]"></div>
+                <div className="w-2 bg-[#fb9026]"></div>
                 <div className="flex-1 bg-card p-6">
-                    <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#FF9800] px-3 py-1 text-sm font-bold text-white">
+                    <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#fb9026] px-3 py-1 text-sm font-bold text-white">
                         <FileText className="h-4 w-4" />
                         <span>Factures</span>
                     </div>
@@ -199,10 +199,10 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex overflow-hidden rounded-xl shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
-            <div className="w-2 bg-violet-500"></div>
+            <div className="w-2 bg-[#2743e3]"></div>
             <div className="flex-1 bg-card p-6">
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-violet-500 px-3 py-1 text-sm font-bold text-white">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-[#2743e3] px-3 py-1 text-sm font-bold text-white">
                         <Calendar className="h-4 w-4" />
                         <span>Rendez-vous à venir</span>
                     </div>

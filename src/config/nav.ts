@@ -5,10 +5,10 @@ import { LayoutDashboard, CalendarDays, Users, FileText, Briefcase, Settings, Cr
 // Définition des couleurs et de leurs contrastes
 // Exporting pageColors to be used in AppHeader for the gradient and RootLayout for HSL updates
 export const pageColors = [
-  { color: '#3F51B5', contrastColor: '#FFFFFF', name: 'blue' }, // Polimik Dark Blue (Primary Style Guide)
+  { color: '#2743e3', contrastColor: '#FFFFFF', name: 'blue' }, 
   { color: '#0ccc34', contrastColor: '#FFFFFF', name: 'green' }, 
-  { color: '#FF9800', contrastColor: '#FFFFFF', name: 'orange' }, // Polimik Orange (Accent Style Guide)
-  { color: '#F0F2F5', contrastColor: '#FF9800', name: 'light-gray' }, // Polimik Light Gray (Background) -> Text Orange (Accent)
+  { color: '#fb9026', contrastColor: '#FFFFFF', name: 'orange' },
+  { color: '#F0F2F5', contrastColor: '#fb9026', name: 'light-gray' },
 ];
 
 export const appNavItems: NavItem[] = [
