@@ -42,9 +42,11 @@ export default function AppPagesLayout({
   
   return (
     <main
-      className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto relative w-full bg-background text-foreground"
+      className="flex-1 overflow-auto bg-background text-foreground"
     >
-      {children}
+      <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8 overflow-x-hidden">
+        {children}
+      </div>
     </main>
   );
 }

@@ -23,6 +23,15 @@ export default function DashboardPage() {
   const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const handleAIPrompt = () => {
+    const promptText = window.prompt("Qu’est-ce que tu veux créer ? (ex. : Facture, RDV, Client)");
+    if (promptText) {
+      console.log("Demande à l'IA :", promptText);
+      // Future AI call can be placed here
+    }
+  };
+
+
   useEffect(() => {
     const fetchData = async () => {
       if (!user?.uid) return;
@@ -191,54 +200,34 @@ export default function DashboardPage() {
                 <h1 className="text-3xl font-bold tracking-tight font-headline">Tableau de Bord</h1>
                 <p className="text-muted-foreground">Aperçu rapide de votre activité.</p>
             </div>
-            <Button asChild>
-                <Link href="/factures/nouveau?type=facture"><PlusCircle className="mr-2 h-4 w-4" />Créer une Facture</Link>
-            </Button>
+            <div className="mt-2 sm:mt-0">
+              <h3 className="text-lg font-semibold text-foreground mb-2">Actions rapides</h3>
+              <Button
+                onClick={handleAIPrompt}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                <PlusCircle className="mr-2 h-4 w-4" /> Demander à l’IA
+              </Button>
+            </div>
         </div>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    Rendez-vous à venir
+                </CardTitle>
+                <CardDescription>
+                    Vos 5 prochains rendez-vous planifiés.
+                </CardDescription>
+            </CardHeader>
+            {renderUpcomingAppointments()}
+        </Card>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {renderStatCards()}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="lg:col-span-4">
-                <CardHeader>
-                    <CardTitle>Rendez-vous à venir</CardTitle>
-                    <CardDescription>
-                        Vos 5 prochains rendez-vous planifiés.
-                    </CardDescription>
-                </CardHeader>
-                {renderUpcomingAppointments()}
-            </Card>
-
-            <Card className="lg:col-span-3">
-                <CardHeader>
-                    <CardTitle>Actions Rapides</CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Button asChild variant="outline" className="justify-start text-base py-6 h-auto whitespace-normal">
-                        <Link href="/clients/nouveau">
-                            <Users className="mr-2 h-5 w-5"/> Nouveau Client
-                        </Link>
-                    </Button>
-                    <Button asChild variant="outline" className="justify-start text-base py-6 h-auto whitespace-normal">
-                        <Link href="/agenda">
-                           <Calendar className="mr-2 h-5 w-5"/> Planifier un RDV
-                        </Link>
-                    </Button>
-                    <Button asChild variant="outline" className="justify-start text-base py-6 h-auto whitespace-normal">
-                        <Link href="/factures/nouveau?type=devis">
-                           <FileText className="mr-2 h-5 w-5"/> Créer un Devis
-                        </Link>
-                    </Button>
-                     <Button asChild variant="outline" className="justify-start text-base py-6 h-auto whitespace-normal">
-                        <Link href="/depenses">
-                           <DollarSign className="mr-2 h-5 w-5"/> Nouvelle Dépense
-                        </Link>
-                    </Button>
-                </CardContent>
-            </Card>
-        </div>
     </div>
   );
 }
