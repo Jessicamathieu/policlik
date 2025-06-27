@@ -7,8 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowUpRight, Users, Calendar, DollarSign, PlusCircle, FileText } from "lucide-react";
 import Link from "next/link";
-import { getAppointments, getInvoices, type Appointment, type Invoice } from "@/lib/data";
+import { type Appointment } from "@/lib/data";
+import { getAppointmentsForUser } from "@/services/appointment-service";
 import { getClients } from "@/services/client-service";
+import { getInvoices } from "@/services/invoice-service";
+import type { Invoice } from "@/lib/data";
 import { format, isFuture, isToday, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useAuth } from "@/context/auth-context";
@@ -22,18 +25,16 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!user) return; // Ne rien faire si l'utilisateur n'est pas chargé
+      if (!user?.uid) return;
 
       setIsLoading(true);
       try {
-        // Use Promise.all to fetch data in parallel
         const [clients, allAppointments, allInvoices] = await Promise.all([
           getClients(user.uid),
-          getAppointments(),
-          getInvoices()
+          getAppointmentsForUser(user.uid),
+          getInvoices(user.uid)
         ]);
 
-        // Calculate stats
         const clientCount = clients.length;
         
         const todayForStats = new Date();
@@ -51,20 +52,18 @@ export default function DashboardPage() {
 
         setStats({ clientCount, monthlyRevenue, pendingInvoices: pendingInvoicesCount });
 
-        // Filter upcoming appointments
         const upcoming = allAppointments
           .filter(app => {
             const appDate = parseISO(app.date);
             return isToday(appDate) || isFuture(appDate);
           })
           .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime() || a.startTime.localeCompare(b.startTime))
-          .slice(0, 5); // Limit to 5 for the dashboard view
+          .slice(0, 5);
 
         setUpcomingAppointments(upcoming);
 
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
-        // In a real app, you might set an error state and show a toast notification
       } finally {
         setIsLoading(false);
       }
@@ -217,22 +216,22 @@ export default function DashboardPage() {
                     <CardTitle>Actions Rapides</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Button asChild variant="secondary" className="justify-start text-base py-6">
+                    <Button asChild variant="outline" className="justify-start text-base py-6 h-auto whitespace-normal">
                         <Link href="/clients/nouveau">
                             <Users className="mr-2 h-5 w-5"/> Nouveau Client
                         </Link>
                     </Button>
-                    <Button asChild variant="secondary" className="justify-start text-base py-6">
+                    <Button asChild variant="outline" className="justify-start text-base py-6 h-auto whitespace-normal">
                         <Link href="/agenda">
                            <Calendar className="mr-2 h-5 w-5"/> Planifier un RDV
                         </Link>
                     </Button>
-                    <Button asChild variant="secondary" className="justify-start text-base py-6">
+                    <Button asChild variant="outline" className="justify-start text-base py-6 h-auto whitespace-normal">
                         <Link href="/factures/nouveau?type=devis">
                            <FileText className="mr-2 h-5 w-5"/> Créer un Devis
                         </Link>
                     </Button>
-                     <Button asChild variant="secondary" className="justify-start text-base py-6">
+                     <Button asChild variant="outline" className="justify-start text-base py-6 h-auto whitespace-normal">
                         <Link href="/depenses">
                            <DollarSign className="mr-2 h-5 w-5"/> Nouvelle Dépense
                         </Link>

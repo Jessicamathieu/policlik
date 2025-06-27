@@ -20,8 +20,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils";
-import { type Invoice, type InvoiceStatus, getInvoices } from "@/lib/data";
+import { type Invoice, type InvoiceStatus } from "@/lib/data";
+import { getInvoices } from "@/services/invoice-service";
 import { useSortableData } from "@/hooks/use-sortable-data";
+import { useAuth } from "@/context/auth-context";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const statusColors: Record<InvoiceStatus, string> = {
   "Brouillon": "bg-gray-100 text-gray-800 border-gray-300", 
@@ -33,12 +37,33 @@ const statusColors: Record<InvoiceStatus, string> = {
 };
 
 export default function FacturesPage() {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { items: sortedInvoices, requestSort, sortConfig } = useSortableData(invoices, { key: 'dateEmission', direction: 'descending' });
   
   useEffect(() => {
-    setInvoices(getInvoices());
-  }, []);
+    if (!user) return;
+    const fetchInvoices = async () => {
+        setIsLoading(true);
+        try {
+            const fetchedInvoices = await getInvoices(user.uid);
+            setInvoices(fetchedInvoices);
+        } catch (error) {
+            console.error("Failed to fetch invoices:", error);
+            toast({
+                title: "Erreur de chargement",
+                description: "Impossible de charger les factures.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    fetchInvoices();
+  }, [user, toast]);
+
 
   const getSortIndicator = (key: keyof Invoice) => {
     if (!sortConfig || sortConfig.key !== key) {
@@ -134,60 +159,80 @@ export default function FacturesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedInvoices.map((invoice) => (
-                <TableRow key={invoice.id} className="border-b-border">
-                  <TableCell className="font-medium text-card-foreground">
-                    <Link href={`/factures/${invoice.id}`} className="hover:text-primary">
-                      {invoice.id}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-card-foreground">{invoice.clientName}</TableCell>
-                  <TableCell className="hidden sm:table-cell text-card-foreground">{format(parseISO(invoice.dateEmission), "dd MMM yyyy", { locale: fr })}</TableCell>
-                  <TableCell className="hidden md:table-cell text-card-foreground">{format(parseISO(invoice.dateEcheance), "dd MMM yyyy", { locale: fr })}</TableCell>
-                  <TableCell className="text-right text-card-foreground">CAD${invoice.amount.toFixed(2)}</TableCell>
-                  <TableCell className="text-center">
-                    <Badge variant="outline" className={cn("text-xs font-semibold border", statusColors[invoice.status])}>
-                      {invoice.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost" className="text-muted-foreground hover:bg-muted/50">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Actions pour {invoice.id}</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                         <DropdownMenuItem>
-                           <Link href={`/factures/${invoice.id}`} className="flex items-center w-full">
-                            <Printer className="mr-2 h-4 w-4" /> Voir / Imprimer
-                           </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                           <Link href={`/factures/nouveau?invoiceId=${invoice.id}`} className="flex items-center w-full">
-                            <FileTextIcon className="mr-2 h-4 w-4" /> Modifier
-                           </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => alert(`Envoyer la facture ${invoice.id} par email.`)}>
-                            <Mail className="mr-2 h-4 w-4" /> Envoyer par Email
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => alert(`Envoyer la facture ${invoice.id} par SMS.`)}>
-                            <MessageSquare className="mr-2 h-4 w-4" /> Envoyer par SMS
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <CreditCard className="mr-2 h-4 w-4" /> Enregistrer Paiement
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive">
-                            Supprimer
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={index} className="border-b-border">
+                    <TableCell><Skeleton className="h-5 w-20 bg-muted" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-32 bg-muted" /></TableCell>
+                    <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
+                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-5 w-20 ml-auto bg-muted" /></TableCell>
+                    <TableCell className="text-center"><Skeleton className="h-6 w-24 mx-auto bg-muted rounded-md" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto bg-muted rounded-md" /></TableCell>
+                  </TableRow>
+                ))
+              ) : sortedInvoices.length > 0 ? (
+                sortedInvoices.map((invoice) => (
+                  <TableRow key={invoice.id} className="border-b-border">
+                    <TableCell className="font-medium text-card-foreground">
+                      <Link href={`/factures/${invoice.id}`} className="hover:text-primary">
+                        {invoice.id}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-card-foreground">{invoice.clientName}</TableCell>
+                    <TableCell className="hidden sm:table-cell text-card-foreground">{format(parseISO(invoice.dateEmission), "dd MMM yyyy", { locale: fr })}</TableCell>
+                    <TableCell className="hidden md:table-cell text-card-foreground">{format(parseISO(invoice.dateEcheance), "dd MMM yyyy", { locale: fr })}</TableCell>
+                    <TableCell className="text-right text-card-foreground">CAD${invoice.amount.toFixed(2)}</TableCell>
+                    <TableCell className="text-center">
+                      <Badge variant="outline" className={cn("text-xs font-semibold border", statusColors[invoice.status])}>
+                        {invoice.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button aria-haspopup="true" size="icon" variant="ghost" className="text-muted-foreground hover:bg-muted/50">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Actions pour {invoice.id}</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                           <DropdownMenuItem>
+                             <Link href={`/factures/${invoice.id}`} className="flex items-center w-full">
+                              <Printer className="mr-2 h-4 w-4" /> Voir / Imprimer
+                             </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                             <Link href={`/factures/nouveau?invoiceId=${invoice.id}`} className="flex items-center w-full">
+                              <FileTextIcon className="mr-2 h-4 w-4" /> Modifier
+                             </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => alert(`Envoyer la facture ${invoice.id} par email.`)}>
+                              <Mail className="mr-2 h-4 w-4" /> Envoyer par Email
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => alert(`Envoyer la facture ${invoice.id} par SMS.`)}>
+                              <MessageSquare className="mr-2 h-4 w-4" /> Envoyer par SMS
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                              <CreditCard className="mr-2 h-4 w-4" /> Enregistrer Paiement
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive">
+                              Supprimer
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                        Aucune facture trouvée.
+                    </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>
