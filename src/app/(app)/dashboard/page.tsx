@@ -74,48 +74,57 @@ export default function DashboardPage() {
   const renderStatCards = () => {
     if (isLoading) {
       return Array.from({ length: 3 }).map((_, index) => (
-         <div key={index} className="relative rounded-2xl border-4 border-muted bg-card p-6 shadow-lg animate-pulse">
-            <div className="absolute -top-4 left-4 flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-                <Skeleton className="h-5 w-5 rounded-full bg-muted-foreground/20" />
-                <Skeleton className="h-5 w-20 bg-muted-foreground/20" />
-            </div>
-            <div className="pt-8 space-y-2">
-                <Skeleton className="h-8 w-1/2 bg-muted-foreground/20" />
-                <Skeleton className="h-4 w-full bg-muted-foreground/20" />
+         <div key={index} className="flex overflow-hidden rounded-xl bg-card shadow-lg">
+            <div className="w-2 bg-muted"></div>
+            <div className="flex-1 p-6">
+                <Skeleton className="mb-4 h-8 w-32 rounded-full bg-muted" />
+                <div className="mt-2 space-y-2">
+                    <Skeleton className="h-10 w-3/5 bg-muted" />
+                    <Skeleton className="h-4 w-4/5 bg-muted" />
+                </div>
             </div>
         </div>
       ));
     }
     return (
         <>
-            <div className="relative rounded-2xl border-4 border-[#3F51B5] bg-card p-6 shadow-lg transition-transform duration-200 hover:-translate-y-1.5 hover:shadow-2xl">
-                <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full bg-[#3F51B5] px-3 py-1.5 text-sm font-bold text-white">
-                    <DollarSign className="h-4 w-4" />
-                    <span>Revenu</span>
-                </div>
-                <div className="p-6 pt-8">
-                    <div className="text-3xl font-bold text-card-foreground">CAD${stats.monthlyRevenue.toFixed(2)}</div>
-                    <p className="text-xs text-muted-foreground mt-1">Basé sur les factures payées du mois</p>
-                </div>
-            </div>
-            <div className="relative rounded-2xl border-4 border-[#0ccc34] bg-card p-6 shadow-lg transition-transform duration-200 hover:-translate-y-1.5 hover:shadow-2xl">
-                <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full bg-[#0ccc34] px-3 py-1.5 text-sm font-bold text-white">
-                    <Users className="h-4 w-4" />
-                    <span>Clients</span>
-                </div>
-                <div className="p-6 pt-8">
-                    <div className="text-3xl font-bold text-card-foreground">+{stats.clientCount}</div>
-                    <p className="text-xs text-muted-foreground mt-1">Nombre total de clients</p>
+            <div className="flex overflow-hidden rounded-xl shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+                <div className="w-2 bg-[#3F51B5]"></div>
+                <div className="flex-1 bg-card p-6">
+                    <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#3F51B5] px-3 py-1 text-sm font-bold text-white">
+                        <DollarSign className="h-4 w-4" />
+                        <span>Revenu</span>
+                    </div>
+                    <div className="mt-2">
+                        <div className="text-4xl font-bold text-card-foreground">CAD${stats.monthlyRevenue.toFixed(2)}</div>
+                        <p className="text-sm text-muted-foreground mt-1">Basé sur les factures payées du mois</p>
+                    </div>
                 </div>
             </div>
-            <div className="relative rounded-2xl border-4 border-[#FF9800] bg-card p-6 shadow-lg transition-transform duration-200 hover:-translate-y-1.5 hover:shadow-2xl">
-                <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full bg-[#FF9800] px-3 py-1.5 text-sm font-bold text-white">
-                    <FileText className="h-4 w-4" />
-                    <span>Factures</span>
+            <div className="flex overflow-hidden rounded-xl shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+                <div className="w-2 bg-[#0ccc34]"></div>
+                <div className="flex-1 bg-card p-6">
+                    <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#0ccc34] px-3 py-1 text-sm font-bold text-white">
+                        <Users className="h-4 w-4" />
+                        <span>Clients</span>
+                    </div>
+                    <div className="mt-2">
+                        <div className="text-4xl font-bold text-card-foreground">+{stats.clientCount}</div>
+                        <p className="text-sm text-muted-foreground mt-1">Nombre total de clients</p>
+                    </div>
                 </div>
-                <div className="p-6 pt-8">
-                    <div className="text-3xl font-bold text-card-foreground">{stats.pendingInvoices} en attente</div>
-                    <p className="text-xs text-muted-foreground mt-1">Factures non payées</p>
+            </div>
+            <div className="flex overflow-hidden rounded-xl shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+                <div className="w-2 bg-[#FF9800]"></div>
+                <div className="flex-1 bg-card p-6">
+                    <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#FF9800] px-3 py-1 text-sm font-bold text-white">
+                        <FileText className="h-4 w-4" />
+                        <span>Factures</span>
+                    </div>
+                    <div className="mt-2">
+                        <div className="text-4xl font-bold text-card-foreground">{stats.pendingInvoices} en attente</div>
+                        <p className="text-sm text-muted-foreground mt-1">Factures non payées</p>
+                    </div>
                 </div>
             </div>
         </>
@@ -142,7 +151,7 @@ export default function DashboardPage() {
     if (upcomingAppointments.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-64">
-                <Calendar className="h-12 w-12 mb-4 text-primary" />
+                <Calendar className="h-12 w-12 text-primary" />
                 <p className="font-semibold">Aucun rendez-vous à venir.</p>
                 <p className="text-sm">Planifiez votre prochain service dès maintenant.</p>
                 <Button asChild variant="secondary" className="mt-4">
@@ -189,35 +198,39 @@ export default function DashboardPage() {
             <div className="mt-2 h-1 w-24 bg-primary rounded-full" />
         </div>
 
-        <div className="relative rounded-2xl border-4 border-violet-500 bg-card p-6 shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl">
-            <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full bg-violet-500 px-3 py-1.5 text-sm font-bold text-white">
-                <Calendar className="h-4 w-4" />
-                <span>Rendez-vous à venir</span>
-            </div>
-            
-            <div className="absolute -top-4 right-4 flex flex-wrap items-center gap-2">
-                 <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
-                    <Link href="/agenda" className="flex items-center">
-                        <CalendarPlus className="mr-2 h-4 w-4" />
-                        Nouveau RDV
-                    </Link>
-                </Button>
-                <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
-                    <Link href="/clients" className="flex items-center">
-                        <UserPlus className="mr-2 h-4 w-4" />
-                        Nouveau Client
-                    </Link>
-                </Button>
-                <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
-                    <Link href="/factures/nouveau?type=facture">
-                        <FilePlus className="mr-2 h-4 w-4" />
-                        Nouvelle Facture
-                    </Link>
-                </Button>
-            </div>
-            
-            <div className="pt-8">
-                 {renderUpcomingAppointments()}
+        <div className="flex overflow-hidden rounded-xl shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+            <div className="w-2 bg-violet-500"></div>
+            <div className="flex-1 bg-card p-6">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-violet-500 px-3 py-1 text-sm font-bold text-white">
+                        <Calendar className="h-4 w-4" />
+                        <span>Rendez-vous à venir</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
+                            <Link href="/agenda" className="flex items-center">
+                                <CalendarPlus className="mr-2 h-4 w-4 text-primary" />
+                                Nouveau RDV
+                            </Link>
+                        </Button>
+                        <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
+                            <Link href="/clients" className="flex items-center">
+                                <UserPlus className="mr-2 h-4 w-4 text-primary" />
+                                Nouveau Client
+                            </Link>
+                        </Button>
+                        <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
+                            <Link href="/factures/nouveau?type=facture">
+                                <FilePlus className="mr-2 h-4 w-4 text-primary" />
+                                Nouvelle Facture
+                            </Link>
+                        </Button>
+                    </div>
+                </div>
+                
+                <div className="mt-4">
+                    {renderUpcomingAppointments()}
+                </div>
             </div>
         </div>
         
