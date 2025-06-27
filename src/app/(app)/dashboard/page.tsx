@@ -75,50 +75,50 @@ export default function DashboardPage() {
   const renderStatCards = () => {
     if (isLoading) {
       return Array.from({ length: 3 }).map((_, index) => (
-         <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <Skeleton className="h-5 w-2/3 bg-muted" />
-              <Skeleton className="h-6 w-6 bg-muted rounded-full" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-8 w-1/2 bg-muted" />
-              <Skeleton className="h-4 w-full mt-1 bg-muted" />
-            </CardContent>
-        </Card>
+         <div key={index} className="relative rounded-2xl border-4 border-muted bg-card p-6 shadow-lg animate-pulse">
+            <div className="absolute -top-4 left-4 flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
+                <Skeleton className="h-5 w-5 rounded-full bg-muted-foreground/20" />
+                <Skeleton className="h-5 w-20 bg-muted-foreground/20" />
+            </div>
+            <div className="pt-8 space-y-2">
+                <Skeleton className="h-8 w-1/2 bg-muted-foreground/20" />
+                <Skeleton className="h-4 w-full bg-muted-foreground/20" />
+            </div>
+        </div>
       ));
     }
     return (
         <>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Revenu (Mois en cours)</CardTitle>
-                    <DollarSign className="h-4 w-4 text-primary" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">CAD${stats.monthlyRevenue.toFixed(2)}</div>
-                    <p className="text-xs text-muted-foreground">Basé sur les factures payées</p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Clients</CardTitle>
-                    <Users className="h-4 w-4 text-primary" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">+{stats.clientCount}</div>
-                    <p className="text-xs text-muted-foreground">Nombre total de clients</p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Factures en Attente</CardTitle>
-                    <FileText className="h-4 w-4 text-primary" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{stats.pendingInvoices}</div>
-                    <p className="text-xs text-muted-foreground">Factures non réglées ou en retard</p>
-                </CardContent>
-            </Card>
+            <div className="relative rounded-2xl border-4 border-[#3F51B5] bg-card p-6 shadow-lg transition-transform duration-200 hover:-translate-y-1.5 hover:shadow-2xl">
+                <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full bg-[#3F51B5] px-3 py-1.5 text-sm font-bold text-white">
+                    <DollarSign className="h-4 w-4" />
+                    <span>Revenu</span>
+                </div>
+                <div className="p-6 pt-8">
+                    <div className="text-3xl font-bold text-card-foreground">CAD${stats.monthlyRevenue.toFixed(2)}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Basé sur les factures payées du mois</p>
+                </div>
+            </div>
+            <div className="relative rounded-2xl border-4 border-[#0ccc34] bg-card p-6 shadow-lg transition-transform duration-200 hover:-translate-y-1.5 hover:shadow-2xl">
+                <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full bg-[#0ccc34] px-3 py-1.5 text-sm font-bold text-white">
+                    <Users className="h-4 w-4" />
+                    <span>Clients</span>
+                </div>
+                <div className="p-6 pt-8">
+                    <div className="text-3xl font-bold text-card-foreground">+{stats.clientCount}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Nombre total de clients</p>
+                </div>
+            </div>
+            <div className="relative rounded-2xl border-4 border-[#FF9800] bg-card p-6 shadow-lg transition-transform duration-200 hover:-translate-y-1.5 hover:shadow-2xl">
+                <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full bg-[#FF9800] px-3 py-1.5 text-sm font-bold text-white">
+                    <FileText className="h-4 w-4" />
+                    <span>Factures</span>
+                </div>
+                <div className="p-6 pt-8">
+                    <div className="text-3xl font-bold text-card-foreground">{stats.pendingInvoices} en attente</div>
+                    <p className="text-xs text-muted-foreground mt-1">Factures non payées</p>
+                </div>
+            </div>
         </>
     );
   };
@@ -190,6 +190,10 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold tracking-tight font-headline">Tableau de Bord</h1>
             <p className="text-muted-foreground">Aperçu rapide de votre activité.</p>
         </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {renderStatCards()}
+        </div>
         
         <Card>
             <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -225,10 +229,6 @@ export default function DashboardPage() {
             </CardHeader>
             {renderUpcomingAppointments()}
         </Card>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {renderStatCards()}
-        </div>
 
     </div>
   );
