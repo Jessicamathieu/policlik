@@ -187,7 +187,7 @@
 
 @layer components {
     .card-dynamic-border {
-        @apply relative bg-card rounded-2xl shadow-lg border-t-4;
+        @apply relative bg-card rounded-2xl shadow-lg border-t-4 border-r-4;
         border-image: linear-gradient(to right, 
             hsl(var(--primary-h), var(--primary-s), var(--primary-l)), 
             hsl(var(--chart-3)), 
@@ -196,50 +196,28 @@
     }
 
     .card-dynamic-border:hover {
-        @apply -translate-y-2 scale-[1.03] shadow-2xl text-primary-foreground;
+        background-color: #ffff00; /* Bright yellow */
+        @apply -translate-y-2 scale-[1.03] shadow-2xl text-gray-800;
     }
     
-    /* On hover, force all text inside the card to be the primary-foreground color for readability */
+    /* On hover, force all text inside the card to be the dark color for readability */
     .card-dynamic-border:hover *:not(svg) {
-      @apply text-primary-foreground;
+      @apply text-gray-800;
       transition: color 0.3s ease;
     }
 
     .card-dynamic-border:hover .text-muted-foreground {
-        @apply text-primary-foreground/80;
+        @apply text-gray-800/80;
     }
     
     .card-dynamic-border:hover svg {
       transform: scale(1.15) rotate(5deg);
-      @apply text-primary-foreground;
+      @apply text-gray-800;
       transition: transform 0.3s ease, color 0.3s ease;
     }
 
     .card-dynamic-border svg {
        transition: transform 0.3s ease, color 0.3s ease;
-    }
-
-    /* Apply different background colors on hover using nth-child selectors */
-    /* This targets cards that are direct children of a grid or flex container */
-    .grid > .card-dynamic-border:nth-child(4n+1):hover,
-    .flex > .card-dynamic-border:nth-child(4n+1):hover,
-    div > .card-dynamic-border:nth-child(4n+1):hover {
-      background-color: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
-    }
-    .grid > .card-dynamic-border:nth-child(4n+2):hover,
-    .flex > .card-dynamic-border:nth-child(4n+2):hover,
-    div > .card-dynamic-border:nth-child(4n+2):hover {
-      background-color: hsl(var(--chart-3));
-    }
-    .grid > .card-dynamic-border:nth-child(4n+3):hover,
-    .flex > .card-dynamic-border:nth-child(4n+3):hover,
-    div > .card-dynamic-border:nth-child(4n+3):hover {
-      background-color: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
-    }
-    .grid > .card-dynamic-border:nth-child(4n+4):hover,
-    .flex > .card-dynamic-border:nth-child(4n+4):hover,
-    div > .card-dynamic-border:nth-child(4n+4):hover {
-       background-color: hsl(var(--chart-4));
     }
 }
 
