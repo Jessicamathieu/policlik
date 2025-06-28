@@ -80,11 +80,22 @@ export default function RootLayout({
 
   const isAuthPage = pathname.startsWith('/login');
 
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+      });
+    }
+  }, []);
+
   return (
     <html lang="fr" className={ptSans.variable} suppressHydrationWarning>
       <head>
         <title>PolicliK</title>
         <meta name="description" content="Application de gestion pour PolicliK." />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#2743e3" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body className={`font-body antialiased bg-background text-foreground`}>
         <AuthProvider>
