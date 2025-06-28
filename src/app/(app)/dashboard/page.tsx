@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,6 +13,7 @@ import type { Invoice } from "@/lib/data";
 import { format, isFuture, isToday, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useAuth } from "@/context/auth-context";
+import { TaskCard } from "@/components/dashboard/task-card";
 
 // Main component
 export default function DashboardPage() {
@@ -189,54 +189,88 @@ export default function DashboardPage() {
     );
   }
 
+  // Ajout d'un filtre pour les tâches du jour
+  const today = new Date();
+  const todayTasks = upcomingAppointments.filter(app => {
+    const appDate = parseISO(app.date);
+    return isToday(appDate);
+  });
+  const weekTasks = upcomingAppointments.filter(app => {
+    const appDate = parseISO(app.date);
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    const endOfWeek = new Date(today);
+    endOfWeek.setDate(today.getDate() + (6 - today.getDay()));
+    return appDate >= startOfWeek && appDate <= endOfWeek;
+  });
+
   // Final component structure
   return (
     <div className="flex flex-col gap-8">
-        <div>
-            <h1 className="text-3xl font-bold tracking-tight font-headline">Tableau de Bord</h1>
-            <p className="text-muted-foreground">Aperçu rapide de votre activité.</p>
-            <div className="mt-2 h-1 w-24 bg-primary rounded-full" />
+      {/* Section Tâches du jour/semaine */}
+      <div>
+        <h2 className="text-2xl font-bold text-primary mb-2">Tâches du jour</h2>
+        <div className="space-y-4">
+          {todayTasks.length === 0 ? (
+            <div className="text-muted-foreground">Aucune tâche aujourd'hui.</div>
+          ) : (
+            todayTasks.map(app => <TaskCard key={app.id} appointment={app} />)
+          )}
         </div>
+        <h2 className="text-xl font-bold text-primary mt-8 mb-2">Tâches de la semaine</h2>
+        <div className="space-y-4">
+          {weekTasks.length === 0 ? (
+            <div className="text-muted-foreground">Aucune tâche cette semaine.</div>
+          ) : (
+            weekTasks.map(app => <TaskCard key={app.id} appointment={app} />)
+          )}
+        </div>
+      </div>
+      <div>
+          <h1 className="text-3xl font-bold tracking-tight font-headline">Tableau de Bord</h1>
+          <p className="text-muted-foreground">Aperçu rapide de votre activité.</p>
+          <div className="mt-2 h-1 w-24 bg-primary rounded-full" />
+      </div>
 
-        <div className="flex overflow-hidden rounded-xl shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
-            <div className="w-2 bg-[#2743e3]"></div>
-            <div className="flex-1 bg-card p-6">
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-[#2743e3] px-3 py-1 text-sm font-bold text-white">
-                        <Calendar className="h-4 w-4" />
-                        <span>Rendez-vous à venir</span>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                        <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
-                            <Link href="/agenda" className="flex items-center">
-                                <CalendarPlus className="mr-2 h-4 w-4 text-primary" />
-                                Nouveau RDV
-                            </Link>
-                        </Button>
-                        <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
-                            <Link href="/clients" className="flex items-center">
-                                <UserPlus className="mr-2 h-4 w-4 text-primary" />
-                                Nouveau Client
-                            </Link>
-                        </Button>
-                        <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
-                            <Link href="/factures/nouveau?type=facture">
-                                <FilePlus className="mr-2 h-4 w-4 text-primary" />
-                                Nouvelle Facture
-                            </Link>
-                        </Button>
-                    </div>
-                </div>
-                
-                <div className="mt-4">
-                    {renderUpcomingAppointments()}
-                </div>
-            </div>
-        </div>
-        
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {renderStatCards()}
-        </div>
+      <div className="flex overflow-hidden rounded-xl shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+          <div className="w-2 bg-[#2743e3]"></div>
+          <div className="flex-1 bg-card p-6">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-[#2743e3] px-3 py-1 text-sm font-bold text-white">
+                      <Calendar className="h-4 w-4" />
+                      <span>Rendez-vous à venir</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                      <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
+                          <Link href="/agenda" className="flex items-center">
+                              <CalendarPlus className="mr-2 h-4 w-4 text-primary" />
+                              Nouveau RDV
+                          </Link>
+                      </Button>
+                      <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
+                          <Link href="/clients" className="flex items-center">
+                              <UserPlus className="mr-2 h-4 w-4 text-primary" />
+                              Nouveau Client
+                          </Link>
+                      </Button>
+                      <Button asChild variant="outline" className="bg-card hover:bg-muted text-foreground">
+                          <Link href="/factures/nouveau?type=facture">
+                              <FilePlus className="mr-2 h-4 w-4 text-primary" />
+                              Nouvelle Facture
+                          </Link>
+                      </Button>
+                  </div>
+              </div>
+              
+              <div className="mt-4">
+                  {renderUpcomingAppointments()}
+              </div>
+          </div>
+      </div>
+      
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {renderStatCards()}
+      </div>
     </div>
   );
 }
