@@ -1,30 +1,40 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { getFirestore, type Firestore } from "firebase/firestore";
+import { getAuth, type Auth } from "firebase/auth";
 
-// La configuration est maintenant chargée à partir des variables d'environnement.
-// Assurez-vous que votre fichier .env contient les bonnes valeurs.
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-};
+// Liste des variables d'environnement requises
+const requiredEnv = [
+  "NEXT_PUBLIC_FIREBASE_API_KEY",
+  "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
+  "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
+  "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
+  "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
+  "NEXT_PUBLIC_FIREBASE_APP_ID",
+  "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID"
+];
 
-// Une vérification pour s'assurer que le développeur a fourni les informations d'identification nécessaires.
-if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-  // Remplacé l'erreur bloquante par un avertissement pour permettre le démarrage du serveur même sans config.
-  // L'application ne fonctionnera pas correctement sans ces clés.
-  console.warn("ATTENTION : La configuration de Firebase est manquante ou incomplète. Veuillez vérifier votre fichier .env et vous assurer que NEXT_PUBLIC_FIREBASE_API_KEY et NEXT_PUBLIC_FIREBASE_PROJECT_ID sont définis.");
+// Vérification stricte de la présence de chaque variable
+const missing = requiredEnv.filter((key) => !process.env[key]);
+if (missing.length > 0) {
+  throw new Error(
+    `Firebase config error: Les variables suivantes sont manquantes dans .env.local : ${missing.join(", ")}`
+  );
 }
 
-// Initialise Firebase
-// La vérification getApps().length empêche la ré-initialisation lors du rechargement à chaud en développement.
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID!
+};
 
-export { app, db, auth };
+// Initialisation unique de Firebase
+const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
+// Exports propres
+export const db: Firestore = getFirestore(app);
+export const auth: Auth = getAuth(app);
+export { app };
